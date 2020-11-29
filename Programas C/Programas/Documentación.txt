@@ -1,0 +1,54 @@
+En este archivo voy a ir anotando qué hacen las distintas instancias del main que
+voy a ir guardando.
+----------------------------------------------------------------------------------
+
+21/03/2020
+
+Este programa lo que hace es arma una red de NxN individuos, con F parámetros y 
+Q opiniones. Luego de hacerla evolucionar una gran cantidad de iteraciones,
+registra los datos en un txt. Lo importante en esta sería el hecho de que está
+armado el cómo hacer un txt. No está implementado para nada el cómo hacer para 
+muchos Q o F, o el cómo asignar números. Pongámosle un nombre a eso. Llamémoslo
+etiquetar vectores.
+---------------------------------------------------------------------------------
+
+23/03/2020
+
+Voy a guardar acá una copia del archivo que tiene la suma de las etiquetas. Armar
+ese archivo tomó 20 minutos, no querría por accidente sobreescribirlo como un boludo.
+El archivo es de una red de 48 individuos, con F=4 y Q=5. Es una larga tira donde
+cada número es la suma de las etiquetas en esa iteración de la red.
+---------------------------------------------------------------------------------
+
+28/03/2020
+
+Guardé una copia del main que tenía hasta ahora antes de modificarlo para poder
+estudiar el tiempo de Termalización en función del tamaño de la red. Al archivo que
+guardé lo llamé Termalización. Lo que hace es armar una red de 48*48, con F=4 y Q=5
+a la cual inicializa y luego realiza N2*N2*F iteraciones, y en cada una calcula el
+valor de la Suma total de las etiquetas de cada individuo. Luego printea todo eso en
+una sóla fila en un txt, para poder ver el tiempo de termalización de la red.
+  No te olvides que N2 es el largo de la red N + 2.
+----------------------------------------------------------------------------------
+
+29/03/2020
+
+Guardé el archivo Termalización varios N. Lo que hace es armar archivos que se llaman
+"Termalizacion_Red_N=$.txt" que tienen una única fila con la suma de las etiquetas
+con cada estado tomado cada N2 iteraciones. Está armado para que haga desde N = 4 
+hasta 512.
+-----------------------------------------------------------------------------------
+
+13/04/2020
+
+Agregué a la carpeta tres archivos. Primero el Ejecutar.sh, el cual uso para poder
+ejecutar archivos de código Bash. Este archivo lo ejecuto usando ./Ejecutar.sh $$
+en la línea de comando. En donde va el signo de dinero pongo el nombre del archivo
+.sh que estoy queriendo ejecutar. El segundo programa que agregué es el Instanciar.sh
+el cual sirve para correr varias veces un programa .c. El objetivo de esto es
+solucionar el problema de que cuando corro problemas largos el programa hasta el final
+no me dice el tiempo que tarda cada iteración. Entonces de esta manera cada iteración
+se realiza por separado, y entonces me cuenta cuanto tarda cada iteración.
+  Por último, agregué el programa de Termalización para cada N pero esta vez que pueda
+tomar el largo de la red como un input de la línea de comando, para que el programa
+Instanciar.sh lo pueda correr y le pase el tamaño de la red correcto.
