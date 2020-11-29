@@ -1,0 +1,106 @@
+Código para generar .e a partir de los .c. Importante para el Prosem.c
+
+"gcc -Wall -O3 -o miprog.e miprog.c -lm"
+
+Para correr el programa el código es: "./miprog.e"
+
+---------------------------------------------------------------------------------------
+
+19/11/2020
+
+Hoy voy a intentar revisar entre todos mis archivos viejos para organizarme todo lo que voy
+a necesitar para empezar a trabajar. Tengo que revisar los .c, los .h, ver cómo funciona
+el make file, cómo funciona el Ejecutar.sh, el Instanciar.sh.
+
+
+---------------------------------------------------------------------------------------
+
+25/11/2020
+
+Voy a empezar a programar algunas boludeces, así ya voy de a poco recuperando el tacto con
+esto. Después debería armarme un diagrama del orden de cosas para programar, así como la
+jerarquía en que voy a plantear las funciones. Quizás convenga redefinir los nombres de
+los archivos tipo avanzar, general y esos.
+
+-----------------------------------------------------------------------------------------
+
+26/11/2020
+
+Luego de batallar con arrancar, ya estamos empezando. Me armé un diagrama de trabajo y una
+lista de las cosas que tengo que poner en el programa. El diagrama lo tengo en una hoja
+escrito a mano. Podría pasarlo a un power Point, ya veré si vale la pena.
+Modifiqué el struct base, el llamado Red, para que tenga los elementos básicos que va a
+necesitar el modelo. Tiene número de agentes, de tópicos, matriz de superposición, matriz de
+adyacencia, vectores de opinión y una serie de parámetros más.
+La próxima arrancamos con los elementos en inicializar. La función de Visualizar queda.
+Creo que voy a borrar CCP y la otra la voy a modificar para que me arme la red. Arranquemos
+con una inicialización fija, después planteamos que el sistema vaya variando los valores
+de la matriz de superposición.
+
+-----------------------------------------------------------------------------------------
+
+27/11/2020
+
+Bien, ya modifiqué el archivo de inicializar. Saqué el CCP que colocaba condiciones de
+contorno cerradas. Esas no las voy a necesitar, porque al final mi sistema es una red
+finita con N nodos, no hay condiciones de contorno que cumplir. Luego, el GenerarR lo adapte
+para que me inicialice los vectores de opiniones. Lo probé, parece funcionar perfecto. Por
+lo menos asigna números con fracción a todas las coordenadas correctamente. Pareciera
+respetar el intervalo de valores. Le cambié el nombre al GenerarR y lo llamé GenerarOpi.
+
+También modifiqué el programa de Visualizar, para que al final reciba un número que indique
+qué vector es el que planeo mirar. Las opciones son "Vectores de Opiniones", "Matriz de
+Superposición" y "Matriz de Adyacencia".
+
+Además separé el struct original de Red en dos structs. El struct Red que contiene la matriz
+de Superposición, la matriz de Adyacencia y la lista de vectores de opinión. El segundo
+struct es Parametros, que contiene todos los parámetros del modelo.
+
+Lo siguiente es armar dos funciones que me inicialicen la matriz de Superposición y la de
+Adyacencia. De paso, se me acaba de ocurrir. Debería probar el numerar vectores con la 
+notación usual de fila y columna "[i,j]", trabajándolos como matrices, en vez de trabajarlos
+como vectores de una sola fila y muchas columnas, donde hago cosas como "[i*N+j]" para
+designar los casilleros del vector.
+Cuestión, cuando tenga todas las funciones de inicialización las voy a empaquetar en una
+sola función, para que quede todo más prolijo. O quizás vea de encerrarlo en una pestaña.
+
+Corte a las 9:40, me pareció que no valía matarse ahora. La dificultad ahora es cómo
+escribir una matriz simétrica, considerando que yo las tengo armadas como una tira y no
+como una matriz. Estoy seguro que alguna vuelta sencilla tiene que haber. Una propuesta que
+tengo para los elementos diagonales y no tener que meter muchos if es armar todos los
+elementos con algún criterio, (Armar una matriz random en cada instanciación no suena como
+una buena idea.) y DESPUÉS reemplazar todos los elementos de la diagonal por 1.
+
+-----------------------------------------------------------------------------------------
+
+28/11/2020
+
+Armé las funciones que estuve mencionando antes. Ya tengo GenerarOpi que me arma la lista
+de vectores de Opinión de todos los agentes. También está GenerarAng, que me crea la mitad
+de la matriz de Superposición. La otra mitad la voy a construir una vez que tenga armada
+una función que me simetrice matrices. Esa función la voy a meter dentro del conjunto de
+funciones generales, podría servir en un futuro. La situación es la misma con GenerarAdy. Me
+genera la mitad de la matriz de Adyacencia, la otra la voy a construir por simetría.
+
+Estuve probando el Visualizar. Algo raro le está pasando, pero empecemos aclarando que me
+visualiza perfecto las matrices de Adyacencia  y Superposición. Pero por alguna razón viene
+tirando un error con la matriz de Opiniones. Creo que el error es puramente en la 
+visualización, que no tiene nada que ver con lo que realmente hay en la matriz. Me percaté
+de esto para empezar porque observaba que los elementos de la última fila de esta matriz
+cuando formaba el sistema con seis agentes eran todos cero. Algo estadísticamente improbable.
+Cuestión, que dependiendo de la cantidad de filas los elementos de las últimas filas se ven
+peor o mejor. Noté que si cambiaba a muchas filas y columnas, de repente todo se emparejaba.
+También descarté que el problema sea el casteo o el armado del Vector. El casteo no es porque
+pasé el vector a Double, que es la salida del Random, y sigue funcionando mal. El armado del
+vector no es porque probé ponerle enteros, y sigue dando el error de que al visualizarlo me
+muestra algo que no tiene sentido, como ceros en las últimas filas o números absurdamente
+largos e inexplicables. Y estos números largos eran siempre los mismos, no cambiaban en un solo
+número. Algo raro pasa ahi y todavía no descubrí qué es lo que está pasando. Para comprobar que
+el vector está bien rellenado podrías armar una sumatoria con sus números y ver que den algo
+correcto.
+
+Ahora voy a armar una carpeta en Github para cargar todo esto. Yo diría que mañana vayas
+haciendo pruebas con lo de sumatorias para verificar que el vector se llena de manera correcta.
+Luego, empezá a revisar la visualización para ver qué clase de error puede estar teniendo. Al
+final del día igual no es vital, pero bueno. Visualizar las redes puede facilitar el encontrar
+errores.
