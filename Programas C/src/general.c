@@ -41,4 +41,3 @@ int delta_x(double *x1, double *x2, double L, double *Dx){
 	return 0;
 }
 
-
