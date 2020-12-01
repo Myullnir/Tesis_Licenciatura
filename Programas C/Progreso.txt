@@ -104,3 +104,32 @@ haciendo pruebas con lo de sumatorias para verificar que el vector se llena de m
 Luego, empezá a revisar la visualización para ver qué clase de error puede estar teniendo. Al
 final del día igual no es vital, pero bueno. Visualizar las redes puede facilitar el encontrar
 errores.
+
+-------------------------------------------------------------------------------------------
+
+30/11/2020
+
+Encontré el error. Al final el problema efectivamente estaba en la visualización. La culpa era
+mía, obviamente. Yo le calculé mal el movimiento a lo largo de las filas. En pocas palabras, el
+sujeto estaba yendo a mirar en posiciones de memoria que no le pertenecían al vector. Eso hizo
+que visualizara cosas raras. Porque eran espacios de memoria que estaban ocupados por cosas
+raras. De paso, le agregué a la visualización que se muestren sólo dos decimales después de
+la coma. Para que sea más sencillo de ver.
+
+Lo pensé mejor, voy a escribir el código de simetrización dentro de las mismas funciones de 
+Generar*. Queda para el futuro armar funciones que tomen punteros, me midan el tamaño de los
+punteros y desde ahí me simetricen la matriz. Igual, el proceso de simetrización es una línea.
+Genial, ya se me simetrizan ambas matrices.
+
+Bueno, armé dos funciones en los archivos de avanzar. Pero todavía no puedo decir que funcionen
+bien. Probé hacer las cuentas. En el caso de un nodo sin conexión a nada, dan bárbaro las
+cuentas. En el caso de que se conecte con alguien, ya no da tan bien. Todavía no descubro
+porqué.
+
+También me ocurrió algo inentendible para mi. En el struct me surgió un error incomprensible.
+Agregué el diferencial de tiempo al struct, y lo puse junto a los otros float, por una cuestión
+de orden, para agrupar los mismos tipos de datos. Cuestión que por alguna razón que no
+comprendo, la posición de este elemento en el struct jodía todo el programa. Pero al cambiarlo
+de lugar y llevarlo al fondo del struct, todo se organizaba y funcionaba bárbaro. Cosa que no
+tiene sentido, porque el struct llama a sus elementos por nombre, no por posición. El orden
+no debería importar. No sé porqué, pero alto error raro.
