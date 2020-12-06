@@ -133,3 +133,79 @@ comprendo, la posición de este elemento en el struct jodía todo el programa. Per
 de lugar y llevarlo al fondo del struct, todo se organizaba y funcionaba bárbaro. Cosa que no
 tiene sentido, porque el struct llama a sus elementos por nombre, no por posición. El orden
 no debería importar. No sé porqué, pero alto error raro.
+
+-------------------------------------------------------------------------------------------
+
+05/12/2020
+
+Por lo que leí en internet, no hay una forma en C de poder leer el tamaño del array al cual 
+apunta el puntero. Pero lo que podemos hacer es un truco, y esto implica un cambio en la
+forma de programar de ahora para SIEMPRE. Lo que vamos a hacer es que de ahora en más, al 
+principio de cada vector los primeros dos números van a estar reservados para el tamaño
+de la matriz. (Si es un vector, igual lo consideraré como matriz). De esta manera, siempre
+podré tener acceso al tamaño de un array. Esto va a ser un cambio que voy a implementar mañana.
+
+Ahora me voy a poner a jugar con los structs y cosas en Prosem.c. Quiero ver si puedo armar
+funciones a las que les llegan punteros y de esa manera en vez de tener que pasar todo el struct,
+le paso sólo el puntero correcto. ¿Porqué querrías volver a trabajar sólo con punteros, en vez de
+usar el struct que es mejor? El tema es que los nombres de los elementos de los structs va
+variando con cada trabajo, entonces una función como la de simetrizar matrices no puede trabajar
+con recibir el struct, porque lo que yo voy a querer es que funcione para cada matriz que 
+le paso independiente del nombre, pero al usar el struct tengo que especificar el nombre
+del objeto, y eso me obligaría a crear una matriz de Simetrización para cada nuevo trabajo.
+
+Veamos si podemos hacer algo con esto. Ok, probando en Prosem, cambiar el orden de los atributos
+del struct Parametros no parece crear problemas. Lo cual es lo razonable, porque no los llamé
+por ningún orden, los llamé por nombre. El motivo del error en la función main original 
+sigue sin ser descubierto, mucho menos solucionado.
+
+Ahora probemos a partir de una matriz inicial el pasarle a una función de visualización básica
+el que me visualice mi matriz a partir de un puntero. Armé una visualización tranca haciendo
+uso de esa idea de poner el tamaño de la matriz al principio. Está bueno el truco este.
+Alguien mencionó también dejar un número para identificar el tipo de dato. Esa para el
+futuro queda. No quiero sumar números al pedo, para no volverme loco en la definición
+de valores y cosas.
+
+Armé la función de visualización. Efectivamente, si defino el input como un puntero, y le
+paso el puntero del struct entonces lo trabaja perfectamente. En este caso le pasé el
+puntero red.Ady, es decir el que apunta a la matriz de Adyacencia de mi sistema, y me
+lo graficó correctamente.
+
+------------------------------------------------------------------------------------------
+
+06/12/2020
+
+Hoy lo que voy a hacer es un reformateo a todo incorporando nuevas prácticas de programación.
+Estas consisten en:
+
+.) Agregar una letra al nombre de una variable que defina el tipo de variable que es.
+Esto lo separo del nombre de la función con un guión bajo. Los espacios en los
+nombres los voy a separar con guiones bajos también. Es importante recordar
+entonces que las primeras letras SIEMPRE indican el tipo de variable.
+
+.) Voy a dejar espacios libres entre secciones de código, separando la parte de
+inicializar, desarrollo, registro de datos y demás. También vamos a poner títulos.
+
+.) En las primeras dos coordenadas de cada vector voy a colocar el tamaño del vector.
+Siendo la primer coordenada las Filas y la segunda las Columnas.
+
+Si sobra tiempo, armaré una función que haga un RK4. Aunque primero necesito una que
+calcule correctamente el campo que define mi ecuación diferencial. Y estas funciones
+necesitan ser probadas primero en Prosem para poder hacer las cuentas a mano y ver
+que efectivamente hacen lo esperado.
+
+##### Ya reformatee general.c y general.h ##########
+
+##### Ya reformatee inicializar.c e inicializar.h ##########
+
+Llegué al punto donde la función hace lo que ya hacía antes de empezar a formattear todo.
+Mañana seguiré con esto. La idea es entonces primero armar la función de la ecuación
+dinámica. Probarla que calcule correctamente. Hecho esto, pasamos a armar un RK4.
+Es decir, mañana arrancamos laburando con el Prosem. Hecho esto, ya vamos a poder
+poner el programa a evolucionar. Lo que va a quedar es registrar los datos y pasarlos
+a Python.
+
+Vamos a terminar el día de hoy subiendo todo lo correspondiente a Github. Vale
+aclarar, los archivos avanzar los dejé afuera de la carpeta src, porque sino
+al compilar el make all me los intenta levantar, y a esos todavía no los corregí.
+Más que nada porque las funciones de la dinámica no están terminadas.
