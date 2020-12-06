@@ -5,9 +5,9 @@
 #include <math.h>
 
 int GenerarOpi(struct Red var, struct Parametros par);
-int GenerarAng(struct Red var, struct Parametros par);
+int GenerarAng(struct Red var);
 int GenerarAdy(struct Red var, struct Parametros par);
-int Visualizar(struct Red var, struct Parametros par, int Crit);
+int Visualizar(struct Red var, int i_Crit);
 
 #endif
 
