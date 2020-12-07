@@ -21,35 +21,35 @@ int main(int argc, char *argv[]){
 		struct Red red;
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = 5; // Cantidad de agentes en el modelo
-		datos.i_T = 4;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
+		datos.i_N = 2; // Cantidad de agentes en el modelo
+		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
-		datos.f_Pint = 0.5; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
+		datos.f_Pint = 1; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
 		datos.f_K = 1; // Influencia social. Arranquemos con un valor intermedio.
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
 		datos.f_alfa = 0.5; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
-		red.d_Ang = (double*) malloc((2+datos.i_T*datos.i_T)*sizeof(double)); // Matriz simétrica de superposición entre tópicos.
-		red.i_Ady = (int*) malloc((2+datos.i_N*datos.i_N)*sizeof(int)); // Matriz de adyacencia de la red. Determina quienes están conectados con quienes
-		red.d_Opi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Lista de vectores de opinión de la red, Tengo T elementos para cada agente.
+		red.pd_Ang = (double*) malloc((2+datos.i_T*datos.i_T)*sizeof(double)); // Matriz simétrica de superposición entre tópicos.
+		red.pi_Ady = (int*) malloc((2+datos.i_N*datos.i_N)*sizeof(int)); // Matriz de adyacencia de la red. Determina quienes están conectados con quienes
+		red.pd_Opi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Lista de vectores de opinión de la red, Tengo T elementos para cada agente.
 		
 		// Inicializo mis tres vectores.
 		// Matriz de Adyacencia. Es de tamaño N*N
-		for(int i_i=0; i_i<datos.i_N*datos.i_N+2; i_i++) red.i_Ady[i_i] = 0;
-		red.i_Ady[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
-		red.i_Ady[1] = datos.i_N; // Pongo el número de columnas en la segunda coordenada
+		for(int i_i=0; i_i<datos.i_N*datos.i_N+2; i_i++) red.pi_Ady[i_i] = 0;
+		red.pi_Ady[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
+		red.pi_Ady[1] = datos.i_N; // Pongo el número de columnas en la segunda coordenada
 		
 		// Matriz de vectores de opinión. Es de tamaño N*T
-		for(int i_i=0; i_i<datos.i_N*datos.i_T+2; i_i++) red.d_Opi[i_i] = 0;
-		red.d_Opi[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
-		red.d_Opi[1] = datos.i_T; // Pongo el número de columnas en la segunda coordenada
+		for(int i_i=0; i_i<datos.i_N*datos.i_T+2; i_i++) red.pd_Opi[i_i] = 0;
+		red.pd_Opi[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
+		red.pd_Opi[1] = datos.i_T; // Pongo el número de columnas en la segunda coordenada
 		
 		//Matriz de Superposición de Tópicos. Es de tamaño T*T
-		for(int i_i=0; i_i<datos.i_T*datos.i_T+2; i_i++) red.d_Ang[i_i] = 0;
-		red.d_Ang[0] = datos.i_T; // Pongo el número de filas en la primer coordenada
-		red.d_Ang[1] = datos.i_T; // Pongo el número de Columnas en la segunda coordenada
+		for(int i_i=0; i_i<datos.i_T*datos.i_T+2; i_i++) red.pd_Ang[i_i] = 0;
+		red.pd_Ang[0] = datos.i_T; // Pongo el número de filas en la primer coordenada
+		red.pd_Ang[1] = datos.i_T; // Pongo el número de Columnas en la segunda coordenada
 		
 	
 	// Genero las redes de mi sistema

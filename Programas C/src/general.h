@@ -14,9 +14,9 @@ int delta_x(double *d_x1, double *d_x2, double d_L, double *d_Dx);
 // Acá vienen los structs.
 // El struct Red tiene los datos que definen mi red, y la info de la red
 struct Red{
-	double *d_Ang; // Matriz de superposición entre tópicos. Tiene tamaño T*T
-	int *i_Ady; // Matriz de adyacencia que define mis conexiones. Tiene tamaño N*N
-	double *d_Opi; // Vector de opinión de cada individuo
+	double *pd_Ang; // Matriz de superposición entre tópicos. Tiene tamaño T*T
+	int *pi_Ady; // Matriz de adyacencia que define mis conexiones. Tiene tamaño N*N
+	double *pd_Opi; // Vector de opinión de cada individuo
 };
 
 struct Parametros{
