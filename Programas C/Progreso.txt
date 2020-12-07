@@ -209,3 +209,18 @@ Vamos a terminar el día de hoy subiendo todo lo correspondiente a Github. Vale
 aclarar, los archivos avanzar los dejé afuera de la carpeta src, porque sino
 al compilar el make all me los intenta levantar, y a esos todavía no los corregí.
 Más que nada porque las funciones de la dinámica no están terminadas.
+
+-----------------------------------------------------------------------------------------
+
+07/12/2020
+
+Corregí los nombres una vez más, porque ahora a los punteros les agregué la letra p.
+
+Además, ya armé la función Din1 y la probé en el archivo Prosem. Ya lo testee y funciona,
+tanto en el caso en que el sujeto no conecta con nadie como en el caso en que conecta con
+alguien, la cuenta que hace es correcta. Estaría bueno conseguir un programa que me permita
+hacer las cuentas con mayor facilidad, porque la verdad es una paja hacerlo en Geogebra.
+Creo que voy a hacer las cuentas en Octave de ahora en más. Va a ser mejor, me puede hacer
+los productos de matrices y eso va a ser mucho más rápido.
+
+Voy a subir todo a Github ahora.
