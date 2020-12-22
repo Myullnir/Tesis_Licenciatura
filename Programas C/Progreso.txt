@@ -224,3 +224,232 @@ Creo que voy a hacer las cuentas en Octave de ahora en más. Va a ser mejor, me p
 los productos de matrices y eso va a ser mucho más rápido.
 
 Voy a subir todo a Github ahora.
+
+------------------------------------------------------------------------------------------
+
+08/12/2020
+
+Ya armé las funciones Din1 y Din2. Confío en que funcionan perfecto porque revisé las
+cuentas yo mismo usando Octave. También, como para dejar constancia del test realizado
+es que guardé una imagen que se llama Cáculos Din2. Es una imagen que tiene los
+resultados obtenidos por el programa en C y las cuentas hechas con el Octave, donde
+se puede ver que las pendientes calculadas en Octave coinciden totalmente con las 
+calculadas en C. Para mayor claridad paso a describir qué son las matrices definidas
+en Octave:
+
+- Opi es la matriz de vectores de opinión transpuesto. El motivo de hacerlo transpuesto
+es porque de esta manera el producto con la matriz Ang me daría en cada elemento la
+suma de las opiniones de un agente en cada tópico ponderada por la superposición con
+el tópico en cuestión. El hecho de usar la matriz de forma diferente a como lo hago en
+C no implica ningún error de cuentas. No hay que olvidar que en C yo no tengo Matrices,
+solamente tengo vectores muy largos. Por tanto el producto entre matrices y vectores
+siempre lo termino armando yo. Y eso ya lo había revisado de que estaba bien.
+
+- Ang es la matriz de superposición de tópicos. Por simplicidad, tiene unos en la
+diagonal y 0.5 afuera.
+
+- Sup es el producto de las matrices Ang y Opi. Como dije, contiene en cada elemento
+la sumatoria de las opiniones de un cierto agente ponderadas según la superposición
+de cada opinión con el tópico en consideración.
+
+- Pendiente es el nómbre del resultado total del miembro de la derecha de la
+ecuación diferencial.
+
+- K es el parámetro homónimo de la ecuación diferencial. Representa la influencia social.
+
+- alfa es el parámetro homónimo de la ecuación diferencial. Representa la
+controversialidad de un tópico.
+
+Ahora el chiste va a ser implementar el RK4. Estuve pensando en que el RK4 debería
+tomar aparte de los structs, el puntero sobre el cual va a trabajar, el puntero
+a la función que define el campo de mi problema, (En este caso sería Din2),
+y algo interesante sería que tuviera un puntero propio dentro de la función.
+Ese puntero debería guardar información sobre el estado inicial del puntero 
+con el que voy a trabajar. Esa información va a ser necesaria durante el trabajo
+RK4, pero terminada la función, se lo puede liberar y listo.
+
+----------------------------------------------------------------------------------------
+
+14/12/2020
+
+Vamos a armar una función que realice el proceso de RK4. Mi idea es escribir una
+función que sea bastante general. Para eso voy a tomar como referencia una versión
+que encontré por internet. Todavía no tengo bien claras las ideas de cómo voy a
+hacer funcionar la versión del RK4. Mi idea es que tome los structs y le pase
+eso a la función. Por eso es que voy a estar dentro del RK4 trabajando la Matriz
+de Opinión, definiéndola y redefiniéndola muchas veces.
+Estaba con la duda de cómo guardar o manejar los datos correctamente, pero al
+final llegué a la conclusión de que lo mejor sería tener vectores, definidos
+por punteros como siempre, que me guarden los valores de las pendientes que
+calculo para cada una de mis variables. Luego al final, luego de haber calculado
+cada una de las pendientes, entonces sí uso todas las pendientes para calcular
+el siguiente paso temporal del sistema.
+Lo interesante para esto es que me di cuenta que iba a tener que hacer cada
+cálculo de pendientes en orden, entonces tenía que escribir las 4 sumatorias.
+Pero para simplificar la escritura de todas las sumatorias, se me ocurrió
+usar un array de punteros. Por eso decidí probar el cómo usarlo en Prosem.
+Ahí lo hice funcionar para que me genere la visualización de mi red.
+Funciona bárbaro. Tengo que recordar no borrar eso. Voy a tener que
+armar un protocolo de guardado de estas cosas. Mañana o en la semana,
+lo próximo a hacer es ya implementar esto. Con esto ya básicamente tendría
+armada la función del RK4. La paja va a ser comprobar que las cuentas están
+bien hechas. Voy a estar un rato con el Octave mirando eso de seguro.
+
+------------------------------------------------------------------------------------------
+
+18/12/2020
+
+Hoy avancé con la construcción de la función RK4. Hay varias cosas para 
+discutir al respecto. Pero en términos de lo que quiero que haga, ya la
+armé. Todavía no la probé ni revisé errores de tipeo, así que todavía
+queda mucho hasta que esté lista. Además, todadvía estoy indeciso sobre
+el formato de la función. Debería analizarlo un poco más, como para estar
+seguro de que la función es perfectamente generalizable. Cosa que sería
+de mucha utilidad.
+
+Por otra parte, rearmé la función de visualizar, de manera de que sólo
+tome un puntero de entrada y de eso haga la visualización. Para eso,
+hice tres funciones, una que toma enteros, otra que toma floats y una
+que toma doubles. Mi idea sería armar una función visualizar Global
+que las encierre, que reciba un char que elija la función correcta 
+y de ahí visualice. Aunque ahora que lo pienso, eso seguiría
+teniendo el mismo problema de que no puedo pasar el vector que 
+quiero a la función. ¿Habrá una forma de solucionar esto en el
+futuro?
+
+Cree una segunda función que es Duplicar, esa función me calcula
+las pendientes de una ecuación diferencial que definí para probar
+el RK4. La ecuación diferencial sería x' = 2x.
+
+Volviendo al RK4, estoy empezando a usar más los arrays. También
+introduje un array de chars, que eso también es nuevo para mi.
+Hay muchas cosas, como los arrays, el meter un for para el free,
+o el visualizar que podrían funcionar mal. Va a ver que mirar
+todo eso la próxima vez. La próxima entonces hay que hacer
+las cuentas y ver que el RK4 esté calculando bien.
+Y después, repensar un poco la forma de que sea lo más general
+posible. Quizás hacer unos gráficos escritos.
+
+Pregunta importante, ¿Cómo guardar las distintas versiones de
+cosas probadas en el Prosem? Podríamos hacer un archivo
+llamado Archivo.c. Ahí voy guardando las cosas con descripción.
+Así no me van ocupando espacio innecesario en mi archivo Prosem.
+Me parece una idea genial.
+
+------------------------------------------------------------------------------------------
+
+21/12/2020
+
+Estuve haciendo las pruebas del RK4 para hacerlo funcionar.
+Increíblemente, pero en cuanto puse la función funco bastante
+fácil, no tuvo tantos errores como esperaba.
+
+Cuestión, hice las pruebas con ecuaciones diferenciales lineales
+en las cuales la variación de mi variable estaba sujeta a
+un múltiplo de su valor actual. Es decir, usé las ecuaciones
+x'=2x y x'=5x. En la primera anoté los k manualmente y
+comprobé que los cálculos estuvieran dando bien los k y
+el valor final del sistema. Además, como conozco la solución
+a estas ecuaciones puedo comprobar que tan lejos está lo
+calculado con respecto a lo real. Elegí los valores de
+dt y la constante que definen mi ecuación diferencial
+de manera que evolucionar temporalmente un paso a mi sistema
+sea equivalente a tomar los datos iniciales y multiplicarlos
+por e en ambas ecuaciones.
+
+Guardé una imagen que se llama cálculos RK4 en la cual se
+puede ver a la derecha los resultados obtenidos por el 
+programa RK4. Luego a la izquierda uso el Octave para
+manualmente hacer los cálculos que el programa RK4 debería
+estar haciendo. En este caso estoy evaluando el sistema
+en el cual la ecuación diferencial es x'=5x. A continuación
+está el paso a paso de las cuentas que hice:
+
+.) Calculo k1 como los valores del sistema en tiempo t
+multiplicados por 5.
+.) Calculo k2 como los valores del sistema en tiempo t
+sumados a k1 por dt/2 y todo eso multiplicado por 5
+.) Calculo k3 como los valores del sistema en tiempo t
+sumados a k2 por dt/2 y todo eso multiplicado por 5
+.) Calculo k4 como los valores del sistema en tiempo t
+sumados a k3 por dt y todo eso multiplicado por 5
+.) Calculo el final como los valores del sistema en
+tiempo t más el producto de dt sobre 6 con 
+k1 más dos k2 más dos k3 más k4.
+.) Corroboro el resultado de tomar los valores del
+sistema a tiempo t y multiplicarlos por e.
+
+Finalmente cabe notar que hay una diferencia en la 
+segunda cifra decimal, lo cual marcaría que debería tomar
+un avance temporal más chico del que tomé. Pero en conclusión,
+el programa funciona perfecto. Me encanta. Sólo queda
+pensar si se la puede hacer un poco más genérica y listo.
+
+Ahora voy a incorporar esto al programa principal. Todavía no
+terminé esto. Mañana lo primero que tengo que hacer es corregir
+los struct que aparecen en todo el código y reemplazarlos
+por los s_cosas. Con el tiempo se me ocurrirán formas de
+hacer que eso funcione más fácil
+
+----------------------------------------------------------------------------------
+
+22/12/2020
+
+Ya implementé el RK4 en el programa, funca bárbaro. Hice
+las anotaciones sobre el bloque que creo es crucial para
+la generalización de esta función en futuros trabajos.
+
+Hice pruebas, el programa funciona muy bien, no tira
+errores ni nada. Por ahora lo único que probé a variar
+son los valores de K y los de la matriz de Superposición.
+Los resultados son los siguientes:
+
+.) Si los valores de la matriz de Superposición son todos
+positivos, entonces todos los signos de los tópicos se
+alinean.
+.) Si los signos de los valores de la matriz de Superposición
+se alternan, entonces lo que me ocurre es que los signos
+de las columnas se alternan igualmente.
+.) Si reduzco el valor de K a cero, el sistema tiende a cero.
+.) Si aumento el valor de K el sistema al evolucionar
+simplemente tiende a crecer.
+.) Con un valor de Tiempo de integración = 20, el sistema
+con K=0 logra llegar a un estado donde todos los agentes
+tienen opinión nula en todos los tópicos.
+
+Ahora lo que voy a hacer es cortar acá, mostrarle esto
+a Pablo mañana y de ahí decidir qué vamos a hacer.
+Si yo estuviera por mi cuenta y tuviera que decidir,
+¿Cuál sería mi siguiente paso?
+
+Razonablemente, yo diría que por ahora lo que tengo
+entonces son sólo dos fotos, la inicial y la final
+y que este fue un análisis muy cualitativo. Para
+poder empezar a hacer un análisis más cuantitativo
+voy a necesitar ver lo que ocurre durante el proceso.
+
+Por tanto los siguientes objetivos serían:
+1) Implementar una forma de tomar registro de
+los datos para poder guardar mis vectores de
+opinión.
+2) Armar un programa para cargar estos datos a
+Python.
+3) Hacer un análisis de los datos. Para esto hay
+que pensar de qué forma deberían graficarse los datos.
+Se me ocurre que el caso de K=0 se pueden graficar
+curvas de variación del valor promedio de la opinión
+en cada tópico y ver cómo eso cae a cero.
+4) Podría graficar el caso de K != 0 considerando la
+direccionalidad de los vectores. Sería una forma
+cualitativa pero un poco mejor que lo que tengo
+ahora de visualizar la evolución del sistema. Me armo
+una especie de Histograma donde voy contando cuántas
+personas apuntan en cierta dirección, y las
+direcciones las defino en base al signo del tópico.
+Eso me ayudaría a ver cómo se van moviendo las personas
+de una opinión a otra y si la condición inicial del
+sistema afecta mucho al resultado final.
+5) Otra opción viable es armar un scatter de puntos
+de colores, donde cada color representa una opinión
+y luego ir acercando los colores cuyas opiniones son
+más similares.
