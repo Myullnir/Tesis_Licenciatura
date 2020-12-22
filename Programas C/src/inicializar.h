@@ -4,10 +4,9 @@
 #define Inicializar_H
 #include <math.h>
 
-int GenerarOpi(struct Red var, struct Parametros par);
-int GenerarAng(struct Red var);
-int GenerarAdy(struct Red var, struct Parametros par);
-int Visualizar(struct Red var, int i_Crit);
+int GenerarOpi(s_Red var, s_Param par);
+int GenerarAng(s_Red var);
+int GenerarAdy(s_Red var, s_Param par);
 
 #endif
 
