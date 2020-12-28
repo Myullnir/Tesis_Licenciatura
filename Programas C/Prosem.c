@@ -37,7 +37,8 @@ int GenerarAng(s_Red var);
 int GenerarAdy(s_Red var,s_Param par);
 double Din1(s_Red var, s_Param par, int i_j);
 double Din2(s_Red var, s_Param par);
-double Duplicar(s_Red var, s_Param par);
+int Escribir_d(double *pd_vec, FILE *pa_archivo);
+int Escribir_i(int *pi_vec, FILE *pa_archivo);
 int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par));
 
 
@@ -72,13 +73,13 @@ int main(){
 	datos.f_Pint = 0.5;
 	datos.f_K = 0.5;
 	datos.f_alfa = 2;
-	datos.i_N = 3;
-	datos.i_T = 3;
+	datos.i_N = 50;
+	datos.i_T = 2;
 	datos.i_Mopi = 3;
 	datos.f_dt = 0.2;
 	
 	// Defino el puntero a mi función y lo inicializo
-	double (*pf_Dup)(s_Red Red, s_Param Parametros) = &Duplicar;	
+	double (*pf_Dup)(s_Red Red, s_Param Parametros) = &Din2;	
 	
 	// Asigno memoria a mis matrices y las inicializo
 	
@@ -103,11 +104,38 @@ int main(){
 	red.pi_Ady[1] = datos.i_N; // Guardo el número de columnas en la segunda coordenada del vector
 	GenerarAdy(red,datos); // Genero la red de Adyacencia propiamente dicha.
 	
-	// Aplico el RK4
-	RK4(red.pd_Opi, red, datos, pf_Dup);
+	// Defino las variables para mi archivo.txt que guarda los datos del sistema
+	char filename[255]; // Siempre lo hago lo más grande posible. Si sobra no es problema.
+	sprintf(filename,"Datos_Evolucion_Opinion_N=%d_T=%d",datos.i_N,datos.i_T); // Uso esto para asignarle el nombre a mi archivo.
+	FILE *pa_txt=fopen(filename,"w"); //Esto me crea un archivo con nombre filename y permiso de escritura. Es a partir del puntero pa_txt que accedo al archivo.
+	
+	// Copio en el archivo mi matriz de Adyacencia
+	Escribir_i(red.pi_Ady, pa_txt);
+	// for(register int i_i=0; i_i<datos.i_N*datos.i_N; i_i++) fprintf(pa_txt,"\t%d",red.pi_Ady[i_i+2]);
+	// fprintf(pa_txt,"\n");
+	
+	// Copio en el archivo mi matriz de Superposicion
+	Escribir_d(red.pd_Ang, pa_txt);
+	// for(register int i_i=0; i_i<datos.i_T*datos.i_T; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Ang[i_i+2]);
+	// fprintf(pa_txt,"\n");
+	
+	// Copio en el archivo mis vectores de opinion
+	Escribir_d(red.pd_Opi, pa_txt);
+	// for(register int i_i=0; i_i<datos.i_N*datos.i_T; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Opi[i_i+2]);
+	// fprintf(pa_txt,"\n");
+	
+	
+	// Evoluciono mi sistema y luego voy guardando los datos.
+	for(register int i_p=0; i_p<20; i_p++){
+		RK4(red.pd_Opi, red, datos, pf_Dup);
+		Escribir_d(red.pd_Opi, pa_txt);
+		// for(register int i_i=0; i_i<datos.i_N*datos.i_N; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Opi[i_i+2]);
+		// fprintf(pa_txt,"\n");
+	}
 	
 	
 	// Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	fclose(pa_txt); // Con esto cierro mi archivo
 	free(red.pi_Ady);
 	free(red.pd_Ang);
 	free(red.pd_Opi);
@@ -341,7 +369,6 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 	}
 	
 	// Con TODAS las pendientes calculadas, ahora sí avanzo temporalmente mi sistema
-	
 	for(register int i_i=0; i_i<i_filas*i_columnas; i_i++){
 	*(pd_vec+i_i+2) = *(pd_inicial+i_i+2)+(par.f_dt/6)*(*(pd_pendientes[1]+i_i+2)+*(pd_pendientes[2]+i_i+2)*2+*(pd_pendientes[3]+i_i+2)*2+*(pd_pendientes[4]+i_i+2));
 	}
@@ -349,20 +376,20 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 	// Ahora hagamos algún mecanismo de visualización, para ver que todo esté correctamente calculado. Dios que esto va a ser un bardo.
 	// Primero visualicemos las pendientes. Para eso voy a armar unos strings que poner en el printeo
 	
-	char c_npendientes[] = "k1234"; //
+	// char c_npendientes[] = "k1234"; //
 	
-	for(register int i_i=0; i_i<4; i_i++){
-		printf("\n Estas son las pendientes %c%c \n",c_npendientes[0],c_npendientes[i_i+1]);
-		Visualizar_d(pd_pendientes[i_i+1]);
-	}
+	// for(register int i_i=0; i_i<4; i_i++){
+		// printf("\n Estas son las pendientes %c%c \n",c_npendientes[0],c_npendientes[i_i+1]);
+		// Visualizar_d(pd_pendientes[i_i+1]);
+	// }
 	
 	// También tengo que visualizar mi vector trabajado.
 	
-	printf("Este es mi vector antes de evolucionarlo \n");
-	Visualizar_d(pd_inicial);
+	// printf("Este es mi vector antes de evolucionarlo \n");
+	// Visualizar_d(pd_inicial);
 	
-	printf("Este es mi vector luego de evolucionarlo \n");
-	Visualizar_d(pd_vec);
+	// printf("Este es mi vector luego de evolucionarlo \n");
+	// Visualizar_d(pd_vec);
 	
 
 	// Libero el espacio de memoria asignado a los punteros de las pendientes y al pd_inicial
@@ -372,15 +399,31 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 	return 0;
 }
 
-// Esta es una función 
-double Duplicar(s_Red var, s_Param par){
-	// Defino mi variable a usar
-	double doble;
-	int i_Columnas = var.pd_Opi[1];
+// Esta función va a recibir un vector double y va a escribir ese vector en mi archivo.
+int Escribir_d(double *pd_vec, FILE *pa_archivo){
+	// Defino las variables del tamaño de mi vector
+	int i_C,i_F;
+	i_F = *pd_vec;
+	i_C = *(pd_vec+1);
 	
-	// Esta ecuación diferencial me define las pendientes como el doble del valor actual.
-	doble = 5*var.pd_Opi[var.i_agente*i_Columnas+var.i_topico+2];
-		
-	return doble;
+	// Ahora printeo todo el vector en mi archivo
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%lf",*(pd_vec+i_i+2));
+	fprintf(pa_archivo,"\n");
+	
+	return 0;
+}
+
+// Esta función va a recibir un vector int y va a escribir ese vector en mi archivo.
+int Escribir_i(int *pi_vec, FILE *pa_archivo){
+	// Defino las variables del tamaño de mi vector
+	int i_C,i_F;
+	i_F = *pi_vec;
+	i_C = *(pi_vec+1);
+	
+	// Ahora printeo todo el vector en mi archivo
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%d",*(pi_vec+i_i+2));
+	fprintf(pa_archivo,"\n");
+	
+	return 0;
 }
 

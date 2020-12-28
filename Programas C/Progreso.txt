@@ -453,3 +453,85 @@ sistema afecta mucho al resultado final.
 de colores, donde cada color representa una opinión
 y luego ir acercando los colores cuyas opiniones son
 más similares.
+
+-------------------------------------------------------------------------------------
+
+23/12/2020
+
+Hoy tuvimos la reunión con Pablo. Le mostré los resultados
+obtenidos. Me aconsejó lo siguiente:
+
+1) Guardar todos los gráficos que vaya realizando en un
+powerpoint. De esta manera vamos mejorando la forma de
+presentar datos, así como también mi hablidad de
+explicarlos y cosas.
+2) Arrancar únicamente con 2 tópicos, así podemos
+concentrarnos en replicar los resultados del paper de
+Baumann.
+3) Que en cada iteración el sistema recorrar a los N agentes
+de manera ordenada, pero elija una pareja de manera aleatoria
+(Esto va a resultar más complicado de lo que parece)
+
+Por si acaso, antes de meterme con esto, resolver primero
+el tema de registrar los datos y levantarlos con Python.
+
+------------------------------------------------------------------
+
+27/12/2020
+
+En la carpeta de Aprendiendo C ayer armé un programa de Bash
+para compilar archivos y correrlos. Eso lo importé acá,
+se llama Compilar.sh. La idea es que para correrlo yo
+uso en la línea de comando "./Compilar.sh Nombre_archivo".
+El Nombre_archivo va sin .e, eso el programa de Compilar
+lo agrega solo. Luego, el programa compila y te da la 
+opción de elegir correr o no el .e. La idea es primero
+revisar los errores. Si no salta ningún error, apretás
+enter y se corre el programa. Si hay errores que corregir,
+apretás una letra y después enter y no se corre el programa.
+
+Hoy voy a encargarme de organizar el tema de que haya registros
+de los datos. Lo que voy a hacer es armar archivos que guarden
+la siguiente info:
+
+.) Primera línea es la matriz de adyacencia.
+.) Segunda línea es la matriz de Superposición
+.) Tercera línea y en adelante es la matriz de Opiniones en cada
+paso temporal.
+
+Si tengo tiempo, me pondré a hacer lo que me propone Pablo sobre
+variar la forma en que se elijen personas para realizar las
+interacciones.
+
+Se me está ocurriendo armar una función que reciba el puntero
+al archivo y una matriz, y que copie toda la matriz. Como para
+hacerlo más prolijo, por más que son sólo dos líneas.
+
+Ok, ya logré usar los comandos para armar un archivo en donde
+guardar los datos. Lo raro de esto es que por alguna razón no puedo
+ponerle la extensión txt al archivo. No comprendo porqué. Igual eso
+es lo de menos. Puedo fácilmente usar línea de comando o armar un
+programa de Bash que se encargue de eso.
+
+También me armé dos programas, uno para vectores doubles y otro
+para vectores ints que me printea los datos. Teniendo esto, y
+siendo que lo que me propuso Pablo es algo más trabajoso de hacer,
+podría ponerme a trabajar en hacer un archivo de Bash que mueva 
+mis archivos de mi carpeta actual a la de Programas Python.
+Esto no está resultando tan fácil. Tampoco es tan importante,
+lo dejaré para otro momento.
+
+Más tarde, subiré las cosas a Github y armaré un registro de lo
+que hice hoy. ¿Qué voy a hacer mañana?
+
+.) Tengo que armar una carpeta en Drive y compartírsela a Pablo
+y Sebastián.
+.) Ahora que tengo un programa que guarda registro de mis datos,
+voy a incorporar esto al main,
+.) Cuando tenga al programa armando mis datos, voy a armar un
+código de Bash que me los mueva todos a la carpeta de Datos
+en la carpeta de Programas de Python.
+.) Una vez que tenga los datos armados, voy a empezar a trabajar
+en Python para ir viendo de levantar los datos y graficarlos.
+.) Hecho todo esto, voy a empezar a trabajar en lo que dijo Pablo
+sobre modificar la forma en que el sistema se itera.
