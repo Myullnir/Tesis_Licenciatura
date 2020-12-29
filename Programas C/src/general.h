@@ -36,6 +36,8 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 int Visualizar_d(double *pd_vec);
 int Visualizar_f(float *pf_vec);
 int Visualizar_i(int *pi_vec);
+int Escribir_d(double *pd_vec, FILE *pa_archivo);
+int Escribir_i(int *pi_vec, FILE *pa_archivo);
 
 #endif
 

@@ -223,3 +223,34 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 	return 0;
 }
 
+//--------------------------------------------------------------------------------------------
+// Las siguientes funciones son complementos para escribir datos en un archivo
+
+// Esta función va a recibir un vector double y va a escribir ese vector en mi archivo.
+int Escribir_d(double *pd_vec, FILE *pa_archivo){
+	// Defino las variables del tamaño de mi vector
+	int i_C,i_F;
+	i_F = *pd_vec;
+	i_C = *(pd_vec+1);
+	
+	// Ahora printeo todo el vector en mi archivo
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%lf",*(pd_vec+i_i+2));
+	fprintf(pa_archivo,"\n");
+	
+	return 0;
+}
+
+// Esta función va a recibir un vector int y va a escribir ese vector en mi archivo.
+int Escribir_i(int *pi_vec, FILE *pa_archivo){
+	// Defino las variables del tamaño de mi vector
+	int i_C,i_F;
+	i_F = *pi_vec;
+	i_C = *(pi_vec+1);
+	
+	// Ahora printeo todo el vector en mi archivo
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%d",*(pi_vec+i_i+2));
+	fprintf(pa_archivo,"\n");
+	
+	return 0;
+}
+
