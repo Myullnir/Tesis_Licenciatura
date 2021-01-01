@@ -22,13 +22,13 @@ int main(int argc, char *argv[]){
 		s_Red red;
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = 50; // Cantidad de agentes en el modelo
+		datos.i_N = 20; // Cantidad de agentes en el modelo
 		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
 		datos.f_K = 5; // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
-		datos.f_alfa = 0.5; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
+		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
 		int i_Pasos = (int) datos.f_Tint/ datos.f_dt; // Esta es la cantidad de pasos en la que voy a iterar mi sistema.
@@ -80,23 +80,18 @@ int main(int argc, char *argv[]){
 	fprintf(pa_archivo, "Matriz de Opiniones\n");
 	Escribir_d(red.pd_Opi,pa_archivo); // Matriz de Opinión
 	
-	
-	printf("Visualizo la matriz de superposicion de mi sistema \n");
-	Visualizar_d(red.pd_Ang);
-	
-	
-	printf("Visualizo el estado inicial de mi sistema \n");
+	printf("Este es mi sistema antes de evolucionarlo\n");
 	Visualizar_d(red.pd_Opi);
 	
 	// Evolucionemos el sistema y probemos que estoy cambiando al sistema	
 	for(register int i_i=0; i_i<i_Pasos; i_i++){
-		RK4(red.pd_Opi, red, datos, pf_EcDin);
+		Iteracion(red,datos,pf_EcDin);
 		Escribir_d(red.pd_Opi,pa_archivo); // Matriz de Opinión
 	}
-
-	printf("Visualizo el estado final de mi sistema \n");
-	Visualizar_d(red.pd_Opi);
 	
+	printf("Este es mi sistema final\n");
+	Visualizar_d(red.pd_Opi);
+
 	// Libero los espacios dedicados a mis vectores y cierro mi archivo
 	free(red.pd_Ang);
 	free(red.pi_Ady);

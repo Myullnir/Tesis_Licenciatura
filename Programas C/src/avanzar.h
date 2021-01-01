@@ -4,7 +4,8 @@
 #define Avanzar_H
 #include <math.h>
 
-double Din1(s_Red var, s_Param par, int i_j);
+double Din1(s_Red var, s_Param par);
 double Din2(s_Red var, s_Param par);
+int Iteracion(s_Red var, s_Param par, double (*pf_Dinamica)(s_Red var, s_Param par));
 
 #endif

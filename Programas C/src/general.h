@@ -12,6 +12,7 @@ typedef struct Red{
 	double *pd_Opi; // Vector de opinión de cada individuo
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
 	int i_topico; // Entero que representa el tópico que estoy mirando. Es un valor que va entre 0 y T-1
+	int i_agente2; // Este es el segundo agente con el cual se pone en contacto el primero.
 }s_Red;
 
 typedef struct Parametros{
