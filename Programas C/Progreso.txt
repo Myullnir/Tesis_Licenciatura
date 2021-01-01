@@ -535,3 +535,243 @@ en la carpeta de Programas de Python.
 en Python para ir viendo de levantar los datos y graficarlos.
 .) Hecho todo esto, voy a empezar a trabajar en lo que dijo Pablo
 sobre modificar la forma en que el sistema se itera.
+
+--------------------------------------------------------------------------
+
+28/12/2020
+
+Ya agregué las partes de registro de datos al programa, funciona
+bien. El tiempo que tarda me preocupa, voy a tener que trabajar
+en armar las tablas previamente. Ahora voy a armar un archivo
+que me mueva los datos.
+
+Ya armé el programa que me mueve los archivos de datos a la carpeta
+de Programas de Python. Despues quizás arme un archivo Bash que
+lo levante, así de una al terminar de hacer todo me los mueva.
+Posiblemente haga eso en el instanciar. Tipo, al final del for
+muevo todo.
+
+Antes de trabajar en Python, voy a anotar algo respecto a lo
+que dijo Pablo sobre modificar la forma de iteración del
+sistema. Entiendo que lo que Pablo dijo fue permitir que
+todos los usuarios interactuen con todos, es decir una
+matriz de adyacencia con ceros en la diagonal y unos afuera.
+Se me ocurre que podría agregar un segundo agente en el struct
+de la red. Luego debería supongo quitar a la matriz de adyacencia
+de la ecuación y hacer que la cuenta se efectúe mirando a un
+agente particular.
+Ahora que lo pienso, el Din1 está calculando las tanh para TODOS
+los agentes, incluso los no conectados. Eso es una pérdida de
+tiempo abismal e innecesario. Podría meter un if en la función
+Din1, pero creo que no sería lo óptimo. Lo mejor que se me
+ocurre es armar un array de punteros a funciones. Que ese
+array en la posición cero tenga una función que returnea un
+cero, y en la posición 1 tenga a la función Din1. Ese array
+lo creo en la función Din2, y eso sería mejor que tener un
+if, porque no hay comparación involucrada. Y debería correr
+más rápido el programa. Me gusta la idea. Ahora sí,
+trabajemos en Python.
+
+Ya logré armar un programa que levanta los datos de los archivos
+y me genera un gráfico de la evolución de las opiniones. Lo que
+grafica es el promedio del cuadrado de la opinión de cada uno 
+de los agentes, y esto lo hace para todos los tópicos.
+Este gráfico no sé si tendría mucho sentido para graficar
+sistemas con K distinto de cero. Pero lo importante es que
+el esqueleto está, modificar esto no sería tan difícil.
+
+Lo interesante va a ser ver cómo graficar el caso de K distinto
+de cero. Se me ocurre que puedo simplemente marcar con puntos o
+líneas muy chicas las trayectorias en un plano 2D. Habrá que ver
+cómo sale eso.
+
+¿Con qué debería seguir? Ahora definitivamente es una buena idea
+seguir con las propuestas de Pablo. Estos son los objetivos:
+
+.) Modificar la iteración de manera de que cada agente se conecte
+con otro agente aleatorio. (¿Cómo verifico que esto se cumpla bien?)
+.) Modificar la función Din1 para que trabaje con un sujeto en vez
+de con todos. (Asegurarse de guardar esta versión del programa
+en algún lado, porque esta era la original. Esta era la buena.
+Quizás simplemente lo deje comentado y listo.)
+.) Corregir esa pila de cálculos innecesarios de las tanh que
+después se mueren. Probar primero con un if. Y si eso no
+es un gran progreso, probar la idea del puntero a dos funciones.
+.) Armar las tablas de cálculo previo de las tanh y las funciones
+de interpolación, para reducir el tiempo de cálculo de las tanh.
+.) A futuro, cuando haya leído sobre el uso de archivos en el Tutorial
+de C, ver de la posibilidad de armar una tabla una sola vez, y luego
+cargarla, para deshacerme definitivamente de esa pérdida de tiempo.
+.) Modificar el instanciar.sh para empezar a realizar muchas corridas
+juntas. Agregarle al fondo el mover.sh. Eso es genial, me encanta.
+.) Cuando esté consiguiendo cantidades ingentes de datos en la carpeta
+de programas, ahí voy a tener que empezar a generalizar el funcionamiento
+de mi programa de Python.
+
+Mañana tengo que subir las nuevas versiones de programas de C y
+de Python al Github.
+
+----------------------------------------------------------------------------------
+
+29/12/2020
+
+Hoy lo que hice fue ver toda una sección de loops y decisiones en
+el tutorial de C de AticleWorld. Aprendí un poco sobre los breaks
+y el goto. Y sobre el continue.
+
+-----------------------------------------------------------------------------------
+
+30/12/2020
+
+Ok, estoy pensando en hacer lo de la modificación al programa para que 
+la iteración cumpla con la idea que propuso Pablo de agregar un elemento
+random a la forma en que evoluciona el sistema. Se me ocurre que es
+un buen momento para modificar el RK4 de manera de que se vuelva
+incluso más general. Voy a sacar las iteraciones en agentes y tópicos
+por fuera de la función.
+
+Lo primero que debo hacer para hacer esto es guardar el programa que
+tengo hasta ahora, para no perder nada de lo que ya funciona. Para
+esto voy a empezar a usar la carpeta de Programas, ahí me voy a guardar
+los archivos de esta versión del programa. Aunque voy a tener que usar
+una carpeta, ya que esta versión que tengo del programa no va a funcionar
+con la nueva versión del RK4, por lo que también va a necesitar su
+correspondiente archivo general y demás.
+
+Mañana arranco con las modificaciones. Si me pongo las pilas, ya mañana
+tengo modificado el programa para que la iteración no sea ordenada.
+
+------------------------------------------------------------------------------------
+
+31/12/2020
+
+Una idea para mis funciones es estandárizar el nombre que le doy a las
+variables que registran el número de filas y columnas. A veces las llamo
+i_C,i_CF, a veces i_columnas,i_filas, a veces i_Filas, i_Columnas. Tiene
+que ser en lo posible siempre el mismo. Después voy a revisar todas mis
+funciones y cambiarlo por el más sencillo, i_C e i_F.
+
+Ahí probé la función RK4 modificada. Ahora efectivamente evoluciona a
+una sola variable, y calcula todo correctamente. Ahora sólo queda
+decidir detalles de si necesito o no armar un vector que me guarde
+los datos extra para ir haciendo la comparación y poder decidir cuando
+cortar el programa.
+
+Igual lo siguiente a esto ahora es implementar esto en el main y ver
+que efectivamente esto itera para cada sujeto. Seguramente armando 
+una función Iteración que englobe al RK4.
+
+Lo último que estaba haciendo es modificar la función Din1. El objetivo
+es justamente modificar la selección del segundo agente de interacción
+para volverla random. Estaba trabajando en eso armando una función
+que toma un número y un rango de valores, crea un vector con todos
+los números en el rango menos el que tomo como input. Luego genera
+un número random menor al tamaño del vector, va a la casilla elegida
+del vector y toma ese número. La función la estaba armando para el
+caso de números ints.
+
+Voy a tomar la siguiente regla de trabajo. Es cierto que soy muy
+celoso con el tiempo de trabajo de mis funciones, pero voy a dejar
+estos temas de optimización de código para más adelante. Por si acaso,
+si pensás que te vas a ir olvidando de esto en el futuro, hagamos un
+archivo llamado optimización donde guardemos las ideas de qué cosas
+necesitan optimizarse, así cuando tengamos tiempo con el código y
+no sepamos qué hacer, podemos invertir el tiempo en mejorar el código
+y otro día resolvemos esos problemas grandes.
+
+De paso, mañana cuando arranques con el programa de nuevo, acordate
+de comentar la función esta de generar números aleatorios, sino te va 
+a tirar altos errores.
+
+-----------------------------------------------------------
+
+01/01/2021
+
+Modifiqué la función Din1 para que no tome al segundo agente como un
+input, sino que el segundo agente sea un elemento dentro de los structs.
+Luego armé al segundo agente dentro del struct de la red, que es i_agente2.
+
+A la función Din2 le saqué el for que hacía que revisara todos los
+agentes con los cuales el primer agente estaba conectado. Esto es para que
+las interacciones sean únicamente de a pares.
+
+Agregué en la iteración del main los elementos necesarios para definir
+el segundo agente y para que el sistema itere en los tópicos y los agentes.
+
+A la función RK4 le saqué todo el mambo de vectores k donde calculaba
+el k para cada elemento del vector de opiniones y evolucionaba
+todo el sistema junto, y lo reemplacé por un sólo vector el
+cual contenía los valores de k0 hasta k4. El k0 es un extra
+que agregué yo para generalizar el cálculo de los k y poder
+hacerlos todos en un sólo loop, en vez de tener que escribir
+4 acciones separadas para calcularlos.
+
+Todavía no pasé esto al programa principal, todo esto fue en
+el programa de pruebas.Así que todavía tengo eso por hacer.
+
+
+Algo interesante que me llamó la atención. El sistema funcionando
+de esta manera converge a un punto en el cual las opiniones
+de los tópicos valen K o -K. El motivo de esto es que hay dos
+términos en conflicto, el primero de -x y el segundo que tiene
+K * tanh(...). El tema es el siguiente, como ahora no estoy
+haciendo una sumatoria en todos los sujetos con los cuales mi
+agente principal tiene conexiones, sino que hago interacciones
+de a pares, mi segundo término es básicamente K*tanh(...).
+Con un alfa suficientemente alto, la tanh cappea rápido,
+por lo que se puede aproximar por 1. Esto me deja la
+ecuación diferencial como -x+K*sgn(x). Esto es lo que lleva
+a que el punto de equilibrio para todas las opiniones se
+encuentre en el valor de K o -K. Antes esto no resultaba
+tan evidente porque cada sujeto tenía una cantidad de
+conexiones aleatoria, entonces me quedaba en el segundo
+término K * sum(vecinos). Entonces cada agente tendía a
+un valor que dependía de la cantidad de vecinos. 
+De nuevo, como ahora las interacciones son de a pares,
+todos tienen 1 solo vecino y por eso es que esto ahora
+resulta tan evidente. Está copado poder observarlo.
+
+Ya pasé todo al archivo principal, ahora funciona con este
+sistema de interacción por pares. ¿Qué debería hacer mañana?
+
+Los objetivos de cosas por hacer que charle con Pablo se 
+pueden resumir en:
+
+.) Optimizar más el código. Todo eso está anotado en el
+archivo de Optimización.txt.
+.) Modificar el archivo de instanciación de Bash para que
+pueda ir tomando valores como input en la línea de comando
+y que pueda correr muchas veces. Eso no es una gran
+urgencia.
+.) Mejorar el archivo de Python para que cuando esté con
+grandes cantidades de datos poder levantarlas y graficarlas
+mejor. Eso surgirá cuando esté graficando.
+
+En principio, tengo una buena parte del trabajo ya hecho,
+y eso que hoy es primero de Enero. Recordá que el gran
+objetivo propuesto por Pablo es arrancar Febrero con los
+dos gráficos de Baumann ya realizados. El de evolución
+del sistema y el de los resultados según combinaciones 
+de Delta y alfa.
+
+Para cumplir esto también es importante revisar si Baumann
+tiene algún código especial que use para hacer los gráficos.
+
+Mañana voy a tomármelo libre. Lo que voy a hacer es armar
+un archivo donde me anoto los objetivos Día a día.
+Como para no tener que andar moviéndome para arriba cada vez
+que necesito ir recordando qué hacer.
+
+Algo que me estoy olvidando es de que debería armar un
+mecanismo de corte automático del programa cuando el sistema
+llega a un estado estable. Para esto, la idea es calcular como
+un error cuadrático y ver la diferencia entre el vector antes
+de iterar y después de iterar. Eso es lo siguiente a
+implementar. Entonces mañana arranco con eso, y después lo
+siguiente ya es empezar a trabajar en Python para armar
+los gráficos. Ese debería ser el orden, creo yo. Bueno,
+entonces el domingo arrancamos con ese mecanismo de corte.
+
+Lo último que voy a hacer hoy es pasar todo el código del
+archivo de pruebas al archivo Archivo.c, como para tener
+guardada esta versión. Y debería subir todo a Github.

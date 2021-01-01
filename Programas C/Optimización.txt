@@ -1,0 +1,31 @@
+Acá voy a ir anotando las ideas que tenga para optimizar el código de manera de que
+corra mejor, ahorrando tiempo y problemas. Además de esto pueden salir algunas funciones
+interesantes para poner en el código general.
+-----------------------------------------------------------------------------------------------
+
+.) Armar una tabla que tenga calculados previamente los valores de las tanh.
+Esto va a requerir también tener armada una función que interpole los datos
+de la tabla de manera que todo dato que caiga en un valor intermedio también
+se pueda calcular correctamente.
+
+.) Revisar la forma en que el programa pueda levantar datos de un archivo
+ya armado previamente. Esto va a servir para que un día calcule simplemente
+una tabla bien grande y desde entonces simplemente la levante.
+
+Estas dos ideas sirven para reemplazar en la función Din1 el cálculo de la 
+tanh.
+
+.) En la función Din1 voy a poner un if para poder elegir el segundo agente
+de manera aleatoria, pero para que ese agente no sea el mismo que estoy
+iterando. Se me ocurrió armar una función que tome como input el número
+principal y el rango de valores en el cual se tiene que mover el número
+aleatorio. La idea es que la función arma una tira de números, que son
+todos los números en el rango menos el número principal, luego genera un
+número al azar que está dentro del rango menos uno, y lo que hace es ir a
+buscar al número que se encuentra en esa casilla aleatoria de la tira de
+números. De esta manera, sin usar un if, me aseguro que en una sola tirada
+aleatoria estoy eligiendo un número que es distinto al número principal.
+Implementando esto en la función Din1, lo que lograría es que el sistema
+no tenga que usar el if y que en un sólo intento genere el número que
+quiero, de manera que el agente principal interactúe con alguien que
+no es él mismo.

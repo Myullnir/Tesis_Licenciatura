@@ -13,6 +13,7 @@ typedef struct Red{
 	double *pd_Opi; // Vector de opinión de cada individuo
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
 	int i_topico; // Entero que representa el tópico que estoy mirando. Es un valor que va entre 0 y T-1
+	int i_agente2; // Este es el segundo agente con el cual se pone en contacto el primero.
 } s_Red;
 
 typedef struct Parametros{
@@ -35,11 +36,13 @@ int Visualizar_i(int *pi_vec);
 int GenerarOpi(s_Red var, s_Param par);
 int GenerarAng(s_Red var);
 int GenerarAdy(s_Red var,s_Param par);
-double Din1(s_Red var, s_Param par, int i_j);
+double Din1(s_Red var, s_Param par);
 double Din2(s_Red var, s_Param par);
 int Escribir_d(double *pd_vec, FILE *pa_archivo);
 int Escribir_i(int *pi_vec, FILE *pa_archivo);
 int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par));
+double Multiplo(s_Red var, s_Param par);
+int Iteracion(s_Red var, s_Param par, double (*pf_Dinamica)(s_Red var, s_Param par));
 
 
 
@@ -63,23 +66,22 @@ int main(){
 	time(&tt_prin);
 	srand(time(NULL));
 	int i_tardanza;
-	
-	
+		
 	// Defino los nombres de mis structs en este programa y los valores de los parámetros
 	s_Red red;
 	s_Param datos;
 	
 	datos.f_Beta = 0.5;
-	datos.f_Pint = 0.5;
-	datos.f_K = 0.5;
+	datos.f_Pint = 0.5; // Ahora mismo este valor no está haciendo nada
+	datos.f_K = 5;
 	datos.f_alfa = 2;
-	datos.i_N = 50;
-	datos.i_T = 2;
-	datos.i_Mopi = 3;
+	datos.i_N = 20;
+	datos.i_T = 4;
+	datos.i_Mopi = 2;
 	datos.f_dt = 0.2;
 	
 	// Defino el puntero a mi función y lo inicializo
-	double (*pf_Dup)(s_Red Red, s_Param Parametros) = &Din2;	
+	double (*pf_Dinamica)(s_Red Red, s_Param Parametros) = &Din2;	
 	
 	// Asigno memoria a mis matrices y las inicializo
 	
@@ -104,38 +106,33 @@ int main(){
 	red.pi_Ady[1] = datos.i_N; // Guardo el número de columnas en la segunda coordenada del vector
 	GenerarAdy(red,datos); // Genero la red de Adyacencia propiamente dicha.
 	
-	// Defino las variables para mi archivo.txt que guarda los datos del sistema
-	char filename[255]; // Siempre lo hago lo más grande posible. Si sobra no es problema.
-	sprintf(filename,"Datos_Evolucion_Opinion_N=%d_T=%d",datos.i_N,datos.i_T); // Uso esto para asignarle el nombre a mi archivo.
-	FILE *pa_txt=fopen(filename,"w"); //Esto me crea un archivo con nombre filename y permiso de escritura. Es a partir del puntero pa_txt que accedo al archivo.
+	// // Defino las variables para mi archivo.txt que guarda los datos del sistema
+	// char filename[255]; // Siempre lo hago lo más grande posible. Si sobra no es problema.
+	// sprintf(filename,"Datos_Evolucion_Opinion_N=%d_T=%d",datos.i_N,datos.i_T); // Uso esto para asignarle el nombre a mi archivo.
+	// FILE *pa_txt=fopen(filename,"w"); //Esto me crea un archivo con nombre filename y permiso de escritura. Es a partir del puntero pa_txt que accedo al archivo.
 	
-	// Copio en el archivo mi matriz de Adyacencia
-	Escribir_i(red.pi_Ady, pa_txt);
-	// for(register int i_i=0; i_i<datos.i_N*datos.i_N; i_i++) fprintf(pa_txt,"\t%d",red.pi_Ady[i_i+2]);
-	// fprintf(pa_txt,"\n");
+	// // Copio en el archivo mi matriz de Adyacencia
+	// Escribir_i(red.pi_Ady, pa_txt);
 	
-	// Copio en el archivo mi matriz de Superposicion
-	Escribir_d(red.pd_Ang, pa_txt);
-	// for(register int i_i=0; i_i<datos.i_T*datos.i_T; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Ang[i_i+2]);
-	// fprintf(pa_txt,"\n");
+	// // Copio en el archivo mi matriz de Superposicion
+	// Escribir_d(red.pd_Ang, pa_txt);
 	
-	// Copio en el archivo mis vectores de opinion
-	Escribir_d(red.pd_Opi, pa_txt);
-	// for(register int i_i=0; i_i<datos.i_N*datos.i_T; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Opi[i_i+2]);
-	// fprintf(pa_txt,"\n");
+	// // Copio en el archivo mis vectores de opinion
+	// Escribir_d(red.pd_Opi, pa_txt);
 	
+	printf("Este es mi sistema antes de evolucionarlo\n");
+	Visualizar_d(red.pd_Opi);
 	
 	// Evoluciono mi sistema y luego voy guardando los datos.
-	for(register int i_p=0; i_p<20; i_p++){
-		RK4(red.pd_Opi, red, datos, pf_Dup);
-		Escribir_d(red.pd_Opi, pa_txt);
-		// for(register int i_i=0; i_i<datos.i_N*datos.i_N; i_i++) fprintf(pa_txt,"\t%lf",red.pd_Opi[i_i+2]);
-		// fprintf(pa_txt,"\n");
-	}
+	for(register int i_i=0; i_i<5000; ++i_i) Iteracion(red,datos,pf_Dinamica);
+
+	
+	printf("Este es mi sistema final\n");
+	Visualizar_d(red.pd_Opi);
 	
 	
 	// Ejecuto los comandos finales para medir el tiempo y liberar memoria
-	fclose(pa_txt); // Con esto cierro mi archivo
+	// fclose(pa_txt); // Con esto cierro mi archivo
 	free(red.pi_Ady);
 	free(red.pd_Ang);
 	free(red.pd_Opi);
@@ -237,7 +234,7 @@ int GenerarAng(s_Red var){
 	i_Columnas = (int) var.pd_Ang[1];
 	
 	// Inicializo la matriz de Superposicion de mi sistema.
-	for(int i_i=0; i_i<i_Filas; i_i++) for(int i_j=0; i_j<i_i; i_j++) var.pd_Ang[i_i*i_Columnas+i_j+2] = 0.5; // Decidí poner 0.5 entre todos los tópicos de mi modelo
+	for(int i_i=0; i_i<i_Filas; i_i++) for(int i_j=0; i_j<i_i; i_j++) var.pd_Ang[i_i*i_Columnas+i_j+2] = 0.5*(((-i_i-i_j)%2)*2+1); // Decidí poner 0.5 entre todos los tópicos de mi modelo
 	for(int i_i=0; i_i<i_Filas; i_i++) var.pd_Ang[i_i*i_Columnas+i_i+2] = 1; // Esto me pone 1 en toda la diagonal
 	for(int i_i=0; i_i<i_Filas; i_i++) for(int i_j=i_i+1; i_j<i_Columnas; i_j++) var.pd_Ang[i_i*i_Columnas+i_j+2] = var.pd_Ang[i_j*i_Columnas+i_i+2]; // Esta sola línea simetriza la matriz
 	return 0;
@@ -270,33 +267,31 @@ int GenerarAdy(s_Red var, s_Param par){
 //#######################################################################################
 
 // Esta función resuelve un término de los de la sumatoria.
-double Din1(s_Red var, s_Param par,int i_j){
-	
+double Din1(s_Red var, s_Param par){
 	// Defino las variables locales de mi función. d_resultados es el return. 
 	// d_opiniones_superpuestas es el producto de la matriz de superposición de tópicos con el vector opinión de un agente.
 	double d_resultado,d_opiniones_superpuestas = 0;
 	
 	// Obtengo el tamaño de columnas de mis tres matrices
-	int i_Co,i_Cs,i_Ca;
+	int i_Co,i_Cs;
 	i_Co = (int) var.pd_Opi[1];
 	i_Cs = (int) var.pd_Ang[1];
-	i_Ca = var.pi_Ady[1];
 	
-	for(register int i_p=0; i_p<i_Cs; i_p++) d_opiniones_superpuestas += var.pd_Ang[var.i_topico*i_Cs+i_p+2]*var.pd_Opi[i_j*i_Co+i_p+2]; // Calculo previamente este producto de la matriz con el vector.
-	d_resultado = var.pi_Ady[var.i_agente*i_Ca+i_j+2]*tanh(par.f_alfa*d_opiniones_superpuestas); // Esto es lo que está dentro de la sumatoria en la ecuación dinámica.
+	for(register int i_p=0; i_p<i_Cs; i_p++) d_opiniones_superpuestas += var.pd_Ang[var.i_topico*i_Cs+i_p+2]*var.pd_Opi[var.i_agente2*i_Co+i_p+2]; // Calculo previamente este producto de la matriz con el vector.
+	d_resultado = tanh(par.f_alfa*d_opiniones_superpuestas); // Esto es lo que está dentro de la sumatoria en la ecuación dinámica.
 	return d_resultado; // La función devuelve el número que buscás, no te lo asigna en una variable.
 }
 
 // Esta es la segunda parte de la ecuación dinámica, con esto puedo realizar una iteración del sistema.
 double Din2(s_Red var, s_Param par){
-	
 	// Defino las variables locales de mi función. d_resultado es lo que voy a returnear.
 	// d_sumatoria es el total de la sumatoria del segundo término de la ecuación diferencial.
 	double d_resultado,d_sumatoria=0;
 	
 	// Calculo la sumatoria de la ecuación diferencial. Para esto es que existe la función Din1.
-	for(register int i_j=0; i_j<var.i_agente; i_j++) d_sumatoria += Din1(var,par,i_j);
-	for(register int i_j=var.i_agente+1; i_j<par.i_N; i_j++) d_sumatoria += Din1(var,par,i_j);
+	// La sumatoria es sobre un sólo agente ahora. La idea es ver que pasa cuando las interacciones se hacen de a pares de manera aleatoria
+	// El sujeto lo voy a definir por afuera de esta función, cosa de que cada iteración del RK4 no me lo cambie.
+	d_sumatoria += Din1(var,par);
 	
 	// Obtengo el tamaño de Columnas de mi matriz de Vectores de opinión y calculo el valor del campo que define mi ecuación diferencial
 	int i_Columnas = (int) var.pd_Opi[1];
@@ -309,47 +304,24 @@ double Din2(s_Red var, s_Param par){
 
 // Esta función me realiza una iteración del sistema a partir de un RK4.
 // Incluso creo que no es necesario el uso del puntero de funciones, pero quiero aprender a usarlo
-int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par)){
+int RK4(double *pd_sistema ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par)){
 	// Defino las variables y vectores que voy a necesitar
-	int i_filas = (int) *pd_vec; // Este es el número de filas del vector principal
-	int i_columnas = (int) *(pd_vec+1); // Este es el número de columnas del vector principal
-	double *pd_pendientes[5]; // Este array de punteros guarda los punteros kN
+	int i_F = (int) *pd_sistema; // Este es el número de filas del vector principal
+	int i_C = (int) *(pd_sistema+1); // Este es el número de columnas del vector principal
 	float DT[4]; // Esto me ayuda a meter el paso temporal que se usa para calcular cada pendiente.
 	
-	
-	// Voy a armar vectores con las pendientes que calcule, para luego calcular el avance de todas las variables al final
-	double *k0;
-	k0 = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
-	
-	double *k1;
-	k1 = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
-	
-	double *k2;
-	k2 = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
-	
-	double *k3;
-	k3 = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
-	
-	double *k4;
-	k4 = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
-	
 	double *pd_inicial; // Este me guarda las condiciones iniciales del vector, que las voy a necesitar al calcular cada paso del RK4
-	pd_inicial = (double*) malloc((i_filas*i_columnas+2)*sizeof(double));
+	pd_inicial = (double*) malloc((i_F*i_C+2)*sizeof(double));
+	
+	double *pd_pendientes; // Este puntero de doubles me guarda todos los valores de las pendientes k
+	pd_pendientes = (double*) malloc((5+2)*sizeof(double));
 	
 	// Inicializo mis punteros
-	pd_pendientes[0] = k0;
-	pd_pendientes[1] = k1;
-	pd_pendientes[2] = k2;
-	pd_pendientes[3] = k3;
-	pd_pendientes[4] = k4;
-	for(register int i_i=0; i_i<i_filas*i_columnas+2; i_i++){
-		*(pd_inicial+i_i) = *(pd_vec+i_i);
-		for(register int i_j=0; i_j<5;i_j++) *(pd_pendientes[i_j]+i_i) = 0; // De esta manera inicializo los 5 punteros, todos en una sola línea.
-	}
+	for(register int i_i=0; i_i<i_F*i_C+2; i_i++) *(pd_inicial+i_i) = *(pd_sistema+i_i);
 	
-	// Guardo registro del tamaño de mis vectores k
-	for(register int i_j=0; i_j<5;i_j++) *(pd_pendientes[i_j]) = i_filas;
-	for(register int i_j=0; i_j<5;i_j++) *(pd_pendientes[i_j]+1) = i_columnas;
+	*pd_pendientes = 1;
+	*(pd_pendientes+1) = 5;
+	for(register int i_i=0; i_i<5;++i_i) *(pd_pendientes+i_i+2)=0;
 	
 	// Armo mi vector DT. Este hay que armarlo uno por uno, si o si.
 	DT[0] = 0;
@@ -359,29 +331,22 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 		
 	// Acá hago las iteraciones del RK4 para hallar las pendientes k
 	for(register int i_j=0; i_j<4; i_j++){ // Esto itera para mis 4 k
-		for(var.i_agente=0; var.i_agente<*pd_vec; var.i_agente++){ // Itero para todos los agentes
-			for(var.i_topico=0; var.i_topico<*(pd_vec+1); var.i_topico++){ // Itero para todos los tópicos
-				// Calculo el elemento de la pendiente k(i_j+1)
-				for(register int i_i=0; i_i<i_filas*i_columnas; i_i++) *(pd_vec+i_i+2) = *(pd_inicial+i_i+2)+*(pd_pendientes[i_j]+i_i+2)*DT[i_j];
-				*(pd_pendientes[i_j+1]+var.i_agente*i_columnas+var.i_topico+2) = (*fp_funcion)(var,par);
-			}
-		}
+		// Calculo el elemento de la pendiente k(i_j+1)
+		for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2)+*(pd_pendientes+i_j+2)*DT[i_j];
+		*(pd_pendientes+i_j+1+2) = (*fp_funcion)(var,par);
 	}
 	
-	// Con TODAS las pendientes calculadas, ahora sí avanzo temporalmente mi sistema
-	for(register int i_i=0; i_i<i_filas*i_columnas; i_i++){
-	*(pd_vec+i_i+2) = *(pd_inicial+i_i+2)+(par.f_dt/6)*(*(pd_pendientes[1]+i_i+2)+*(pd_pendientes[2]+i_i+2)*2+*(pd_pendientes[3]+i_i+2)*2+*(pd_pendientes[4]+i_i+2));
-	}
+	// Copio al sistema igual que el inicial para deshacer los cambios que hice en el vector principal al calcular los k
+	for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2);
+	// Ahora que tengo los 4 k calculados, avanzo al sujeto que quiero avanzar.
+	*(pd_sistema+var.i_agente*i_C+var.i_topico+2) = *(pd_inicial+var.i_agente*i_C+var.i_topico+2)+(par.f_dt/6)*(*(pd_pendientes+2)+*(pd_pendientes+3)*2+*(pd_pendientes+4)*2+*(pd_pendientes+5));
+	
 	
 	// Ahora hagamos algún mecanismo de visualización, para ver que todo esté correctamente calculado. Dios que esto va a ser un bardo.
 	// Primero visualicemos las pendientes. Para eso voy a armar unos strings que poner en el printeo
 	
-	// char c_npendientes[] = "k1234"; //
-	
-	// for(register int i_i=0; i_i<4; i_i++){
-		// printf("\n Estas son las pendientes %c%c \n",c_npendientes[0],c_npendientes[i_i+1]);
-		// Visualizar_d(pd_pendientes[i_i+1]);
-	// }
+	// printf("\n Estas son las pendientes\n");
+	// Visualizar_d(pd_pendientes);
 	
 	// También tengo que visualizar mi vector trabajado.
 	
@@ -389,12 +354,12 @@ int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, 
 	// Visualizar_d(pd_inicial);
 	
 	// printf("Este es mi vector luego de evolucionarlo \n");
-	// Visualizar_d(pd_vec);
+	// Visualizar_d(pd_sistema);
 	
 
 	// Libero el espacio de memoria asignado a los punteros de las pendientes y al pd_inicial
 	free(pd_inicial);
-	for(int register i_i=0; i_i<5; i_i++) free(pd_pendientes[i_i]);
+	free(pd_pendientes);
 	
 	return 0;
 }
@@ -426,4 +391,64 @@ int Escribir_i(int *pi_vec, FILE *pa_archivo){
 	
 	return 0;
 }
+
+
+// Esta es una función define la ecuación deiferencial como un múltiplo del valor actual
+double Multiplo(s_Red var, s_Param par){
+	// Defino mis variables a usar
+	int i_C;
+	i_C = var.pd_Opi[1];
+	double multiplo;
+	
+	// Esta ecuación diferencial me define las pendientes como el doble del valor actual.
+	multiplo = 2*var.pd_Opi[var.i_agente*i_C+var.i_topico+2];
+	
+	return multiplo;
+}
+
+
+// Esta función me itera todo el sistema. Está buena para simplemente reemplazarla en el main.
+int Iteracion(s_Red var, s_Param par, double (*pf_Dinamica)(s_Red var, s_Param par)){
+	// Simplemente copio lo que estaba usando antes
+	// Primero itero en los agentes, luego defino el segundo agente y evoluciono al primero interactuando con el segundo.
+	for(var.i_agente=0; var.i_agente<par.i_N; ++var.i_agente){
+			do{
+				var.i_agente2 = rand()%par.i_N;
+			}
+			while(var.i_agente==var.i_agente2);
+			for(var.i_topico=0; var.i_topico<par.i_T; ++var.i_topico) RK4(var.pd_Opi, var, par, pf_Dinamica);
+		}
+		
+	return 0;
+}
+
+
+// Esta función toma un número y me da un número aleatorio DISTINTO al número recibido en un cierto rango.
+// Esta es la versión con ints. Para que este programa funcione correctamente tiene que pasar que i_min <= i_input <= i_max
+// Además, el min y el max pertenecen al rango.
+// Seré sincero, toda esta función es para no meter un if justo en el corazón de la iteración de mi programa.
+// Esta función no está terminada, otro día la retomo.
+// int Aleatorio_distinto_i(int i_input, int i_min, int i_max){
+	// // Defino mis variables a usar
+	// unsigned int i_rango = i_max - i_min; // Fijate que el i_rango tiene que ser siempre positivo.
+	// // 
+	// // Espero que esto no me genere problemas a futuro. Problemas del tipo: "Segmentation Fault" que nunca más descubro dónde ocurren.
+	// unsigned int i_aleatorio = (Random()%i_rango);
+	
+	// // Armo la tira de datos que va a tener todos los números posibles dentro del rango, MENOS el número i_input
+	// int *pi_Tira;
+	// pi_Tira = (int*) malloc((i_rango-1+2)*sizeof(int));
+	// *pi_Tira = 1; // Este es el número de filas de mi vector
+	// *(pi_Tira+1) = i_rango-1; // Este es el número de columnas de mi vector
+	// for(register int i_i=0; i_i<i_input; ++i_i) *(pi_Tira+i_i+2) = i_i+i_min;
+	// for(register int i_i=i_input+1; i_i<i_rango; ++i_i) *(pi_Tira+i_i-1+2) = i_i+i_min;
+	
+	
+	
+	
+	
+	
+	// return ;
+// }
+
 
