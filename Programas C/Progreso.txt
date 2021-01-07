@@ -775,3 +775,98 @@ entonces el domingo arrancamos con ese mecanismo de corte.
 Lo último que voy a hacer hoy es pasar todo el código del
 archivo de pruebas al archivo Archivo.c, como para tener
 guardada esta versión. Y debería subir todo a Github.
+
+----------------------------------------------------------------
+
+03/01/2021
+
+Estuve intentando armar algo en el archivo Archivo.c de
+manera de que me permita moverme rápido entre elementos.
+No encontré un método útil. Después seguiré buscando,
+y sino simplemente armaré una carpeta y pondré todo en
+archivos separados.
+
+Ahí corregí mis dos funciones, la de Norma y la de
+Deltax, que ahora la llamo Delta_Vec_d.
+Funcionan perfecto, Delta_Vec_d toma dos vectores
+double, los resta y guarda la diferencia en la
+tercer coordenada. Norma_d por su parte calcula
+correctamente la norma del vector double que le
+pases. Así que con esto estoy totalmente en condiciones
+de hacer la modificación al programa del main para
+que pueda registrar una condición de corte automático.
+Igual, antes de armar la condición en el programa, me 
+conviene primero calcular datos para un cálculo bien grande,
+verificar cuanto tarda el sistema en llegar a un punto estable
+y cuánto vale el error cuadrático en ese punto, como para tener
+una noción de cuanto debe ser el error cuadrático. Además
+ese error va a ser una función del tamaño de mi sistema, así
+que estaría bueno ver si podemos hallar alguna relación
+entre esas dos magnitudes.
+
+Ahí coloqué esto en el main. Estoy teniendo un error de lo más
+raro. Por alguna razón el programa no funciona, ya ni me itera
+el vector de opiniones correctamente. No entiendo porqué
+sólo está moviendo la primer coordenada, y además la mueve mal.
+Es un total sin sentido esto.
+
+---------------------------------------------------------------------
+
+07/01/2021
+
+Ahí empecé a retocar el archivo main que no funcionaba. Saqué los
+elementos nuevos en los structs, saqué la función iteración del
+main y todo rastro de los nuevos elementos del main. Con nuevos
+elementos me refiero a los nuevos punteros y cosas que
+puse en los struct que iba a necesitar.
+
+El problema al parecer corría por el programa de iteración,
+que lo reemplacé directamente por su código. Lo único que
+realmente cambié es que en la iteración del for, en vez de
+hacer un PRE incremento, lo pasé a un POST incremento.
+Pareciera que esa fue la solución. Ojalá haya sido eso. 
+Ahora voy a guardar el programa tal cual está, y voy a empezar
+a agregar los elementos nuevos al struct. Espero que esta
+vez no se rompa de nuevo.
+
+Bien, ya incorporé todo y no explotó. No sé si funca,
+pero por lo menos no explota. Quiero decir, llega al
+resultado que llegaba antes, pero todavía no tengo
+forma de saber que las funciones están haciendo su
+trabajo correctamente. Por eso ahora lo que voy a hacer
+es probar en Prosem si puedo abrir dos archivos en simultáneo
+y escribir en ambos a la vez.
+
+Ahí lo probé, funciona perfecto. De seguro el error estaba
+en que quería usar el mismo puntero para dos archivos
+distintos o algo así. Esto está buenísimo. Voy a además
+empezar a usar esta notación de ahora en adelante, se siente
+re natural.
+
+Perfecto, el archivo ya funciona. Lo próximo que tengo que hacer
+ahora es levantar los datos con Python, ver que está todo bien, y
+empezar a hacer corridas masivas. Eso no suena muy bien. Me refiero
+a correr el programa muchas veces, para muchos valores de N distintos.
+
+Mi objetivo es ver si existe alguna variación de los valores de 
+error cuadrático al ir variando el tamaño de la red. Considerando
+que al ir aumentando el número de sujetos aumenta también el
+número de coordenadas que tienen que restarse y luego sumar
+su error cuadrático, yo pensaría que tiene que aumentar. Pero
+también es cierto que el error cuadrático que estoy calculando
+está normalizado según el número de agentes y tópicos, por tanto
+NO debería cambiar con el cambio de número de agentes y tópicos.
+Esto es muy importante para poder definir un criterio de corte del
+sistema.
+
+¿Que es lo próximo que tengo que hacer entonces?:
+
+.) Levantar los datos en Python y ver que las funciones estén
+trabajando correctamente.
+.) Modificar el main para que tome datos desde la línea de comando.
+.) Modificar el Bash para que las instanciaciones corran el programa
+y luego manden todos los datos a la carpeta de C correspondiente.
+.) Si queda tiempo y ganas, investigar un poco sobre cómo cambiar el
+nombre de mis archivos para agregarles una extensión txt.
+
+Voy a subir todo esto a GitHub

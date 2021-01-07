@@ -1,7 +1,6 @@
 // Este archivo es para guardar programas de pruebas armados previamente.
 
 
-
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
@@ -1728,3 +1727,253 @@ se podría ahorrar igualmente. Esta mejora y otras más, se encuentran anotadas 
 	
 	// return ;
 // }
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+Este programa lo hice el 03/01/2021. La idea era modificar las funciones de Deltax y
+la que calculaba la norma de los vectores de manera de poder usarla de forma más general.
+Para esto hice que puedan tomar el tamaño de los vectores de las primeras coordenadas
+de los vectores. Aproveché para cambiarles los nombres siguiendo un poco las nuevas
+reglas de nomenclatura. Les agregué una d al final para señalar que son las versiones
+que funcionan sobre vectores double.
+
+Este trabajito lo hice porque como quería implementar un mecanismo de corte en mi
+programa principal, quería que este mecanismo use como criterio la diferencia entre
+el paso siguiente y el anterior, de manera de que si al iterar el sistema deja de 
+evolucionar, el programa corte y avance a otra cosa. Por eso necesitaba calcular
+diferencias entre vectores y sus normas.
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+// // Acá voy a declarar las funciones.------------------------------------
+
+// double Random();
+// int Visualizar_d(double *pd_vec);
+// int Visualizar_f(float *pf_vec);
+// int Visualizar_i(int *pi_vec);
+// int Escribir_d(double *pd_vec, FILE *pa_archivo);
+// int Escribir_i(int *pi_vec, FILE *pa_archivo);
+// int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx);
+// double Norma_d(double *pd_x);
+
+
+
+// /*####################################################################################
+// ####################################################################################
+// ####################################################################################
+// ####################################################################################
+// */
+
+
+// //---------------------------------------------------------------------------------------------------
+
+// // Vamos a intentar ver como se leen archivos y data desde estos
+// // Creo que lo más útil va a ser usar el fscanf porque mis datos están separados por tabulaciones
+// // Acá está la forma de leer el archivo. Sólo necesitaría poder saber que tan largo es antes de
+// // subirlo, pero creo que eso sería mucho pedir.
+
+// int main(){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Defino los vectores que voy a restar y el que voy a usar para guardar la diferencia. También el tamaño de los vectores y la variable de la norma final.
+	// int i_F = 3,i_C = 3; // Esto está bueno para reducir filas, pero no siempre es bueno para la lectura del código
+	// double d_norma = 0;
+	// double *pd_x1, *pd_x2, *pd_diferencia; // Pensé que no me iba a tomar esto.
+	// // Voy a poner los tres punteros en un solo array
+	// double *apd_punteros[3];
+	// apd_punteros[0] = pd_x1;
+	// apd_punteros[1] = pd_x2;
+	// apd_punteros[2] = pd_diferencia;
+	
+	// // Asigno memoria a mis vectores.
+	// for(register int i_i=0; i_i<3; ++i_i) apd_punteros[i_i] = (double*) malloc((i_F*i_C+2)*sizeof(double));
+	
+	// // Inicializo mis vectores
+	// for(register int i_i=0; i_i<3; ++i_i) *(apd_punteros[i_i])= i_F;
+	// for(register int i_i=0; i_i<3; ++i_i) *(apd_punteros[i_i]+1)= i_C;
+	// for(register int i_i=0; i_i<3; ++i_i) for(register int i_j=0; i_j<i_F*i_C; ++i_j) *(apd_punteros[i_i]+i_j+2) = 0;
+	
+	// // Ahora sí. Voy a poner todos 1 en el primer vector, números que crecen en progresión de a 1 en el segundo vector, y el tercero queda para ser la diferencia
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(apd_punteros[0]+i_i+2) = 1;
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(apd_punteros[1]+i_i+2) = i_i;
+	
+	// // Voy a visualizarlos para garantizar que están bien
+	// printf("Este es el primer vector. Tiene todos 1\n");
+	// Visualizar_d(apd_punteros[0]);
+	
+	// printf("Este es el segundo vector. Tiene numeros que van del 0 al %d\n",i_C*i_F-1);
+	// Visualizar_d(apd_punteros[1]);
+	
+	// printf("Este es el vector de diferencias. Por ahora solo tiene ceros porque simplemente esta inicializado\n");
+	// Visualizar_d(apd_punteros[2]);
+	
+	// // Ahora aplico mis funciones
+	// Delta_Vec_d(apd_punteros[0],apd_punteros[1],apd_punteros[2]);
+	// d_norma = Norma_d(apd_punteros[2]);
+	
+	// printf("La norma del vector de diferencias es: %lf\n", d_norma);
+	
+	// printf("El vector de diferencias ahora cambio a esto\n");
+	// Visualizar_d(apd_punteros[2]);
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// for(register int i_i=0; i_i<3; ++i_i) free(apd_punteros[i_i]);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar\n",i_tardanza);
+	// return 0;
+// }
+
+// /*####################################################################################
+// ####################################################################################
+// ####################################################################################
+// ####################################################################################
+// */
+
+// // De acá en adelante van las funciones a declarar
+
+// // Esta función me genera un número random
+// double Random(){
+	// return ((double) rand()/(double) RAND_MAX);
+// }
+
+
+// // Estas son las funciones de Inicialización.
+// // #########################################################################################################
+
+
+// // Esta función es para observar los vectores double
+// int Visualizar_d(double *pd_vec){
+	// // Defino las variables que voy a necesitar.
+	// int i_F,i_C;
+	// i_F = *pd_vec;
+	// i_C = *(pd_vec+1);
+	
+	// // Printeo mi vector
+	// for(register int i_i=0; i_i<i_F; i_i++){
+		// for(register int i_j=0; i_j<i_C; i_j++) printf("%lf\t",*(pd_vec+i_i*i_C+i_j+2));
+		// printf("\n");
+	// }
+	// printf("\n");
+	
+	// return 0;
+// }
+
+// // Esta función es para observar los vectores float
+// int Visualizar_f(float *pf_vec){
+	// // Defino las variables que voy a necesitar.
+	// int i_F,i_C;
+	// i_F = *pf_vec;
+	// i_C = *(pf_vec+1);
+	
+	// // Printeo mi vector
+	// for(register int i_i=0; i_i<i_F; i_i++){
+		// for(register int i_j=0; i_j<i_C; i_j++) printf("%lf\t",*(pf_vec+i_i*i_C+i_j+2));
+		// printf("\n");
+	// }
+	// printf("\n");
+	
+	// return 0;
+// }
+
+// // Esta función es para observar los vectores int
+// int Visualizar_i(int *pi_vec){
+	// // Defino las variables que voy a necesitar.
+	// int i_F,i_C;
+	// i_F = *pi_vec;
+	// i_C = *(pi_vec+1);
+	
+	// // Printeo mi vector
+	// for(register int i_i=0; i_i<i_F; i_i++){
+		// for(register int i_j=0; i_j<i_C; i_j++) printf("%d\t",*(pi_vec+i_i*i_C+i_j+2));
+		// printf("\n");
+	// }
+	// printf("\n");
+	
+	// return 0;
+// }
+
+// // Esta función va a recibir un vector double y va a escribir ese vector en mi archivo.
+// int Escribir_d(double *pd_vec, FILE *pa_archivo){
+	// // Defino las variables del tamaño de mi vector
+	// int i_C,i_F;
+	// i_F = *pd_vec;
+	// i_C = *(pd_vec+1);
+	
+	// // Ahora printeo todo el vector en mi archivo
+	// for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%lf",*(pd_vec+i_i+2));
+	// fprintf(pa_archivo,"\n");
+	
+	// return 0;
+// }
+
+// // Esta función va a recibir un vector int y va a escribir ese vector en mi archivo.
+// int Escribir_i(int *pi_vec, FILE *pa_archivo){
+	// // Defino las variables del tamaño de mi vector
+	// int i_C,i_F;
+	// i_F = *pi_vec;
+	// i_C = *(pi_vec+1);
+	
+	// // Ahora printeo todo el vector en mi archivo
+	// for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%d",*(pi_vec+i_i+2));
+	// fprintf(pa_archivo,"\n");
+	
+	// return 0;
+// }
+
+// // Esta función me calcula la norma de un vector
+// double Norma_d(double *pd_x){
+	// // Defino mis variables iniciales que son el resultado final, la suma de los cuadrados y el tamaño de mi vector
+	// double d_norm,d_sum = 0;
+	// int i_C,i_F;
+	// i_F = *pd_x;
+	// i_C = *(pd_x+1);
+	
+	// // Calculo la norma como la raíz cuadrada de la sumatoria de los cuadrados de cada coordenada.
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) d_sum += *(pd_x+i_i+2)*(*(pd_x+i_i+2));
+	// d_norm = sqrt(d_sum);
+	// return d_norm;
+// }
+
+// // Esta función me calcula la diferencia entre dos vectores
+// int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
+	// // Compruebo primero que mis dos vectores sean iguales en tamaño
+	// if(*pd_x1!=*pd_x2 || *(pd_x1+1)!=*(pd_x2+1) || *pd_x1!=*pd_Dx || *(pd_x1+1)!=*(pd_Dx+1)){
+		// printf("Los vectores son de tamaños distintos, no puedo restarlos\n");
+		// return 0;
+	// }
+	
+	// // Defino las variables de tamaño de mis vectores
+	// int i_C,i_F;
+	// i_F = *pd_x1;
+	// i_C = *(pd_x2);
+	
+	// // Defino mi vector intermedio de registro de datos y lo inicializo
+	// double *pd_diferencias;
+	// pd_diferencias = (double*) malloc((i_C*i_F+2)*sizeof(double));
+	// *pd_diferencias = i_F;
+	// *(pd_diferencias+1) = i_C;
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = 0;
+	
+	// // Calculo la diferencia entre dos vectores
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
+	
+	// // Me anoto la diferencia en un vector que está en el main del programa, y luego libero el espacio usado.
+	// for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_diferencias+i_i+2);
+	// free(pd_diferencias);
+	// return 0;
+// }
+
+
