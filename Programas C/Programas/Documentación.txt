@@ -1,54 +1,55 @@
-En este archivo voy a ir anotando qué hacen las distintas instancias del main que
-voy a ir guardando.
+En este archivo voy a ir anotando qué hacen las distintas versiones del
+programa que vaya guardando. De esta manera tendré registros de las versiones
+de los programas en la medida en que los voy modificando.
 ----------------------------------------------------------------------------------
 
-21/03/2020
+30/12/2020
 
-Este programa lo que hace es arma una red de NxN individuos, con F parámetros y 
-Q opiniones. Luego de hacerla evolucionar una gran cantidad de iteraciones,
-registra los datos en un txt. Lo importante en esta sería el hecho de que está
-armado el cómo hacer un txt. No está implementado para nada el cómo hacer para 
-muchos Q o F, o el cómo asignar números. Pongámosle un nombre a eso. Llamémoslo
-etiquetar vectores.
+Armé la carpeta "Iteración ordenada". Esta versión contiene 2 structs, uno de 
+Parámetros y uno de la Red. El programa puede armar las redes, inicializarlas,
+aplicar el método RK4 y evolucionar el sistema. Luego guarda los datos de la
+matriz de Adyacencia, la de Superposición y los valores de Opiniones a medida
+que evoluciona. Me crea a la salida un archivo con el nombre
+"Datos_Evolucion_Opinion_N=$_T=$_K=$".
+
+Lo que tiene este programa y el motivo por el cuál lo voy a archivar es que
+la iteración se realiza de manera ordenada, evolucionando a TODOS los agentes
+al mismo tiempo. De alguna manera es como si tomara una fotografía del sistema,
+se fijara cómo deben evolucionar todos los agentes dada esta foto y luego de
+calcular cuál sería el avance para todos, recién ahí hiciera la evolución.
+
+Pablo me propuso que este avance tan ordenado podría estar afectando a la forma
+de evolucionar del sistema y que por tanto debería probar primero con realizar
+una recorrida ordenada de los agentes, pero permitiendo que estos se conecten con
+1 agente de manera aleatoria. Después en el futuro quizás le permita además que
+la selección de quién va a evolucionar sea también aleatoria.
+
+Dado esto, se me presenta la oportunidad de modificar el RK4 usado, de manera
+de que el RK4 sea mucho más general en su forma de iterar. Estoy pensando en
+que quizás eso me lleve a construir nuevas funciones que encierren al RK4 mientras
+hago iterar al sistema. Habrá que ver eso. Pero lo importante es que entonces el
+motivo de no guardar un sólo archivo sino toda la carpeta en "Iteración Ordenada"
+es que las funciones guardadas en sus archivos general, inicializar y avanzar
+no van a ser las mismas que las que voy a armar ahora.
+
 ---------------------------------------------------------------------------------
 
-23/03/2020
+07/01/2021
 
-Voy a guardar acá una copia del archivo que tiene la suma de las etiquetas. Armar
-ese archivo tomó 20 minutos, no querría por accidente sobreescribirlo como un boludo.
-El archivo es de una red de 48 individuos, con F=4 y Q=5. Es una larga tira donde
-cada número es la suma de las etiquetas en esa iteración de la red.
----------------------------------------------------------------------------------
+Armé la carpeta "Interacción de a pares". Esta carpeta lo que contiene es el programa
+modificado de manera de que cada iteración recorra a todos los agentes y realice las
+interacciones con un segundo agente seleccionado de manera aleatoria. En esta
+versión el sistema evoluciona de a una sóla variable a la vez. Ahora el RK4 toma
+una sola variable y esa la evoluciona, y la variable se define por fuera del RK4.
 
-28/03/2020
-
-Guardé una copia del main que tenía hasta ahora antes de modificarlo para poder
-estudiar el tiempo de Termalización en función del tamaño de la red. Al archivo que
-guardé lo llamé Termalización. Lo que hace es armar una red de 48*48, con F=4 y Q=5
-a la cual inicializa y luego realiza N2*N2*F iteraciones, y en cada una calcula el
-valor de la Suma total de las etiquetas de cada individuo. Luego printea todo eso en
-una sóla fila en un txt, para poder ver el tiempo de termalización de la red.
-  No te olvides que N2 es el largo de la red N + 2.
-----------------------------------------------------------------------------------
-
-29/03/2020
-
-Guardé el archivo Termalización varios N. Lo que hace es armar archivos que se llaman
-"Termalizacion_Red_N=$.txt" que tienen una única fila con la suma de las etiquetas
-con cada estado tomado cada N2 iteraciones. Está armado para que haga desde N = 4 
-hasta 512.
------------------------------------------------------------------------------------
-
-13/04/2020
-
-Agregué a la carpeta tres archivos. Primero el Ejecutar.sh, el cual uso para poder
-ejecutar archivos de código Bash. Este archivo lo ejecuto usando ./Ejecutar.sh $$
-en la línea de comando. En donde va el signo de dinero pongo el nombre del archivo
-.sh que estoy queriendo ejecutar. El segundo programa que agregué es el Instanciar.sh
-el cual sirve para correr varias veces un programa .c. El objetivo de esto es
-solucionar el problema de que cuando corro problemas largos el programa hasta el final
-no me dice el tiempo que tarda cada iteración. Entonces de esta manera cada iteración
-se realiza por separado, y entonces me cuenta cuanto tarda cada iteración.
-  Por último, agregué el programa de Termalización para cada N pero esta vez que pueda
-tomar el largo de la red como un input de la línea de comando, para que el programa
-Instanciar.sh lo pueda correr y le pase el tamaño de la red correcto.
+Estoy guardando ahora el archivo porque el otro día intenté agregar elementos al
+Struct de la Red y eso me descuajeringó todo. Ahora mismo logré hacer que el
+programa vuelva a funcionar, por lo que por lo menos de movida, ahora
+todo vuelve a estar en su lugar. Lo que voy a hacer ahroa es volver a intentar
+agregar los elementos necesarios a los structs e intentar hacer funcionar el
+programa de nuevo. Si todo funca, genial. Sino, habrá que ir revisando de nuevo
+cómo hacerlo funcionar. Igual, pareciera que el problema giraba en torno a los
+PRE incrementos colocados en los for. Al cambiar eso, pareciera que se ordenó todo.
+También puede ser que hubiera problemas que están guardados en los archivos.o
+que yo desconozco y si hubiera borrado y re armado esos archivos estos problemas
+se hubieran solucionado antes, quién sabe.
