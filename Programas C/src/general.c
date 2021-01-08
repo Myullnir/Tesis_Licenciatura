@@ -25,30 +25,46 @@ double Gaussiana(float f_mu, float f_sigma){
 	return d_z*f_sigma+f_mu;
 }
 
-// Esta función me calcula la norma de la distancia entre dos partículas
-double Norma(double *pd_x){
-	// Defino mis variables iniciales
-	double d_norm;
+// Esta función me calcula la norma de un vector
+double Norma_d(double *pd_x){
+	// Defino mis variables iniciales que son el resultado final, la suma de los cuadrados y el tamaño de mi vector
+	double d_norm,d_sum = 0;
+	int i_C,i_F;
+	i_F = *pd_x;
+	i_C = *(pd_x+1);
 	
-	// Calculo la norma como la raíz cuadrada de la sumatoria de los cuadrados de cada coordenada. (Hasta ahora considera vectores de tres coordenadas.)
-	d_norm = sqrt((*pd_x)*(*pd_x)+(*(pd_x+1))*(*(pd_x+1))+(*(pd_x+2))*(*(pd_x+2)));
+	// Calculo la norma como la raíz cuadrada de la sumatoria de los cuadrados de cada coordenada.
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) d_sum += *(pd_x+i_i+2)*(*(pd_x+i_i+2));
+	d_norm = sqrt(d_sum);
 	return d_norm;
 }
 
-// Esta función me calcula el vector desplazamiento entre dos partículas
-int delta_x(double *d_x1, double *d_x2, double d_L, double *d_Dx){
-	// Defino mi vector intermedio de registro de datos
-	double *d_diferencias;
-	d_diferencias = (double*) malloc(3*sizeof(double));
+// Esta función me calcula la diferencia entre dos vectores
+int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
+	// Compruebo primero que mis dos vectores sean iguales en tamaño
+	if(*pd_x1!=*pd_x2 || *(pd_x1+1)!=*(pd_x2+1) || *pd_x1!=*pd_Dx || *(pd_x1+1)!=*(pd_Dx+1)){
+		printf("Los vectores son de tamaños distintos, no puedo restarlos\n");
+		return 0;
+	}
 	
-	// Calculo la diferencia entre dos vectores de R^3
-	for(int i_i=0;i_i<3;i_i++) *(d_diferencias+i_i) = *(d_x1+i_i)-*(d_x2+i_i);
-	for(int i_i=0;i_i<3;i_i++) if(*(d_diferencias+i_i) < -0.5*d_L) *(d_diferencias+i_i) = *(d_diferencias+i_i)+d_L;
-	for(int i_i=0;i_i<3;i_i++) if(*(d_diferencias+i_i) > 0.5*d_L) *(d_diferencias+i_i) = *(d_diferencias+i_i)-d_L;
+	// Defino las variables de tamaño de mis vectores
+	int i_C,i_F;
+	i_F = *pd_x1;
+	i_C = *(pd_x1+1);
+	
+	// Defino mi vector intermedio de registro de datos y lo inicializo
+	double *pd_diferencias;
+	pd_diferencias = (double*) malloc((i_C*i_F+2)*sizeof(double));
+	*pd_diferencias = i_F;
+	*(pd_diferencias+1) = i_C;
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = 0;
+	
+	// Calculo la diferencia entre dos vectores
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
 	
 	// Me anoto la diferencia en un vector que está en el main del programa, y luego libero el espacio usado.
-	for(int i_i=0;i_i<3;i_i++) *(d_Dx+i_i) = *(d_diferencias+i_i);
-	free(d_diferencias);
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_diferencias+i_i+2);
+	free(pd_diferencias);
 	return 0;
 }
 

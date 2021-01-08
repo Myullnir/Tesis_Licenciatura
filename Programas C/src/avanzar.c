@@ -44,8 +44,8 @@ double Din2(s_Red var, s_Param par){
 	d_sumatoria += Din1(var,par);
 	
 	// Obtengo el tamaño de Columnas de mi matriz de Vectores de opinión y calculo el valor del campo que define mi ecuación diferencial
-	int i_Columnas = (int) var.pd_Opi[1];
-	d_resultado = -var.pd_Opi[var.i_agente*i_Columnas+var.i_topico+2]+par.f_K*d_sumatoria;
+	int i_C = (int) var.pd_Opi[1];
+	d_resultado = -var.pd_Opi[var.i_agente*i_C+var.i_topico+2]+par.f_K*d_sumatoria;
 	return d_resultado;
 }
 
@@ -53,12 +53,12 @@ double Din2(s_Red var, s_Param par){
 int Iteracion(s_Red var, s_Param par, double (*pf_Dinamica)(s_Red var, s_Param par)){
 	// Simplemente copio lo que estaba usando antes
 	// Primero itero en los agentes, luego defino el segundo agente y evoluciono al primero interactuando con el segundo.
-	for(var.i_agente=0; var.i_agente<par.i_N; ++var.i_agente){
+	for(var.i_agente=0; var.i_agente<par.i_N; var.i_agente++){
 			do{
 				var.i_agente2 = rand()%par.i_N;
 			}
 			while(var.i_agente==var.i_agente2);
-			for(var.i_topico=0; var.i_topico<par.i_T; ++var.i_topico) RK4(var.pd_Opi, var, par, pf_Dinamica);
+			for(var.i_topico=0; var.i_topico<par.i_T; var.i_topico++) RK4(var.pd_Opi, var, par, pf_Dinamica);
 		}
 		
 	return 0;

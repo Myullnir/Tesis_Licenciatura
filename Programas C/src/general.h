@@ -13,6 +13,9 @@ typedef struct Red{
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
 	int i_topico; // Entero que representa el tópico que estoy mirando. Es un valor que va entre 0 y T-1
 	int i_agente2; // Este es el segundo agente con el cual se pone en contacto el primero.
+	double *pd_PreOpi; // Vector que guarda la matriz de opiniones del sistema en el paso temporal Previo.
+	double *pd_Diferencia; // Vector que guarda las diferencias entre PreOpi y Opi.
+	double d_ErrCuad; // Esto es el "Error Cuadrático" de la diferencia de opiniones entre Opi Y PreOpi.
 }s_Red;
 
 typedef struct Parametros{
@@ -31,8 +34,8 @@ typedef struct Parametros{
 
 double Random();
 double Gaussiana(float f_mu, float f_sigma);
-double Norma(double *d_x);
-int delta_x(double *d_x1, double *d_x2, double d_L, double *d_Dx);
+double Norma_d(double *pd_x);
+int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx);
 int RK4(double *pd_vec ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par));
 int Visualizar_d(double *pd_vec);
 int Visualizar_f(float *pf_vec);
