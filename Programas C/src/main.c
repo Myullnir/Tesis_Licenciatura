@@ -22,11 +22,11 @@ int main(int argc, char *argv[]){
 		s_Red red;
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = 5; // Cantidad de agentes en el modelo
+		datos.i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
-		datos.f_K = 2; // Influencia social
+		datos.f_K = strtof(argv[2],NULL); // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
 		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]){
 	fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
 	Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 	
-	printf("Este es mi sistema antes de evolucionarlo\n");
-	Visualizar_d(red.pd_Opi);
+	// printf("Este es mi sistema antes de evolucionarlo\n");
+	// Visualizar_d(red.pd_Opi);
 	
 	// Evolucionemos el sistema y probemos que estoy cambiando al sistema	
 	for(register int i_i=0; i_i<i_Pasos; i_i++){
@@ -105,14 +105,15 @@ int main(int argc, char *argv[]){
 		Iteracion(red,datos,pf_EcDin);
 		Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 		Delta_Vec_d(red.pd_Opi,red.pd_PreOpi,red.pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
-		red.d_ErrCuad = Norma_d(red.pd_Diferencia); // Calculo la suma de las diferencias al cuadrado y la normalizo.
+		red.d_ErrCuad = (Norma_d(red.pd_Diferencia)/(datos.i_N*datos.i_T)); // Calculo la suma de las diferencias al cuadrado y la normalizo.
+		// Al ErrCuad lo multiplico por 1000 para que no sea tan chico al graficarlo.
 		fprintf(pa_archivo2,"\t%lf",red.d_ErrCuad);
 	}
 	
-	printf("Este es mi sistema final\n");
-	Visualizar_d(red.pd_Opi);
+	// printf("Este es mi sistema final\n");
+	// Visualizar_d(red.pd_Opi);
 
-	// Libero los espacios dedicados a mis vectores y cierro mi archivo
+	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(red.pd_Ang);
 	free(red.pi_Ady);
 	free(red.pd_Opi);
