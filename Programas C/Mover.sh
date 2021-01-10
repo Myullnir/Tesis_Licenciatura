@@ -1,4 +1,8 @@
 #!/bin/bash
 # Este programa lo voy a usar para mover los archivos de datos a la carpeta de Python.
+# Y también para convertirlos en txt
 
-mv Datos_* ../"Programas de Python"/Datos/
+for nombre in Datos_*
+do
+	mv $nombre ../"Programas de Python"/"Datos Corte"/$nombre
+done

@@ -5,7 +5,12 @@
 
 make all
 
-for N in {4..100..2}
+for N in {2..15}
 do
-	./axelrod.e $N
+	for K in {0..5}
+	do
+		./$1.e $N $K
+	done
 done
+
+./Mover.sh

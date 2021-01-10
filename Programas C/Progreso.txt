@@ -870,3 +870,126 @@ y luego manden todos los datos a la carpeta de C correspondiente.
 nombre de mis archivos para agregarles una extensión txt.
 
 Voy a subir todo esto a GitHub
+
+----------------------------------------------------------------------------------
+
+08/01/2021
+
+Ahí subí todo a Github hoy a la mañana. Por accidente apreté enter
+y subí los archivos del Source sin un nombre correcto, ni hablar de
+que no le puse descripción. En ese archivo se puede ver que ya cambié
+todos los i_filas (y las columnas también), y les puse un único nombre
+en todas las funciones, para que sea siempre i_F e i_C.
+Eso era una tarea de unificación necesaria.
+
+Ahora voy a empezar a trabajar en Python para armar una estructura que
+levante los datos y los grafique. Mi objetivo ahora es mirar un poco
+cuando se produce el corte en mis datos y ver si puedo armar alguna relación
+entre la variable de corte, K y N.
+
+El programa de Python me parece que está bastante prolijo y ahora está
+armado para levantar los datos de los archivos y graficarlos. En particular
+lo que hace la función es tomar las opiniones de todos los sujetos en
+una iteración respecto a un tópico, elevarlas al cuadrado, sumarlas y
+normalizarlas según la cantidad de agentes.
+Además, por una cuestión de que la leyenda del gráfico no me tape todo,
+antes de graficar los datos lo que hago es sumar estos valores al cuadrado
+y sumados de todas las opiniones de un tópico sobre todos los tópicos.
+De esa manera lo que estoy graficando es una sumatoria de las opiniones
+sobre TODOS los tópicos. Repito que esto es para una simplificación de la
+graficación por un tema de que al final del día yo espero que todas las
+opiniones se estabilicen en algún valor, por lo que como todas convergen
+a algo, la suma también va a converger. En este momento perder rastro de
+los valores de cada opinión no es un problema porque lo que yo quiero medir
+es más o menos cuantos pasos requiere el sistema para alcanzar un punto
+de convergencia. Al parecer con 7500 paso le sobra a todos los sistemas.
+
+Es más, cuando lo corra en C para tener bastantes más datos, lo que
+podría hacer es reducir el tiempo de corrida a 10000 paso.
+
+Bueno, ¿qué voy a hacer la próxima vez que agarre esto?:
+
+.) Tengo que terminar de armar el cargado de datos de los errores cuadráticos.
+Necesito eso para determinar correctamente un punto de corte.
+.) Modificar el main para que tome datos desde la línea de comando.
+.) Modificar el Bash para que las instanciaciones corran el programa
+y luego manden todos los datos a la carpeta de C correspondiente.
+.) Si queda tiempo y ganas, investigar un poco sobre cómo cambiar el
+nombre de mis archivos para agregarles una extensión txt.
+
+-------------------------------------------------------------------------------
+
+09/01/2021
+
+Ya armé el programa para que tome los archivos de errores y lo grafique.
+Fue bastante fácil, total fue hacer una copia casi del código
+para graficar los datos de opiniones. Lo raro es lo que estoy viendo en
+los datos. Al parecer el sistema primero cae a un primer mínimo local.
+Esto se encuentra cerca de las 2500 iteraciones. Hasta este punto, la
+evolución parece bastante caótica porque la suma de diferencias cuadráticas
+oscila fuertemente. Luego de eso el ruido se reduce de forma considerable
+y las diferencias cuadradas comienzan a aumentar hasta llegar a un pico
+claramente definido, apenas antes de las 5000 iteraciones. De ahí descienden
+las diferencias a cero de manera progresiva y sin ningún ruido.
+Es como si el sistema alcanzara un punto crítico en el cual se
+decide un claro estado "ganador" que se encarga de absorber a todos los
+demás estados. Me lo imagino como que se habían formado ciertas comunidades,
+(Cosa rara porque no hay ningún mecanismo de formación de comunidades),
+y luego el gran cambio se da porque una comunidad colapsa y es absorbida
+por la otra.
+Lo interesante es que jamás se me hubiera ocurrido ver esto tomando en cuenta
+los gráficos de opiniones. Ese gráfico, con las pérdidas de información
+que implica, pareciera sugerir un progresivo avance hacia una dirección
+que ya en la iteración 5000 pareciera haberse prácticamente establecido.
+
+Esto es raro, pero bueno, ahora voy a tomar MUCHAS mediciones más
+y ver qué pasa. Mi mayor miedo es qué hacer con la leyenda. 
+Quizás la ignore. Eso lo pensaré una vez que tenga mis datos.
+
+Primero tengo entonces que modificar el archivo Bash.
+También tengo que armar una carpeta separada para guardar mis nuevos
+datos. No quiero borrar los que tengo hasta haberlo charlado con
+Pablo.
+
+De paso, te comento que por alguna razón no habías realmente
+normalizado los errores. Sólo para que lo sepas. Igual quizás
+también convenga multiplicarlo por algún número grande,
+sólo para que no se vea tan chico.
+
+Armé un nuevo archivo en Prosem para probar un poco el tema de
+mandarle números al programa a través de input por línea de comando.
+En el mismo archivo está explicado detalladamente cómo funcionan las
+variables argc y argv, así como la función strtol que voy a usar para
+el programa. Ya mañana lo puedo mandar a correr y sacar muchos
+datos.
+
+Lo que sí voy a necesitar es armar una segunda carpeta donde
+guardar esos datos. Y modificar el instanciar.sh para que
+mande todos los archivos a esa carpeta y no a la ya existente.
+
+----------------------------------------------------------------------------------
+
+10/01/2021
+
+Cosas importantes de hoy. Ya modofiqué el instanciar para que
+corra muchos N y muchos K. Es más, ya lo hice correr, así que
+eso ya está hecho. Además el programa levanta todos los archivos
+con nombre "Datos_*" y los mueve a la carpeta de Datos Corte
+dentro de la carpeta de programas Python.
+
+Por otra parte, al parecer el antivirus era lo que impedía
+que el comando mv cambie los nombres de los archivos. Así que
+modifiqué eso ahora para que los nombres de los archivos movidos
+se escriban como txt.
+Ahora que lo pienso, si bien puedo hacerlo, eso no necesariamente
+es bueno. Creo que voy a seguir trabajando sin eso, porque al final
+me va a generar más problemas.
+
+También tuve que poner una nueva función, strtof, que me permite
+convertir números en floats. Bah, yo digo que tuve, pero en
+realidad lo hice por si acaso porque el número K está definido
+como un float, pero en realidad no sé si me hubiera tirado un
+error el usar el strtol.
+
+Ahora debería levantar los datos con Python y ver qué me da. 
+Eso lo haré mañana seguro.

@@ -1,9 +1,17 @@
 // Este archivo es para guardar programas de pruebas armados previamente.
 
+Para acceder a los programas rápido salteando todo el código que no querés ver
+lo que tenés que hacer es apretar Ctrl+F, eso te abre el buscador de palabras dentro del código.
+Lo que tenés que buscar es la palabra "NUEVO_PROGRAMA", con las mayúsculas y guión, todo correcto.
+Luego vas saltando de uno al siguiente, y eso rápidamente te mueve entre programas
+
 
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
+
+NUEVO_PROGRAMA
+
 
 Este es el programa que armé el 14/12/2020. La idea era probar cómo funcionan los arrays de punteros.
 Esto es sólo para ver cómo funcionan, no hace nada especial. La sección de la evolución dinámica del
@@ -419,6 +427,8 @@ sistema no es necesaria para este programa.
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 
+NUEVO_PROGRAMA
+
 Este programa lo usé el 21/12/2020 para probar mi función de RK4. La estoy probando
 usando la función Duplicar. Esta función lo que hace es determinarme una ecuación
 diferencial en la cual la derivada es igual a un múltiplo del valor actual de
@@ -817,6 +827,8 @@ Esta probado, funciona bárbaro la función RK4
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
+
+NUEVO_PROGRAMA
 
 30/12/2020
 
@@ -1255,6 +1267,8 @@ el vector en tu archivo.
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
+
+NUEVO_PROGRAMA
 
 Este programa lo terminé el 01/01/2021. Acá lo que hice fue modificar el RK4, la función Din2 y Din1.
 El motivo es para poder realizar interacciones de agentes de a pares, en vez de hacerlos con todos los agentes
@@ -1733,6 +1747,8 @@ se podría ahorrar igualmente. Esta mejora y otras más, se encuentran anotadas 
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------
 
+NUEVO_PROGRAMA
+
 Este programa lo hice el 03/01/2021. La idea era modificar las funciones de Deltax y
 la que calculaba la norma de los vectores de manera de poder usarla de forma más general.
 Para esto hice que puedan tomar el tamaño de los vectores de las primeras coordenadas
@@ -1977,3 +1993,112 @@ diferencias entre vectores y sus normas.
 // }
 
 
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+NUEVO_PROGRAMA
+
+Este programa lo hice el 07/01/2021. La idea era ver si se podía escribir en dos
+archivos de manera simultánea. Efectivamente se puede, se necesitan abrir dos punteros
+a FILE diferenciados y abrir los distintos programas por separado. Después de eso, todo
+funca bárbaro. Es muy corto, saqué todo lo que no fuera necesario. Así que no tiene
+ninguna de las otras funciones.
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+
+// int main(){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Voy a abrir un archivo y guardar algo en él
+	// char s_Nombre1[255];
+	// sprintf(s_Nombre1,"Primer Archivo");
+	// FILE *pf_archivo1=fopen(s_Nombre1,"w");
+	// fprintf(pf_archivo1,"Estoy escribiendo en el primer archivo\n");
+	
+	// // Ahora abro un segundo archivo en el mismo código
+	// char s_Nombre2[255];
+	// sprintf(s_Nombre2,"Segundo Archivo");
+	// FILE *pf_archivo2=fopen(s_Nombre2,"w");
+	// fprintf(pf_archivo2,"Estoy escribiendo en el segundo archivo\n");
+	
+	// for(register int i_i=0; i_i<10; i_i++){
+		// fprintf(pf_archivo1,"%d\n",i_i);
+		// fprintf(pf_archivo2,"%d\n",i_i);
+	// }
+	
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// fclose(pf_archivo1);
+	// fclose(pf_archivo2);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar\n",i_tardanza);
+	// return 0;
+// }
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+NUEVO_PROGRAMA
+
+Este programa lo armé el 09/01/2021. La idea era probar el funcionamiento del
+argc y del argv para ver cómo se pasan datos a la función a través de línea
+de comando. También acá probé el uso de la función strtol. Estas dos cosas
+están muy bien explicadas al final de este programa.
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+
+	// // Defino dos variables a las que les voy a pasar input desde línea de comando, y las voy a sumar.
+	// int i_var1,i_var2;
+	// i_var1 = strtol(argv[1],NULL,10);
+	// i_var2 = strtol(argv[2],NULL,10);
+	
+	// printf("La suma de los numeros que me pasaste es: %d \n",i_var1+i_var2);
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar\n",i_tardanza);
+	// return 0;
+// }
+
+// Voy a explicar acá cómo funca el strtol(const char *str, char **endptr, int base).
+// La idea es que uno le pasa el string str. Este string puede tener una parte numérica seguida de una parte
+// literal. O podría ser sólo numérica. La cosa es que uno le pasa el str a la primera coordenada. A la segunda
+// coordenada le pasa la dirección de un puntero donde la función va a guardar la parte literal sobrante de str.
+// Siempre se puede poner NULL ahí en caso de que uno no quiera guardar esa info. El tercer elemento es la
+// base numérica a la cual quiere convertir el número. Claramente yo me muevo en base 10, así que eso
+// siempre puede ser 10 tranquilamente.
+
+// Expliquemos también argc y *argv. argc es el número de elementos pasados en por input de línea de
+// comando al main. En particular el nombre del archivo SIEMPRE se pasa, así que argc siempre es 1 como mínimo.
+// Por otro lado, en cada coordenada argv guarda cada uno de los argumentos pasados. argv[0] es el nombre del
+// archivo. argv[1] es el primer argumento. argv[2] es el segundo argumento, y así.
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------

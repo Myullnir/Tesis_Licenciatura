@@ -7,6 +7,6 @@ echo Apreta enter para correr, sino primero apreta alguna letra y despues enter
 read decision
 if [ -z $decision ]
 then
-	./$1.e
+	./$1.e $2 $3 $4 $5 $6
 fi
 	
