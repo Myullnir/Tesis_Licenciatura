@@ -1,4 +1,0 @@
-1) Usar Runge-Kutta 4 para el programa
-2) Pasar todo el código a Python
-3) Estudiar el valor de Deltat útil para el sistema
-4) Hacer cálculo del Runge-Kutta con 2 o tres usuarios
