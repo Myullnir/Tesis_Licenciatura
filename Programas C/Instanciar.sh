@@ -5,7 +5,7 @@
 
 make all
 
-for N in {2..15}
+for N in {16..30}
 do
 	for K in {0..5}
 	do

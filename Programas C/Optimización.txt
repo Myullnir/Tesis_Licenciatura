@@ -29,3 +29,22 @@ Implementando esto en la función Din1, lo que lograría es que el sistema
 no tenga que usar el if y que en un sólo intento genere el número que
 quiero, de manera que el agente principal interactúe con alguien que
 no es él mismo.
+
+.) En el archivo de Análisis Datos.ipynb fijate que en el módulo que
+usé para calcular Kmin y Kmax, estoy considerando a K entero. K por
+definición en mis funciones es un float. Eso podría ser un problema
+al intentar armar un for entre esos valores de K. La función que detecta
+mínimos y máximos puede seguir funcionando bárbaro si cambio las
+transformaciones de int a float, pero habría que revisar algo sobre
+el paso que existe entre valores para hacer que el código no se
+trabe si hubiera valores de K que fueran floats.
+Se me ocurre que no sólo mida el Kmin y el Kmax, que mida un deltaK.
+Luego podría tomar la diferencia de Kmax-Kmin, dividirla por el
+deltaK y eso me daría la cantidad de valores de K que hay en
+ese intervalo. Luego armaría alguna ecuación que moviendo algún
+entero en ese intervalo me reproduzca los valores de K y listo.
+Creo que ya sé cómo hacerlo. Simplemente me anoto TODOS los valores
+de K que me encuentre en una lista. Convierto la lista a Set para
+eliminar las repeticiones. Después la vuelvo lista de nuevo.
+La ordeno. El primer elemento es el Kmin. El último elemento
+es el Kmax. La diferencia del primero con el segundo es el deltaK.

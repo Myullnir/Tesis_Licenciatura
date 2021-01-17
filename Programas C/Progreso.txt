@@ -971,7 +971,7 @@ mande todos los archivos a esa carpeta y no a la ya existente.
 
 10/01/2021
 
-Cosas importantes de hoy. Ya modofiqué el instanciar para que
+Cosas importantes de hoy. Ya modifiqué el instanciar para que
 corra muchos N y muchos K. Es más, ya lo hice correr, así que
 eso ya está hecho. Además el programa levanta todos los archivos
 con nombre "Datos_*" y los mueve a la carpeta de Datos Corte
@@ -993,3 +993,149 @@ error el usar el strtol.
 
 Ahora debería levantar los datos con Python y ver qué me da. 
 Eso lo haré mañana seguro.
+
+--------------------------------------------------------------------------------
+
+14/01/2021
+
+Estoy anotando esto con un día de retraso.
+
+Lo que voy a hacer hoy es tomar los archivos de Python y
+modificarlos de manera de que me hagan un gráfico de Opiniones
+y uno de Errores por cada valor de agentes N, y que en cada
+gráfico entren todos los valores de K considerado. La idea es
+separar un poco todas las curvas para poder entender mejor qué
+está pasando.
+
+Bien, ya logré hacer esto. De paso intenté generalizar el sistema
+haciendo que primero reconozca los valores entre los cuales se
+mueve N y de ahí el código grafica todo correctamente.
+Ahora sería interesante lograr que me guarde los gráficos automáticamente,
+así puedo mirarlos mejor y más cómodo en la pc en vez de mirarlos
+en el notebook de Python.
+
+Bueno, eso fue sencillo, lo realicé con la función plt.savefig().
+Listo, ahora voy a subir estos datos al powerpoint de la tesis,
+voy a subir todas las imágenes asociadas a una carpeta
+que se llame: "Datos Corte", porque son los datos que
+voy a usar para definir el mecanismo de corte.
+
+Ya está todo subido y correctamente documentado en el archivo
+de powerpoint de la tesis.
+
+¿Qué es lo que sigue?
+
+1) Debería empezar a pensar un criterio de corte y ponerlo
+a prueba con los datos. La idea sería que el sistema me grafique
+una línea vertical en mis plots y con eso poder comprobar cuándo
+el sistema cortaría las iteraciones según ese criterio.
+2) Para lo anterior estaría bueno comprobar si realmente
+los valores de ErrCuad están debidamente normalizados o si
+varían con los valores de N y K. Lo ideal sería que estén
+correctamente normalizados. Eso me garantizaría que puedo
+tomar algún valor arbitrario como criterio definitivo
+y estar tranquilo de que nunca va a pasar que el sistema
+nunca llegue a cumplirlo.
+3) Hacer el gráfico de las opiniones para el caso de N=5 
+que tiene ese error con el pico raro. Así lo podemos analizar
+más en detalle.
+4) ¿Podría normalizar los errores cuadráticos usando 
+el máximo del error o no? El problema de eso es que
+eso tiene sentido una vez que YA tenés los datos de errores
+calculados, no me ayudaría a armar un criterio de
+corte para el sistema mientras corre
+
+-----------------------------------------------------------------------------------
+
+15/01/2021
+
+Lo primero que hice fue revisar que no faltara nada en el Github.
+Luego cloné el repositorio de Github en mi carpeta de SiCoMoDa. La
+idea es empezar a usar Github Desktop como una forma más sencilla,
+(y parece que sinceramente lo es), de ir comitteando el progreso
+de mis archivos. De esta manera no soy yo el que tiene que estar
+atento a qué cosas se modificaron, sino que el programa me avisa de
+qué se modificó, crea las carpetas necesarias, sube los archivos.
+Es realmente más cómodo.
+
+Estuve dándole vueltas al asunto del criterio de corte, todavía no
+llegué a un criterio razonable. No me convence del todo la idea de 
+pedirle al sistema que corte cuando llega a cero. ¿Porque si nunca
+llega a cero que hacemos? ¿Y si cero es una aproximación?
+
+Estoy pensando en una cota variable, que sea una fracción del máximo
+de error. De esa manera puedo desentenderme del tamaño de mi sistema
+y del valor de la influencia K. En este caso se me ocurre darle un 
+período largo, unas 1000 iteraciones, en las cuales el sistema se
+encuentre en un intervalo del 10% o del 5% del valor máximo.
+La idea sería ver en los valores que tengo cuánto "tiempo" el
+sistema se encuentra en ese intervalo. Si el tiempo que se encuentra
+ahí es muy grande, es decir que ya en el principio cumple ese criterio,
+el criterio es super holgado y no me sirve. Necesito ver que el sistema
+comience a cumplir con el criterio que yo establezca en el último tramo
+de su evolución.
+
+Por otro lado, para ver si existe una correlación entre K y N y la
+cantidad de pasos necesarios para que el sistema deje de evolucionar
+es que armé un gráfico que me marca la cantidad de ceros que hay en
+el vector de Errores. El motivo de mirar la cantidad de ceros es que en
+todos los sistemas una vez que el sistema llega al cero, no vuelve
+a levantar cabeza. Entonces el número de cantidad de ceros es de alguna
+manera la cantidad de iteraciones demás que hizo el sistema. Si el
+sistema tardara más en llegar a un equilibrio para valores de N y K
+grandes, entonces yo debería ver una caída en la cantidad de ceros
+a medida que K y N crecen.
+
+Creo que estaría bueno hacer cuentas para algunos valores de N más.
+Voy a hacer eso y ver si se ve algo claro.
+
+Ok, hice unas cuantas sumas más para valores de N entre 16 y 30. Por lo
+que vi no aportan MUCHA más claridad. Pareciera que efectivamente
+valores bajos de K llegan a una convergencia total más rápido a medida
+que N aumenta. Después "pareciera" que los valores de K más grande
+tardan más en llegar a una convergencia, y los valores intermedio
+"pareciera" que se organizan de manera que la cantidad de pasos
+necesarios para converger totalmente disminuye a medida que disminuye
+el K. Pongo comillas al pareciera porque la verdad tampoco es
+algo definitivo. El K=1 oscila terriblemente, el K=3 a veces
+está por debajo del K=5, a veces por encima del K=1. No es claro.
+
+Después armé un código para marcar sobre los gráficos de Errores_Corte
+unas barreras de porcentaje respecto del valor del error máximo.
+La idea es visualizar cuántas iteraciones el sistema tarda en reducir
+sus errores por debajo del valor máximo, siendo que la mayoría de los
+comportamientos de los errores son monótonamente decrecientes y que
+por tanto los máximos suelen encontrarse al principio del gráfico.
+También sirve para ver cuánto vive el sistema en cierto umbral, de manera
+de determinar si el hecho que el sistema atraviese esa barrera es un 
+buen criterio de corte o si resulta muy holgado, o muy estricto.
+
+Para la próxima la idea entonces es 
+.) Guardar los gráficosde Umbrales_Error. Van a ser MUCHOS gráficos, 
+la idea es mirar un poco a ojo que efectivamente una vez que el 
+sistema cruza la barrera del 0.5%, por decir un número, se encuentra
+a unas 1000 o 2000 iteraciones de terminar. Entonces le podemos
+pedir que corte luego de 500 iteraciones una vez cruzado ese
+umbral.
+
+.) Para cerciorarme cuántas iteraciones hay de distancia desde que
+el sistema cruza la barrera que le digo que cruce, podría hacer alguna
+clase de resta entre el índice en el cual cruza la barrera
+y el valor en el cual los errores se vuelven cero. Creo que este
+gráfico va a ser el definitivo para elegir un criterio. Idealmente,
+todos los sistemas tienen un mismo valor de cantidad de iteraciones
+desde que cruzan la barrera y eso me permite asegurarme que nunca
+corto muy temprano o muy tarde. Realísticamente van a ser números
+con algo de suerte no muy dispares. De ahí, si quiero un criterio 
+más holgado, puedo tirarme a elegir uno de los números altos,
+si quiero un criterio estricto puedo tomar valores de los bajos,
+si hay mucha disparidad puedo tomar un promedio, ya veré cuando
+tenga el gráfico.
+
+De paso, la idea es que ese gráfico me va a dar una idea
+de cuánto tarda el sistema luego de cruzar una cierta barrera
+en llegar a una convergencia TOTAL, donde ya no varía más.
+Por eso si tomo alguno de los valores más grandes el criterio es
+holgado, porque en ese caso lo que va a pasar es que los sistemas
+van a por si acaso pasar tiempo sin evolucionar en favor de que
+ningún sistema se quede sin llegar a ese estado.

@@ -4,5 +4,5 @@
 
 for nombre in Datos_*
 do
-	mv $nombre ../"Programas de Python"/"Datos Corte"/$nombre
+	mv $nombre ../"Programas Python"/"Datos Corte"/$nombre
 done

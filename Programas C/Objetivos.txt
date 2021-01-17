@@ -5,13 +5,6 @@ scroll hacia arriba en el archivo de progreso cada vez que quiero recordar qué t
 
 .) Optimizar más el código. Todo eso está anotado en el
 archivo de Optimización.txt.
-.) Modificar el archivo de instanciación de Bash para que
-pueda ir tomando valores como input en la línea de comando
-y que pueda correr muchas veces. Eso no es una gran
-urgencia.
-.) Mejorar el archivo de Python para que cuando esté con
-grandes cantidades de datos poder levantarlas y graficarlas
-mejor. Eso surgirá cuando esté graficando.
-.) Verificar si existe alguna relación entre el tamaño de mi
-matriz y los valores a los cuales cae el error cuadrático.
-Quizás puedo normalizarlo de alguna manera eso.
+.) Hacer el gráfico de las opiniones para el caso de N=5 
+que tiene ese error con el pico raro. Así lo podemos analizar
+más en detalle.
