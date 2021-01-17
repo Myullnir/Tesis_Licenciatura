@@ -1,0 +1,14 @@
+En esta carpeta voy a ir guardando ciertos gráficos que haga de manera más particular. En general van a ser los primeros gráficos
+que hago de un cierto tipo y que después seguramente masificaré para sacar alguna estadística o patrón relevante.
+
+Los gráficos que tengo guardados hasta ahora son:
+
+.) Evolución Opiniones: La idea es ver cómo cambian los valores de opinión de los sistemas. Por eso grafico la suma de las opiniones
+cuadradas de todos los agentes. En un gráfico esto lo tengo dividido por tópicos, pero en el resto sumo también sobre todos los tópicos
+para reducir la carga de datos sobre el gráfico e intentar volverlo más legible. Uno de los gráficos está sobrecargado al tener datos
+de sistemas con diversas cantidades de agentes N y diversos valores de influencia social K.
+
+.) Variación del error: Estos son simplemente la suma de la diferencia cuadrada entre la matriz opinion en un paso temporal
+y la misma matriz en un paso temporal previo. Interesantemente en el de Variación del Error se tiene un pico un poco raro.
+En otros gráficos que hice no se ve tan pronunciado. Un análisis más en detalle de esto está escrito en las notas del archivo
+Powerpoint que está en la carpeta Tesis del drive.

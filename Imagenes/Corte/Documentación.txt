@@ -1,0 +1,12 @@
+En esta carpeta voy a guardar dos tipos de gráficos que voy a usar para estudiar un posible mecanismo de corte
+de las iteraciones de mi modelo.
+
+Los dos gráficos que voy a guardar son (Los signos pesos representan números):
+.) Opiniones_Corte_N=$_T=$ : Esto grafica la suma de las opiniones al cuadrado en función de la cantidad de iteraciones.
+El objetivo es poder ver a ojo cuántas iteraciones toma para que el sistema llegue a un valor de convergencia, así como
+poder ver cuál es ese valor de convergencia. Para un análisis más detallado de estos gráficos mirar las notas en el
+archivo powerpoint subido al drive en la carpeta de Tesis. En ese archivo voy guardando los gráficos con los cuales
+analizo mi sistema.
+.) Errores_Corte_N=$_T=$ : Esto grafica la suma de la diferencia cuadrada de la matriz opinión en un paso temporal y la misma
+matriz en el paso temporal previo. Este valor es una especie de error cuadrático que disminuye ne la medida que el
+sistema deja de variar.
