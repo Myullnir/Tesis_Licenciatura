@@ -7,6 +7,24 @@ El objetivo es poder ver a ojo cuántas iteraciones toma para que el sistema lle
 poder ver cuál es ese valor de convergencia. Para un análisis más detallado de estos gráficos mirar las notas en el
 archivo powerpoint subido al drive en la carpeta de Tesis. En ese archivo voy guardando los gráficos con los cuales
 analizo mi sistema.
-.) Errores_Corte_N=$_T=$ : Esto grafica la suma de la diferencia cuadrada de la matriz opinión en un paso temporal y la misma
-matriz en el paso temporal previo. Este valor es una especie de error cuadrático que disminuye ne la medida que el
-sistema deja de variar.
+.) Variaciones_Corte_N=$_T=$ : Esto grafica la variación promedio de cada una de las opiniones del sistema con escala logarítmica
+en Y. 
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Conclusiones:
+
+Los graficos de Opiniones muestran que todos los sistemas tienden a ciertos valroes de convergencia. Estos valores son
+2*K^2. Esto es debido a que dada la ecuación diferencial que rige el sistema, las opiniones de los sujetos tienden a
+los valores de K. Luego, como al graficarlas yo quiero sumarlas y que no se anulen, lo que estoy haciendo es elevarlas
+al cuadrado primero. De ahí se explica que sea K^2. El hecho de que haya un factor 2 multiplicando surge de que
+la cantidad de tópicos es 2. Justamente, porque estoy sumando todas las opiniones de todos los tópicos.
+  El hecho de que la cantidad de agentes no esté afectando tiene que ver con que los valores están normalizados según
+la cantidad de agentes.
+
+Los gráficos de variaciones muestran que las variaciones describen rectas en estos gráficos en los cuales el eje Y
+tiene una escala logarítmica. Esto me demuestra que la variación del sistema se da de forma exponencial. 
+  Podemos observar que en general los sistemas atraviesan el piso de 10^(-6) llegando a las 10000 iteraciones.
+Por tanto diría que una vez cruzado ese piso podemos pedirle al sistema que corte si se mantiene otras
+500 iteraciones debajo de ese piso. Si veo que el programa me sigue tardando mucho, podría subir el piso
+a 3*10^(-6).
