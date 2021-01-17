@@ -52,19 +52,10 @@ int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
 	i_F = *pd_x1;
 	i_C = *(pd_x1+1);
 	
-	// Defino mi vector intermedio de registro de datos y lo inicializo
-	double *pd_diferencias;
-	pd_diferencias = (double*) malloc((i_C*i_F+2)*sizeof(double));
-	*pd_diferencias = i_F;
-	*(pd_diferencias+1) = i_C;
-	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = 0;
-	
 	// Calculo la diferencia entre dos vectores
-	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_diferencias+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
 	
 	// Me anoto la diferencia en un vector que está en el main del programa, y luego libero el espacio usado.
-	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_diferencias+i_i+2);
-	free(pd_diferencias);
 	return 0;
 }
 
@@ -199,7 +190,7 @@ int Escribir_d(double *pd_vec, FILE *pa_archivo){
 	i_C = *(pd_vec+1);
 	
 	// Ahora printeo todo el vector en mi archivo
-	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%lf",*(pd_vec+i_i+2));
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%.12lf",*(pd_vec+i_i+2));
 	fprintf(pa_archivo,"\n");
 	
 	return 0;

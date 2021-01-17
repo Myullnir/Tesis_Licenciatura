@@ -13,6 +13,9 @@ typedef struct Red{
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
 	int i_topico; // Entero que representa el tópico que estoy mirando. Es un valor que va entre 0 y T-1
 	int i_agente2; // Este es el segundo agente con el cual se pone en contacto el primero.
+	double *pd_PreOpi; // Vector que guarda la matriz de opiniones del sistema en el paso temporal Previo.
+	double *pd_Diferencia; // Vector que guarda las diferencias entre PreOpi y Opi.
+	double d_Varprom; // Esto es la Variación promedio del sistema. Es cuanto cambia en promedio cada opinión
 }s_Red;
 
 typedef struct Parametros{
@@ -25,6 +28,7 @@ typedef struct Parametros{
 	int i_Mopi; // Máximo inicial de opiniones
 	float f_Tint; // Esto es el tiempo total que integro a mi sistema
 	float f_dt; // Paso temporal de iteración del sistema
+	double d_NormError; // Este es el factor de normalización de la Variación Promedio.
 }s_Param;
 
 //################################################################################################

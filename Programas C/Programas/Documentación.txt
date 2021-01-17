@@ -53,3 +53,7 @@ PRE incrementos colocados en los for. Al cambiar eso, pareciera que se ordenó to
 También puede ser que hubiera problemas que están guardados en los archivos.o
 que yo desconozco y si hubiera borrado y re armado esos archivos estos problemas
 se hubieran solucionado antes, quién sabe.
+
+Lo actualicé a la versión del 17/01/2021. Es decir, crea dos archivos de texto
+simultáneos, toma valores de input, calcula la variación del sistema, tiene
+dos matrices más que antes.

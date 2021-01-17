@@ -31,6 +31,7 @@ int main(int argc, char *argv[]){
 		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
+		datos.d_NormError = sqrt(datos.i_N*datos.i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
 		int i_Pasos = (int) datos.f_Tint/ datos.f_dt; // Esta es la cantidad de pasos en la que voy a iterar mi sistema.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]){
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		char s_archivo2[255];
-		sprintf(s_archivo2,"Datos_Errcuad_DiferenciaOpi_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
+		sprintf(s_archivo2,"Datos_Variacion_Promedio_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
 		FILE *pa_archivo2=fopen(s_archivo2,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
@@ -105,9 +106,8 @@ int main(int argc, char *argv[]){
 		Iteracion(red,datos,pf_EcDin);
 		Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 		Delta_Vec_d(red.pd_Opi,red.pd_PreOpi,red.pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
-		red.d_ErrCuad = (Norma_d(red.pd_Diferencia)/(datos.i_N*datos.i_T)); // Calculo la suma de las diferencias al cuadrado y la normalizo.
-		// Al ErrCuad lo multiplico por 1000 para que no sea tan chico al graficarlo.
-		fprintf(pa_archivo2,"\t%lf",red.d_ErrCuad);
+		red.d_Varprom = Norma_d(red.pd_Diferencia)/datos.d_NormError; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+		fprintf(pa_archivo2,"\t%.12lf",red.d_Varprom);
 	}
 	
 	// printf("Este es mi sistema final\n");

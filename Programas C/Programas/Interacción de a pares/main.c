@@ -22,28 +22,33 @@ int main(int argc, char *argv[]){
 		s_Red red;
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = 5; // Cantidad de agentes en el modelo
+		datos.i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
-		datos.f_K = 2; // Influencia social
+		datos.f_K = strtof(argv[2],NULL); // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
 		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
+		datos.d_NormError = sqrt(datos.i_N*datos.i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
 		int i_Pasos = (int) datos.f_Tint/ datos.f_dt; // Esta es la cantidad de pasos en la que voy a iterar mi sistema.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
 		red.pd_Ang = (double*) malloc((2+datos.i_T*datos.i_T)*sizeof(double)); // Matriz simétrica de superposición entre tópicos.
 		red.pi_Ady = (int*) malloc((2+datos.i_N*datos.i_N)*sizeof(int)); // Matriz de adyacencia de la red. Determina quienes están conectados con quienes
 		red.pd_Opi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Lista de vectores de opinión de la red, Tengo T elementos para cada agente.
-		// red.pd_PreOpi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
-		// red.pd_Diferencia = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
+		red.pd_PreOpi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
+		red.pd_Diferencia = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		
 		// Voy a abrir dos archivos ahora. Uno para la evolución de opiniones, otro para la evolución del error.
-		char filename[255];
-		sprintf(filename,"Datos_Evolucion_Opinion_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
-		FILE *pa_archivo=fopen(filename,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+		char s_archivo1[255];
+		sprintf(s_archivo1,"Datos_Evolucion_Opinion_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
+		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+		
+		char s_archivo2[255];
+		sprintf(s_archivo2,"Datos_Variacion_Promedio_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
+		FILE *pa_archivo2=fopen(s_archivo2,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
 		// Matriz de Adyacencia. Es de tamaño N*N
@@ -60,6 +65,16 @@ int main(int argc, char *argv[]){
 		for(register int i_i=0; i_i<datos.i_N*datos.i_T+2; i_i++) red.pd_Opi[i_i] = 0;
 		red.pd_Opi[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
 		red.pd_Opi[1] = datos.i_T; // Pongo el número de columnas en la segunda coordenada
+		
+		// Matriz de vectores de opinión en el paso temporal Previo. Es de tamaño N*T
+		for(register int i_i=0; i_i<datos.i_N*datos.i_T+2; i_i++) red.pd_PreOpi[i_i] = 0;
+		red.pd_PreOpi[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
+		red.pd_PreOpi[1] = datos.i_T; // Pongo el número de columnas en la segunda coordenada
+		
+		// Matriz de diferencia entre los vectores Opi y PreOpi. Es de tamaño N*T
+		for(register int i_i=0; i_i<datos.i_N*datos.i_T+2; i_i++) red.pd_Diferencia[i_i] = 0;
+		red.pd_Diferencia[0] = datos.i_N; // Pongo el número de filas en la primer coordenada
+		red.pd_Diferencia[1] = datos.i_T; // Pongo el número de columnas en la segunda coordenada
 				
 		// Inicializo el Agente y Tópico a mirar. Esto no significa mucho porque después lo voy a cambiar.
 		red.i_agente = 0;
@@ -74,31 +89,38 @@ int main(int argc, char *argv[]){
 	GenerarAdy(red,datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
 	GenerarAng(red); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
 	
-	// Anoto los valores de mis tres matrices en mi archivo
-	fprintf(pa_archivo, "\tMatriz de Adyacencia\n");
-	Escribir_i(red.pi_Ady,pa_archivo); // Matriz de Adyacencia
-	fprintf(pa_archivo, "\tMatriz de Superposicion\n");
-	Escribir_d(red.pd_Ang,pa_archivo); // Matriz de Superposición
-	fprintf(pa_archivo, "\tMatriz de Opiniones\n");
-	Escribir_d(red.pd_Opi,pa_archivo); // Matriz de Opinión
+	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
+	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
+	Escribir_i(red.pi_Ady,pa_archivo1); // Matriz de Adyacencia
+	fprintf(pa_archivo1, "\tMatriz de Superposicion\n");
+	Escribir_d(red.pd_Ang,pa_archivo1); // Matriz de Superposición
+	fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
+	Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 	
-	printf("Este es mi sistema antes de evolucionarlo\n");
-	Visualizar_d(red.pd_Opi);
+	// printf("Este es mi sistema antes de evolucionarlo\n");
+	// Visualizar_d(red.pd_Opi);
 	
 	// Evolucionemos el sistema y probemos que estoy cambiando al sistema	
 	for(register int i_i=0; i_i<i_Pasos; i_i++){
+		for(register int i_j=0; i_j<datos.i_N*datos.i_T; i_j++) red.pd_PreOpi[i_j+2] = red.pd_Opi[i_j+2];
 		Iteracion(red,datos,pf_EcDin);
-		Escribir_d(red.pd_Opi,pa_archivo); // Matriz de Opinión
+		Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
+		Delta_Vec_d(red.pd_Opi,red.pd_PreOpi,red.pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+		red.d_Varprom = Norma_d(red.pd_Diferencia)/datos.d_NormError; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+		fprintf(pa_archivo2,"\t%.12lf",red.d_Varprom);
 	}
 	
-	printf("Este es mi sistema final\n");
-	Visualizar_d(red.pd_Opi);
+	// printf("Este es mi sistema final\n");
+	// Visualizar_d(red.pd_Opi);
 
-	// Libero los espacios dedicados a mis vectores y cierro mi archivo
+	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(red.pd_Ang);
 	free(red.pi_Ady);
 	free(red.pd_Opi);
-	fclose(pa_archivo);
+	free(red.pd_PreOpi);
+	free(red.pd_Diferencia);
+	fclose(pa_archivo1);
+	fclose(pa_archivo2);
 	
 	// Finalmente imprimo el tiempo que tarde en ejecutar todo el programa
 	time(&tt_fin);

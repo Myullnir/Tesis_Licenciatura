@@ -13,12 +13,27 @@ int main(int argc, char *argv[]){
 	srand(time(NULL));
 	int i_tardanza;
 
-	// Defino dos variables a las que les voy a pasar input desde línea de comando, y las voy a sumar.
-	int i_var1,i_var2;
-	i_var1 = strtol(argv[1],NULL,10);
-	i_var2 = strtol(argv[2],NULL,10);
+	// Defino unas variables int y doubles para hacer unas cuentas.
 	
-	printf("La suma de los numeros que me pasaste es: %d \n",i_var1+i_var2);
+	double d_resultado;
+	double d_num1 = 0.453;
+	int i_num1 = 250, i_num2 = 1000;
+	
+	char s_archivo1[255];
+	sprintf(s_archivo1,"Prueba");
+	FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+	
+	d_resultado = d_num1/(i_num1*i_num2);
+	
+	fprintf(pa_archivo1,"%.12lf\t", d_resultado);
+	
+	d_resultado = d_num1/ (double) (i_num1*i_num2);
+	
+	fprintf(pa_archivo1,"%lf\t", d_resultado);
+	
+	d_resultado = 0.000000001;
+	
+	fprintf(pa_archivo1,"%lf\t",d_resultado);
 	
 	// Ejecuto los comandos finales para medir el tiempo y liberar memoria
 	time(&tt_fin);
@@ -27,15 +42,5 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-// Voy a explicar acá cómo funca el strtol(const char *str, char **endptr, int base).
-// La idea es que uno le pasa el string str. Este string puede tener una parte numérica seguida de una parte
-// literal. O podría ser sólo numérica. La cosa es que uno le pasa el str a la primera coordenada. A la segunda
-// coordenada le pasa la dirección de un puntero donde la función va a guardar la parte literal sobrante de str.
-// Siempre se puede poner NULL ahí en caso de que uno no quiera guardar esa info. El tercer elemento es la
-// base numérica a la cual quiere convertir el número. Claramente yo me muevo en base 10, así que eso
-// siempre puede ser 10 tranquilamente.
-
-// Expliquemos también argc y *argv. argc es el número de elementos pasados en por input de línea de
-// comando al main. En particular el nombre del archivo SIEMPRE se pasa, así que argc siempre es 1 como mínimo.
-// Por otro lado, en cada coordenada argv guarda cada uno de los argumentos pasados. argv[0] es el nombre del
-// archivo. argv[1] es el primer argumento. argv[2] es el segundo argumento, y así.
+// Estoy queriendo ver si descubro porqué mis datos de error me guardan sólo hasta
+// seis decimales, cuando mis variables son doubles.

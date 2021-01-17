@@ -190,7 +190,7 @@ int Escribir_d(double *pd_vec, FILE *pa_archivo){
 	i_C = *(pd_vec+1);
 	
 	// Ahora printeo todo el vector en mi archivo
-	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%lf",*(pd_vec+i_i+2));
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%.12lf",*(pd_vec+i_i+2));
 	fprintf(pa_archivo,"\n");
 	
 	return 0;
