@@ -1139,3 +1139,58 @@ Por eso si tomo alguno de los valores más grandes el criterio es
 holgado, porque en ese caso lo que va a pasar es que los sistemas
 van a por si acaso pasar tiempo sin evolucionar en favor de que
 ningún sistema se quede sin llegar a ese estado.
+
+-------------------------------------------------------------------------------------
+
+17/01/2021
+
+Por alguna razón, recién hoy se me ocurrió pensar que quizás, sólo quizás,
+estaba guardando mal mis datos. Efectivamente se me estaban guardando los datos
+con una precisión de seis decimales. Lo cual es una gran cagada consideranco que
+estoy trabajando con doubles, es decir que el programa tiene datos con precisión
+de 12 decimales. (Leí que técnicamente son 14, igual yo por si acaso le pido
+sólo 12).
+
+Así que lo que hice fue primero probar en un archivo aparte cómo lograr que se
+printearan datos con precisión de más de 6 decimales, logré que se printeara
+con 12.
+
+Luego, pasé eso al main y me aseguré que los errores y los valores de opinión
+tuvieran esa precisión. Aunque siendo sincero, los valores de opinión no necesitan
+semejante precisión. Digo, esos números rondan los enteros, ¿Para qué carajos
+quiero 12 decimales más de precisión? Pero como digo, ya están calculados,
+no es que me esté ahorrando cómputo no anotándolos.
+
+Lo otro que hice, que me siento muy bien por haberle encontrado la vuelta,
+es darle un sentido a la variable de Error_Cuad. Hasta ahora era sólo un
+número que en la medida que se iba a cero me marcaba que el sistema cambiaba
+cada vez menos, pero ni idea de qué representaba. Lo que hice ahora es normalizarlo
+usando la definición de norma para que ese número represente la VARIACIÓN PROMEDIO
+DE CADA OPINIÓN. De esta manera, si ese número es 0.0001, lo que me dice es que
+en promedio TODAS las opiniones variaron eso. Eso es lo que significa ese número
+ahora. Por eso decidí llamarlo ahora en el código VarProm, es decir Variación Promedio.
+
+Me doy cuenta que el nombre de los archivos sigue siendo Datos_ErrCuad_... .
+Debería cambiarlo para llamarlo variación promedio y reflejar mejor el sentido
+de ese valor. Dejaré eso para otro día. Lo bueno es que puedo cambiar eso
+sin necesidad de cambiar el código de Python en nada.
+
+Esto hace que mi análisis de la cantidad de pasos que el sistema necesita
+para llegar a una convergencia TOTAL sea una total pelotudez. Debí darme
+cuenta de la terrible gilada que estaba diciendo.
+
+Ahora, visto y considerado esto, habría que considerar que el criterio sea
+un número fijo ahora que la variable representa algo claro del sistema.
+Por ejemplo, si propongo que el criterio sea 10^(-6), sería decir
+que si las opiniones empiezan a variar en valores menores a la
+millonésima parte, entonces considero que el sistema deja de
+evolucionar y llegó al estado de equilibrio. Suena bastante
+razonable, recordando que mi sistema se mueve en el orden de los
+enteros. Es decir, las opiniones en promedio estarían variando 
+en 6 órdenes de magnitud menos que sus valores actuales. Por tanto
+esa es una variación desreciable. Si el sistema entra en esta región
+y no escapa luego de un tiempo, lo podemos cortar y listo.
+
+En lo que queda del día me voy a poner simplemente a ordenar todo,
+subir todos los datos correspondientes y listo. Estoy actualizando
+programas y archivos de Documentación.

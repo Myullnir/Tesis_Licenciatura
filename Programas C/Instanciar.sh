@@ -5,12 +5,18 @@
 
 make all
 
-for N in {16..30}
-do
-	for K in {0..5}
-	do
-		./$1.e $N $K
-	done
-done
+echo Apreta enter para correr, sino primero apreta alguna letra y despues enter
+read decision
 
-./Mover.sh
+if [ -z $decision ]
+then
+	for N in {2..30}
+	do
+		for K in {0..5}
+		do
+			./$1.e $N $K
+		done
+	done
+
+	./Mover.sh
+fi
