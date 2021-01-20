@@ -7,7 +7,7 @@
 #include "general.h"
 
 
-// Esta función me genera un número random
+// Esta función me genera un número random entre 0 y 1
 double Random(){
 	return ((double) rand()/(double) RAND_MAX);
 }

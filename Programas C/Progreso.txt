@@ -1194,3 +1194,55 @@ y no escapa luego de un tiempo, lo podemos cortar y listo.
 En lo que queda del día me voy a poner simplemente a ordenar todo,
 subir todos los datos correspondientes y listo. Estoy actualizando
 programas y archivos de Documentación.
+
+Cosas pasaron y tuve que borrar los archivos de datos que tenía
+en la carpeta local, por lo que aproveché para mandar a correr de
+nuevo todo el programa. Así que no voy a tener tiempo de subir
+las imágenes a la carpeta de Tesis, eso queda para otro día.
+
+¿Qué es lo próximo para hacer?
+
+.) Implementar el sistema de corte en el main. El criterio
+seguro sea que la variación atraviese el piso de los
+10^(-6) durante unas 500 iteraciones.
+.) Mirar en el trabajo de Baumann cómo realizó las imágenes.
+Empezar a intentar hacer esas imágenes.
+.) Subir las imágenes que tengo al Drive para mantener
+registro de todo. (Quizás arranque por esto)
+.) Optimizar el código en el tema de la tanh. A esta altura
+los tiempos de corrida están empezando a ser molestos, me gustaría
+reducirlos.
+
+------------------------------------------------------------------------------
+
+19/01/2021
+
+Ayer subí los gráficos al Drive. Al final borré algunos que tenía de
+antes porque ya no eran válidos. Y subí uno de los nuevos de Variación
+Promedio de las Opiniones.
+
+Hoy ya armé una función que implementa el criterio de corte. Algo gracioso
+es que al armar esta función pude claramente observar la diferencia entre
+pasar una variable por copia o por referencia. Al principio estaba pasando
+el parámetro de corte por copia. Eso hacía que mi sistema nunca cortase
+porque el parámetro de corte nunca variaba, sino que lo que variaba era su copia.
+
+La solución entonces fue pasar el parámetro por referencia, y se solucionó
+bárbaro. Creo que ese problema no lo voy a tener en mi sistema, pero bueno,
+esto muestra lo importante que es seguir con el tutorial de C. Quiero llegar
+a la parte donde habla sobre structs.
+
+Al final decidí pasar el código y no armar una función en el main. El motivo
+de esto es que siento que sino estoy pasando MUCHAS veces el struct por copia.
+Eso me preocupa un poco. También está el tema de que iba a tener que definir
+muchos argumentos para la función, por el hecho de que iba a tener que
+pasar los punteros a mis archivos en los cuales estoy anotando los datos.
+Para ahorrarme eso, decidí simplemente copiar el código fuente en vez
+de pasarlo en una función. En un futuro, cuando decida corregir el pase
+por copia a un pase por referencia, quizás convierta todo esto a una función.
+O cuando me arme la función que interpola las LUT.
+
+Ahí lo implementé y estuve mirando los números. Tomando un criterio de corte
+de 10^(-6), lo que observé es que en las últimas iteraciones el sistema
+está variando en la séptima cifra decimal en valores promedio de tres o cuatro.
+Es decir, ~4*10^(-7). Por tanto, el programa está cortando correctamente.

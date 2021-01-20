@@ -63,3 +63,4 @@ int Iteracion(s_Red var, s_Param par, double (*pf_Dinamica)(s_Red var, s_Param p
 		
 	return 0;
 }
+

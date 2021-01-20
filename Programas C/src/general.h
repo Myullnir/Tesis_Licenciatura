@@ -28,7 +28,9 @@ typedef struct Parametros{
 	int i_Mopi; // Máximo inicial de opiniones
 	float f_Tint; // Esto es el tiempo total que integro a mi sistema
 	float f_dt; // Paso temporal de iteración del sistema
-	double d_NormError; // Este es el factor de normalización de la Variación Promedio.
+	double d_NormDif; // Este es el factor de normalización de la Variación Promedio.
+	double d_CritCorte; // Este número es el piso que tiene que cruzar el Varprom para que se corte la iteración
+	int i_Itextra; // Esta es la cantidad de iteraciones extra que el sistema tiene que hacer para asegurarme de que el estado alcanzado realmente es estable
 }s_Param;
 
 //################################################################################################
