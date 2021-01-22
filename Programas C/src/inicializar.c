@@ -20,14 +20,14 @@ int GenerarOpi(s_Red var, s_Param par){
 }
 
 // Esta función me genera la matriz de Superposicion del sistema. Esto es una matriz de T*T
-int GenerarAng(s_Red var){
+int GenerarAng(s_Red var, s_Param par){
 	// Obtengo las dimensiones de la matriz de Superposicion.
 	int i_F,i_C;
 	i_F = (int) var.pd_Ang[0];
 	i_C = (int) var.pd_Ang[1];
 	
 	// Inicializo la matriz de Superposicion de mi sistema.
-	for(int i_i=0; i_i<i_F; i_i++) for(int i_j=0; i_j<i_i; i_j++) var.pd_Ang[i_i*i_C+i_j+2] = 0.5; //*(((-i_i-i_j)%2)*2+1); // Decidí poner 0.5 entre todos los tópicos de mi modelo
+	for(int i_i=0; i_i<i_F; i_i++) for(int i_j=0; i_j<i_i; i_j++) var.pd_Ang[i_i*i_C+i_j+2] = par.f_Cosangulo; //*(((-i_i-i_j)%2)*2+1); // Decidí poner 0.5 entre todos los tópicos de mi modelo
 	for(int i_i=0; i_i<i_F; i_i++) var.pd_Ang[i_i*i_C+i_i+2] = 1; // Esto me pone 1 en toda la diagonal
 	for(int i_i=0; i_i<i_F; i_i++) for(int i_j=i_i+1; i_j<i_C; i_j++) var.pd_Ang[i_i*i_C+i_j+2] = var.pd_Ang[i_j*i_C+i_i+2]; // Esta sola línea simetriza la matriz
 	return 0;

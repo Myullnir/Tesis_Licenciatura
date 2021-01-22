@@ -31,6 +31,7 @@ typedef struct Parametros{
 	double d_NormDif; // Este es el factor de normalización de la Variación Promedio.
 	double d_CritCorte; // Este número es el piso que tiene que cruzar el Varprom para que se corte la iteración
 	int i_Itextra; // Esta es la cantidad de iteraciones extra que el sistema tiene que hacer para asegurarme de que el estado alcanzado realmente es estable
+	float f_Cosangulo; // Este es el coseno del ángulo entre los tópicos.
 }s_Param;
 
 //################################################################################################

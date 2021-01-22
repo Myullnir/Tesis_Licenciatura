@@ -5,7 +5,7 @@
 #include <math.h>
 
 int GenerarOpi(s_Red var, s_Param par);
-int GenerarAng(s_Red var);
+int GenerarAng(s_Red var, s_Param par);
 int GenerarAdy(s_Red var, s_Param par);
 
 #endif

@@ -22,18 +22,19 @@ int main(int argc, char *argv[]){
 		s_Red red;
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
+		datos.i_N = 100; // Cantidad de agentes en el modelo
 		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
-		datos.f_K = strtof(argv[2],NULL); // Influencia social
+		datos.f_K = 3; // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
-		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
+		datos.f_alfa = strtof(argv[1],NULL); // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
 		datos.d_NormDif = sqrt(datos.i_N*datos.i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
 		datos.d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
 		datos.i_Itextra = 1000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		datos.f_Cosangulo = cosf(strtof(argv[2],NULL)); // Este es el coseno de Delta que define la relación entre tópicos.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
@@ -45,12 +46,8 @@ int main(int argc, char *argv[]){
 		
 		// Voy a abrir dos archivos ahora. Uno para la evolución de opiniones, otro para la evolución del error.
 		char s_archivo1[255];
-		sprintf(s_archivo1,"Datos_Evolucion_Opinion_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
+		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.3f",datos.f_alfa,datos.f_Cosangulo);
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
-		
-		char s_archivo2[255];
-		sprintf(s_archivo2,"Datos_Variacion_Promedio_N=%d_T=%d_K=%.3f",datos.i_N,datos.i_T,datos.f_K);
-		FILE *pa_archivo2=fopen(s_archivo2,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
 		// Matriz de Adyacencia. Es de tamaño N*N
@@ -89,7 +86,7 @@ int main(int argc, char *argv[]){
 	// Genero las redes de mi sistema
 	GenerarOpi(red,datos); // Esto me inicializa mis vectores de opinión, asignándole a cada agente una opinión en cada tópico
 	GenerarAdy(red,datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
-	GenerarAng(red); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
+	GenerarAng(red,datos); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
 	
 	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
 	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
@@ -98,9 +95,6 @@ int main(int argc, char *argv[]){
 	Escribir_d(red.pd_Ang,pa_archivo1); // Matriz de Superposición
 	fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
 	Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
-	
-	// printf("Este es mi sistema antes de evolucionarlo\n");
-	// Visualizar_d(red.pd_Opi);
 	
 	// Evolucionemos el sistema utilizando un mecanismo de corte
 	while(i_contador<datos.i_Itextra){
@@ -114,7 +108,6 @@ int main(int argc, char *argv[]){
 			Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(red.pd_Opi,red.pd_PreOpi,red.pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			red.d_Varprom = Norma_d(red.pd_Diferencia)/datos.d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-			fprintf(pa_archivo2,"\t%.12lf",red.d_Varprom);
 		}
 		while(red.d_Varprom > datos.d_CritCorte);
 		
@@ -125,16 +118,12 @@ int main(int argc, char *argv[]){
 			Escribir_d(red.pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(red.pd_Opi,red.pd_PreOpi,red.pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			red.d_Varprom = Norma_d(red.pd_Diferencia)/datos.d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-			fprintf(pa_archivo2,"\t%.12lf",red.d_Varprom);
 			i_contador +=1;
 		}
 		// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
 		// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
 		// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
 	}
-	
-	// printf("Este es mi sistema final\n");
-	// Visualizar_d(red.pd_Opi);
 
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(red.pd_Ang);
@@ -143,12 +132,11 @@ int main(int argc, char *argv[]){
 	free(red.pd_PreOpi);
 	free(red.pd_Diferencia);
 	fclose(pa_archivo1);
-	fclose(pa_archivo2);
 	
 	// Finalmente imprimo el tiempo que tarde en ejecutar todo el programa
 	time(&tt_fin);
 	f_tardanza = tt_fin-tt_prin;
-	printf("Tarde %.3f segundos \n",f_tardanza);
+	printf("Tarde %.1f segundos \n",f_tardanza);
 	
 	
 	return 0;

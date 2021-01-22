@@ -10,7 +10,7 @@ read decision
 
 if [ -z $decision ]
 then
-	for N in {2..30}
+	for N in {2..15}
 	do
 		for K in {0..5}
 		do
