@@ -1246,3 +1246,54 @@ Ahí lo implementé y estuve mirando los números. Tomando un criterio de corte
 de 10^(-6), lo que observé es que en las últimas iteraciones el sistema
 está variando en la séptima cifra decimal en valores promedio de tres o cuatro.
 Es decir, ~4*10^(-7). Por tanto, el programa está cortando correctamente.
+
+Ya subí el programa con las nuevas implementaciones a Github.
+
+--------------------------------------------------------------------------------
+
+21/01/2021
+
+Ahora que el mecanismo de corte funciona, lo que voy a hacer
+es crear una nueva muestra de datos y graficarlos en Python, para
+ver que el código funcionó bien.
+
+Ahí miré las imágenes, parece estar bárbaro. Cada iteración corta
+luego de 1000 iteraciones de haber atravesado el piso de 10^(-6).
+Y en los gráficos de las opiniones se ve que cada uno corta
+a ritmos diferentes, pero siempre la curva se ve como que
+deja de variar.
+
+Ahora lo que voy a ver es si Baumann tiene algo anotado
+sobre el código con el cual arma sus gráficos. Sino, tuve algunas
+ideas de cómo reproducir esos gráficos por mi cuenta.
+Bueno, en lo que yo leí no vi ninguna referencia a un código
+o software especial usado para generar esos gráficos.
+Queda entonces arremangarse y hacerlo yo mismo. Por ahora
+dejemos de lado las distribuciones, arranquemos con los gráficos
+que muestran como la opinión de los agentes se van
+moviendo. La idea es que las opiniones armen una trayectoria
+en línea gris. Es decir, voy a tener que armar vectores con 
+la opinión de un agente en cada iteración, graficar eso con una
+línea muy fina y gris. Luego, en el punto final, le pongo
+un punto grande con un color que tenga que ver con el ángulo
+que forma el vector, tomando en cuenta una distribución de todos
+los colores según el ángulo que forman con la horizontal.
+
+Para el tema de estudiar cómo varía el estado final del sistema
+con delta y alfa, lo que voy a hacer es dentro del mismo programa
+de C, o quizás en Python, un código que discrimine los distintos casos
+en función de los signos de las opiniones finales y de sus módulos y
+le ponga la etiqueta de: Consenso, Polarización y Estado Ideológico.
+Luego, en Python tomo la etiqueta y a ese punto le coloco un marcador
+cuadrado del tamaño correcto y con el color asociado a la etiqueta.
+
+Ya modifiqué un poco el archivo del main para que me empiece a 
+generar los datos que voy a necesitar graficar. En este caso
+cambié los nomrbes de los archivos, me deshice del archivo de
+Variación promedio de las Opiniones porque creo que no lo voy a necesitar
+y ya modifiqué el Mover.sh. Ahora me voy a poner en Python a armar
+el gráfico de estos datos.
+
+De paso, también voy a armar una documentación en la carpeta con
+imágenes de los archivos creados con el mecanismo de corte implementado.
+

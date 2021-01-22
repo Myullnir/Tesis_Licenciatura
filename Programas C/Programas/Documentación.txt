@@ -57,3 +57,25 @@ se hubieran solucionado antes, quién sabe.
 Lo actualicé a la versión del 17/01/2021. Es decir, crea dos archivos de texto
 simultáneos, toma valores de input, calcula la variación del sistema, tiene
 dos matrices más que antes.
+
+---------------------------------------------------------------------------------
+
+21/01/2021
+
+Hice la que creo es la última actualización a Interacción de a Pares. Ahora
+voy a cambiar los archivos para que me creen los datos necesarios para armar
+los gráficos de Baumann. Es por esto que voy a hacer que me guarde un archivo
+de menos, le voy a cambiar los nombres, le voy a cambiar las variables y más.
+
+Guardo un sólo archivo porque para los gráficos de Baumann no necesito
+guardar los datos de la variación promedio del sistema.
+
+Los nombres los voy a cambiar para que reflejen la variación en Delta y
+Alfa correspondiente. Por ahora no le voy a poner el valor de N.
+Es cierto que por ahora voy a empezar computando para 100 agentes, porque
+creo que 100 va a ser mucho tiempo de cómputo. Pero considero
+que esa info la puedo deducir sabiendo que la cantidad de tópicos es 2.
+
+Con cambiar variables me refiero a que ahora los valores que se van a
+definir por input de línea de comando son alfa y Delta, que además son
+los dos floats.

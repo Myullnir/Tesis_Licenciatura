@@ -5,6 +5,4 @@ scroll hacia arriba en el archivo de progreso cada vez que quiero recordar qué t
 
 .) Optimizar más el código. Todo eso está anotado en el
 archivo de Optimización.txt.
-.) Hacer el gráfico de las opiniones para el caso de N=5 
-que tiene ese error con el pico raro. Así lo podemos analizar
-más en detalle.
+

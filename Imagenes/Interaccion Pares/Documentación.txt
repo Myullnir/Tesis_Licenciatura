@@ -1,0 +1,19 @@
+Ene sta carpeta voy a guardar las imágenes obtenidas de los datos generados con el programa que tiene el mecanismo de
+corte implementado.
+
+Los tipos de archivos que voy a guardar son:
+
+.) Opiniones_Corte_N=$_T=$ : Estos archivos tienen los gráficos del valor promedio de las opiniones al cuadrado de todos
+los agentes sumadas. Lo que se puede ver es que cada sistema evoluciona una cantidad de iteraciones diferente,
+cortando cuando los valores de las opiniones parecen haberse estabilizado.
+.) Variaciones_Corte_N=$_T=$ : Estos archivos tienen los gráficos de la Variación Promedio de las opiniones de los agentes.
+Acá se puede ver que todos los sistemas cortan después de pasar el piso de 10^(-6), no vuelven a subir y pareciera que
+todas cortan más o menos después de las 1000 iteraciones. Que es cuando deberían cortar.
+
+------------------------------------------------------------------------------------------------------------------------
+
+Conclusiones:
+
+Pareciera que los gráficos se arman correctamente y que el mecanismo de corte está funcionando. Por tanto
+estamos en condiciones de pasar a intentar realizar los gráficos de Baumann. Aunque sigue quedando en duda
+el tema de ver si estamos implementando correctamente las redes de contacto.
