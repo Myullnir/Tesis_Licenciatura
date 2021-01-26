@@ -12,3 +12,10 @@ de sistemas con diversas cantidades de agentes N y diversos valores de influenci
 y la misma matriz en un paso temporal previo. Interesantemente en el de Variación del Error se tiene un pico un poco raro.
 En otros gráficos que hice no se ve tan pronunciado. Un análisis más en detalle de esto está escrito en las notas del archivo
 Powerpoint que está en la carpeta Tesis del drive.
+
+.) Grafico Baumann$ : Estos son unos primeros gráficos para revisar que el archivo de datos que hice con el nuevo
+programa que voy a usar para replicar los gráficos de Baumann funciona bien.
+
+.) Trayectoria Opiniones: Esto me grafica con líneas grises la trayectoria que recorre la opinión de un sujeto a lo
+largo del espacio de tópicos, y me coloca al final del recorrido un punto. Lo ideal sería poder convertir ese punto
+en un punto cuyo color indique el tipo de opinión final del sujeto
