@@ -2262,3 +2262,221 @@ vuelve a disparar durante esas iteraciones extra, el sistema deja de correr.
 	
 	// return i_iteraciones;
 // }
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA
+
+Este programa lo terminé de formatear el 29/01/2021. La idea era usarlo para probar las funciones de
+lectura y escritura y ver cómo funcionaban. Probé el fgets(), al cual le puse una nota extra al fondo,
+probé los modos de apertura de archivos, el ftell(), el fseek(), el fscanf() y algunas cosas más.
+
+Lo último que hice en este archivo fue separar lo mejor posible toda la parte utilizada para crear
+el archivo de la parte utilizada para leer el archivo. La idea es por si querés revisarlo después
+puedas abrir una parte u otra sin hacer quilombos. Quilombos del tipo: Primero abro el archivo
+para escritura y después lo abro para lectura.
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Voy a separar la parte de escritura del programa de la parte de lectura. No actives las dos partes juntas
+	
+	// //#######################################################################################
+	// // Escritura
+	
+	// // Defino un array que tenga unos números y listo. Estos son los números que voy a meter en mi matriz de 3x3.
+	// // Armé dos listas para probar guardar ints y para guardar doubles. La idea no es que se armen las dos juntas, pero no generaría un crash eso.
+	// int ia_Lista[9];
+	// for(int register i_i=0; i_i<9; i_i++) ia_Lista[i_i] = i_i+1;
+	// double da_Lista[9];
+	// for(int register i_i=0; i_i<9; i_i++) da_Lista[i_i] = 0.3*(i_i+1);
+	
+	// // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Tabla_Valores_Prueba");
+	// FILE *pa_archivo=fopen(s_archivo,"w+x"); // Con esto abro mi archivo y dirijo el puntero a él. Con el +x lo que hago es que no me reescriba el archivo ya creado
+	
+	// // Primero voy a escribir un nuevo archivo que voy a usar para leer y ver cómo funcionan las funciones de lectura
+	// for(int register i_i=0; i_i<3; i_i++){
+		// for(int register i_j=0; i_j<3; i_j++) fprintf(pa_archivo,"%lf\t",da_Lista[i_i*3+i_j]);
+		// fprintf(pa_archivo,"\n");
+	// }
+	// //##########################################################################################
+	// // Lectura
+	
+	// // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Tabla_Valores_Prueba");
+	// FILE *pa_archivo=fopen(s_archivo,"r"); // Con esto abro mi archivo y dirijo el puntero a él
+	
+	// // Defino un int y un double para guardar los datos que voy levantando del archivo y un long int para la posición del indicador.
+	// // Los *_salida son los que guardan los valores leídos de la matriz.
+	// int i_salida = 0;
+	// double d_salida = 0;
+	// long int li_posicion = -5;
+	
+	// // Acá lo que hago es ir probando las funciones de ftell() y viendo cuanto avanza el puntero cada vez que leo un número.
+	// // También probé el fseek() para ir moviendo el indicador de posición y el uso del while con el fscanf para leer todo el archivo.
+	// li_posicion = ftell(pa_archivo);
+	// printf("La posicion del indicador es %li\n", li_posicion);
+	// // while(fscanf(pa_archivo,"%d",&i_salida) != EOF)	printf("Lei %d \n", i_salida);
+	// // fseek(pa_archivo,2,SEEK_SET);
+	// fscanf(pa_archivo,"%lf",&d_salida);
+	// printf("Lei %.12lf\n",d_salida);
+	// li_posicion = ftell(pa_archivo);
+	// printf("La posicion del indicador es %li\n", li_posicion);
+	
+	// //##############################################################################################
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// fclose(pa_archivo);
+	// // free(pc_Lectura);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar\n",i_tardanza);
+	// return 0;
+// }
+
+
+// Defino ahora un puntero de char para guardar mis datos. Esto lo usé con el fgets(), pero ahora ya no es necesario en este código.
+// char * pc_Lectura;
+// pc_Lectura = (char*) malloc(20*sizeof(char));
+
+// Haré una explicación acá. La idea es la siguiente. El fgets toma una cantidad de caracteres igual a los definidos
+// O hasta encontrarse con un newline o fin de archivo. En ese caso es que el fgets returnea un puntero nulo.
+// Por eso es que uso un while para levantarlo, porque de esa manera leo todas las filas hasta llegar al final. Y cada fila
+// la leo una vez. AHORA, hasta donde vi, no importa si el puntero a char que yo le paso es más chico que el número de
+// caracteres a leer, el tipo escribe en el puntero sin ningún drama. Por tanto, eso es bueno porque te guarda los datos
+// que querés, pero es malo porque puede escribir cosas que no querés y armarte alto quilombo. Por otro lado, esto levanta
+// chars, no sé si sirva para lo que quiero hacer, porque yo voy a querer levantar doubles. Probemos de nuevo con el
+// fscanf.
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA
+
+Este programa lo usé el 31/01/2021. Lo usé para construir dos conjuntos de datos. Estos dos conjuntos
+me sirven para medir que tan pesado computacionalmente es realizar ciertas operaciones en el programa.
+Lo que hice fue darle una tarea de unas cuentas tontas al programa, hacer que la haga muchas veces y 
+separar esa tarea en dos casos. El primer caso, la tarea era un conjunto de cuentas aritméticas simples:
+Sumas, restas, multiplicaciones y divisiones. El segundo caso es el mismo tipo de cuentas, pero esta vez
+le agrego uan tanh. Mi idea es que como mi precisión en la medición del tiempo es muy mala, los hago 
+hacer muchas veces la tarea, cuento cuántas veces pueden hacer la misma tarea en un segundo y me guardo ese
+número. Luego, como el proceso tiene variabilidad de tiempo, guardo muchos números para poder hacer un histograma
+con eso. Y dicho y hecho, lo hice correr 2000 veces para ambos casos, lo cual claramente tomó 4000 segundos.
+Guardé los datos y me armé los histogramas. Lo que se vió es que de media las cuentas simples realizaban 100 ciclos
+en un segundo, mientras que las cuentas complejas con tanh realizaban 25. Por tanto, esto me da la confianza que la 
+implementación de un programa que interpole datos pre calculados en un archivo externo debería reducir tiempos
+de cálculo. Algo que necesito fuertemente.
+
+
+
+
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// //##################################################################################
+	// // // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Histograma_Ciclos");
+	// FILE *pa_archivo=fopen(s_archivo,"w+x"); // Con esto abro mi archivo y dirijo el puntero a él. Con el +x lo que hago es que no me reescriba el archivo ya creado
+	
+	
+	// //##################################################################################
+	
+	// // En un ratito continuo con el guardado de datos. Primero quiero probar unos temas de cómputo
+	// // Voy a hacer que el programa realice la misma tarea muchas veces, guardarme la cantidad de ciclos
+	// // que realiza en cada segundo y luego con eso armar un histograma. Por eso voy a separar la parte
+	// // del cálculo complejo del cálculo simple
+	
+	// int i_contador = 0; // Este lo uso para ver la cantidad de ciclos que el programa realiza
+	// int i_a = 10;
+	// int i_b = -3;
+	// int i_c = 4;
+	// int i_resultado = 0;
+	
+	// // Ahora realizo unas cuentas con tanh.
+	// // double d_resultado = 0; // Defino el double para guardar en algún lado la cuenta
+	// // for(int register i_i=0; i_i<10000000; i_i++) d_resultado = tanh(i_a*(i_b+i_i)+i_c); // Hago la cuenta 100000 veces para que me tome un tiempo medible
+	// for(int register i_j=0; i_j<2000; i_j++){
+		// i_contador = 0;
+		// time(&tt_prin);
+		// do{
+			// // Primero realizo unas simples cuentas con ints muchas veces
+			
+			// for(int register i_i=0; i_i<10000000; i_i++) i_resultado = (i_a*(i_b+i_i)+i_c)/2;
+			// time(&tt_fin);
+			// i_tardanza = tt_fin-tt_prin;
+			// i_contador++;
+		// }
+		// while(i_tardanza<1);
+		// fprintf(pa_archivo,"\t%d",i_contador);
+	// }
+	// fprintf(pa_archivo,"\n"); // Separo los ciclos de mi primer cálculo de los ciclos del segundo
+	// //################################################################################
+	
+	// // Defino mis variables para tomar registro y hacer las cuentas
+	// i_contador = 0; // Este lo uso para ver la cantidad de ciclos que el programa realiza
+	// i_a = 10;
+	// i_b = -3;
+	// i_c = 4;
+	// double d_resultado = 0; // Defino el double para guardar en algún lado la cuenta
+	
+	// for(int register i_j=0; i_j<2000; i_j++){
+		// i_contador = 0;
+		// time(&tt_prin);
+		// do{
+			// // Primero realizo unas simples cuentas con ints muchas veces
+			
+			// for(int register i_i=0; i_i<10000000; i_i++) d_resultado = tanh((i_a*(i_b+i_i)+i_c)/2);
+			// time(&tt_fin);
+			// i_tardanza = tt_fin-tt_prin;
+			// i_contador++;
+		// }
+		// while(i_tardanza<1);
+		// fprintf(pa_archivo, "\t%d",i_contador);
+	// }
+	
+	
+	// //#####################################################################################
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// fclose(pa_archivo);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar de calcular las tanh\n",i_tardanza);
+	
+	
+	// return 0;
+// }
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA

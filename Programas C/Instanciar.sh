@@ -10,13 +10,14 @@ read decision
 
 if [ -z $decision ]
 then
-	for N in {2..15}
+	for Alfa in {0..10}
 	do
-		for K in {0..5}
+		for Delta in {0..90..3}
 		do
-			./$1.e $N $K
+			./$1.e $Alfa $Delta
 		done
 	done
-
+	
 	./Mover.sh
+
 fi

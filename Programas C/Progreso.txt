@@ -1297,3 +1297,201 @@ el gráfico de estos datos.
 De paso, también voy a armar una documentación en la carpeta con
 imágenes de los archivos creados con el mecanismo de corte implementado.
 
+-------------------------------------------------------------------------
+
+27 y 28/01/2021
+
+Esto es una entrada doble porque ayer arranqué con esto.
+
+Mi idea es empezar a probar el tema de optimizar el código. Busco
+implementar el uso de un archivo en el cual se encuentren ya calculados
+los valores de la tanh. De esa manera mi intención es reducir el 
+tiempo de cómputo de cada iteración y así poder correr los datos más rápido.
+Porque con el tiempo actual esto resulta muy poco viable. Supongo que
+podría ganar tiempo reduciendo alguna cantidad de cuentas, pero entiendo
+yo que si quiero armar un gráfico similar al que hace Baumann para
+determinar en el espacio de sus variables cuando el sistema llega 
+a un consenso o cuando se polariza, voy a necesitar hacer un
+barrido fino. Por no decir que técnicamente tendría que iterar
+muchas veces y tomar un promedio, no alcanza con una sola iteración.
+
+Reducir el tiempo de cómputo es PRIORITARIO.
+
+Por eso partí de armar un archivo "Tabla_Valores_Prueba". En este
+archivo armé una matriz de 3x3 con números en sucesión.
+Probé el uso de la función fgets. Si bien está copada porque
+lee una cierta cantidad de caracteres, los convierte a string
+y los mete en un puntero, mi problema es que hasta donde
+entiendo sólo puede levantar chars. Eso es un problema, porque
+entonces no podría correctamente levantar los números doubles.
+
+Ahora estoy pasando al uso del fscanf. Por lo que entiendo,
+fscanf busca el patrón que le armás en el centro y eso se lo
+pasa a las variables que le indicas. Entonces ignora totalmente
+los newline y por lo que vi, ignora las tabulaciones también, porque
+le estuve pidiendo que levante ints, que son los números que como
+dije antes puse en la matriz, y ni registro tuvo de las tabulaciones.
+Entonces se me ocurre que puedo armar un vector, o dos valores ya veré,
+en los cuales guardar los números que necesito para la interpolación.
+
+Mi idea hoy seria investigar un poco el fseek(). La idea sería poder
+leer el archivo sin tener que pasar todos los datos a un puntero.
+Lo cual sería una re cagada y creo yo que haría que todo este trabajo
+sea reverendamente al pedo, porque el archivo va a tener muchos datos
+ya de por sí. Eso es algo que también tengo que ver, si abrir un archivo
+pesado requiere mucho trabajo o no.
+
+Pero volviendo al fseek(), eso me permitiría fácilmente moverme en el
+archivo. Esto además es muy importante porque el instanciar va a hacer
+que el programa se cargue muchas veces, haciendo que el archivo se abra
+y cierre muchas veces. Entonces, nuevamente, estaría perdiendo un
+montón si tengo que cada vez cargar todo el archivo. De nuevo,
+reverendamente al pedo.
+
+Ok, el fseek() parece bastante sencillo. Además, comprobé que las 
+tabulaciones ocupan una posición cada una, efectivamente. Ahora
+debería comprobar que efectivamente los double ocupan un único
+espacio, cosa razonable, y algo más importante, que el fscanf
+avanza el indicador de posición a la posición inmediatamente
+siguiente en la cual termina el patrón que busca, una vez
+encontrado. Esto es importante porque si quiero moverme leyendo
+desde el archivo, necesito total control de la posición del indicador.
+
+Para esto voy a necesitar entonces las funciones ftell() y rewind().
+ftell() me devuelve un int que me indica la posición del indicador,
+mientras que rewind() regresa el indicador a su posición inicial. 
+No sé si ese sea tan necesario o útil.
+
+Bien, como yo supuse, el fscanf revisa el archivo hasta encontrar
+la primera instancia del patrón indicado. Luego lee el patrón,
+envía los elementos a las variables indicadas y luego avanza
+una posición más. Cabría ver que los doubles ocupan exactamente
+el mismo lugar, pero eso es casi obvio. Igual lo voy a probar.
+Una vez hecho eso, lo que voy a hacer es archivar esto, armar
+un archivo gigante y ver si el revisar algunos de sus elementos
+me consume mucho tiempo.
+
+Menos mal que probé si los doubles ocupaban el mismo lugar. No lo
+hacen. Cada número guardado de un double tiene una posición propia.
+Lo que ocurre es que el scanf sabe interpretar el número y lo lee
+entero cuando le decís que tiene que levantar un %lf. La pregunta
+interesante es, ¿Lo levantaría igual si el número tuviera más decimales?
+¿O en ese caso habría que indicarle la cantidad de decimales? Además,
+¿Qué pasa si arranca a leer número por la mitad?
+
+.) Ya probé lo de indicar más decimales, eso no funcionó. La función
+fscanf() no permite agregar el número de decimales como parámetro
+a la hora de levantar datos, entiendo yo que lo que pasa es que lo levanta
+todo y listo.
+
+.) Sobre arrancar el número por la mitad, lo que hace es tomar el número
+desde el cual arranca y lo lee todo hasta encontrar un punto o un final.
+Vas a tener un problema en las cuentas, pero nada malo va a pasar en términos
+de crasheos.
+
+.) Si el número de decimales es mayor, el tipo lo lee correctamente. Recordá
+que lo que hace fscanf al leer un "%lf" es mirar el número, ubicar el punto
+y leer hasta que haya un corte del número. Entonces si el número tiene más
+decimales no importa, lo va a leer hasta que se corte. Por tanto, lo que
+marca el final del número es la tabulación al final del día.
+
+Bueno, habiendo hecho todas estas pruebas estoy en condiciones de armar
+una función que lea los datos que yo quiero leer. La idea de
+la función es que reciba el puntero al archivo, usando fseek() ubique
+los valores a interpolar y luego pase esos valores a una función de
+interpolación. O que ella misma interpole. Igual quizás la interpolación
+la arme aparte sólo para tenerla para futuras funciones.
+
+Entonces, ¿Cuáles son los objetivos mañana?
+
+.) Primero, mandar a correr el programa para crear un archivo con millones
+de datos. Estaría bueno primero probar de armar un archivo de muchos datos
+y ver si el programa le toma tiempo abrirlo, buscar dos números y volver.
+
+.) Definir los intervalos en los cuales voy a calcular mi tanh. La idea
+es cortar en algún punto donde pueda aproximar la tanh por 1. También
+definir cada cuanto debería hacer el paso de la tanh. Para eso estaría
+bueno ver una medida de cuánto varía la tanh punto a punto, porque
+quizás varía cada 10^(-6) y el tipo varía en 10^(-3) cada 10^(-4).
+Entonces tendría una precisión de 100 valores en los cuales yo no noto
+diferencia de la función.
+
+.) Armar una función de Interpolación de los datos.
+
+.) Archivar la función de prueba armada hasta ahora. Ordenalo para
+que se vea un poco más fácil de entender la próxima vez que quieras
+mirarlo. Separa la parte escritura de la parte de lectura.
+
+------------------------------------------------------------------------------
+
+29/01/2021
+
+Ya guardé los datos en el programa de Archivo.c. Ahora lo que voy a hacer
+es armar la tabla de datos. Ya hice un primer archivo en el cual guardé
+1 millón de datos double. Eso me tomó siete segundos. Por tanto podría guardar
+10 o 100 veces esta cantidad de información y no sería mucho problema.
+Sería una tarde trabajando, ningún problema. Creo, veamos si ahora
+intento guardar doubles, pero que sean tanh.
+
+Es algo totalmente inesperado, pero el programa tardó 4 segundos menos
+en guardar valores de tanh. No entiendo qué pasó ahí. Pero bueno,
+cosas pasan. Hagamos unas pruebas sobre tiempo de cómputo primero.
+
+Esto no pareciera que es un problema. Estoy probando el uso de la función
+tanh para realizar diez millones de cuentas y lo estoy comparando con la
+realización de unas simples cuentas de multiplicación y suma. Las mismas
+cuentas que más o menos haría con la función de interpolación.
+No logro ver una diferencia  de tiempo en el cálculo que hace el programa. 
+Digo, los dos parecen tardar cero segundos. No parece haber ninguna
+diferencia, como que la tanh no le aporta mayores problemas al cálculo. 
+De ser así, no tiene ningún sentido que haga todo este quilombo para cambiarla
+en mi función original. Quizás vale más la pena que revise el
+funcionamiento general del modelo y empiece a trabajar en el 
+armado del gráfico de los estados finales del sistema en función
+de las opiniones alcanzadas.
+
+Ahí está, ahora sí pude poner a prueba esto. Casi se me cae el
+mundo a pedazos. Como mi medición del tiempo no tenía una precisión
+que me permitiera diferenciar cuál proceso tardaba más, lo que hice
+fue meter a los dos loops en un while y ver cuál proceso lograba
+en un segundo realizar más ciclos. El resultado fue que el proceso
+que agregaba una tanh realizaba un 40% menos de ciclos en el mismo
+intervalo de tiempo. Por tanto, hay una diferencia apreciable
+y vale la pena optimizar al sistema con la implementación de un método
+de interpolación de los valores de mi tanh().
+
+Ok, momento, todavía no está todo dicho. Esto parece tener una variabilidad
+de la concha de la lora. Volví a mirar al sujeto que hace las cuentas
+simples, el que le ganó por un 40% en los ciclos, y en una iteración
+apenas logró realizar 9 ciclos. En otra realizó 76. Creo
+que voy a tener que guardar muchos valores y luego armar un histograma
+y compararlos. Qué paja.
+
+---------------------------------------------------------------------------
+
+31/01/2021
+
+Bueno, estuve retocando el Instanciar.sh para que mañana simplemente lo
+mando a correr y eso pueda estar tranquilamente tres putas horas corriendo.
+Todo para armar un cuarto de los archivos que necesito y encima con sólo
+500 agentes, no con 1000. Pero bueno, es lo que hay, quiero gráficos.
+
+Por otro lado, también armé un programa para medir los tiempos de cómputo
+y comprobar que efectivamente vale la pena implementar una función de
+interpolación. Con eso me guardé los datos y armé un histograma. El histograma
+está guardado en la carpeta de Tesis. La idea es simplemente que hice
+que el programa realice muchos cálculos, unos simples, unos con tanh.
+La idea es que para medir cuál caso trabaja más rápido los hice
+hacer una tarea similar y ver quién puede hacerlo más veces seguidas.
+Guardé esa cantidad de veces y eso es lo que grafiqué en el histograma.
+
+Ya archivé los datos, pero no subí nada a Github.
+
+¿Entonces, qué debería hacer mañana?
+
+1) Armar muchos archivos y empezar a armar los gráficos
+correspondientes en Python. Va a haber muuuucho cálculo de fondo.
+2) Definir los intervalos para calcular la tanh. Para esto calcular
+la derivada de la función y ver cada cuanto varía. Creo que puedo
+incluso hacer un barrido cada 10^(-5).
+3) Armar efectivamente la función de interpolación.

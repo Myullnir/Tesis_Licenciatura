@@ -1,4 +1,4 @@
-Ene sta carpeta voy a guardar las imágenes obtenidas de los datos generados con el programa que tiene el mecanismo de
+En esta carpeta voy a guardar las imágenes obtenidas de los datos generados con el programa que tiene el mecanismo de
 corte implementado.
 
 Los tipos de archivos que voy a guardar son:
