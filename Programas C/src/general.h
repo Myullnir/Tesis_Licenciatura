@@ -4,6 +4,10 @@
 #define General_H
 #include <math.h>
 
+#ifndef MPI
+#define M_PI 3.14159265358979323846
+#endif
+
 // Acá vienen los structs.
 // El struct Red tiene los datos que definen mi red, y la info de la red
 typedef struct Red{

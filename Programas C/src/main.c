@@ -21,20 +21,22 @@ int main(int argc, char *argv[]){
 		s_Param datos;
 		s_Red red;
 		
+		double d_AngtRad = (double) (2*M_PI)/360; // La idea es que con el instanciar le paso el ángulo en grados al archivo y esta es la constante para pasarlo a radianes.
+		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		datos.i_N = 100; // Cantidad de agentes en el modelo
+		datos.i_N = 500; // Cantidad de agentes en el modelo
 		datos.i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		datos.f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
 		datos.f_K = 3; // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
-		datos.f_alfa = strtof(argv[1],NULL); // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
+		datos.f_alfa = strtof(argv[1],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
 		datos.d_NormDif = sqrt(datos.i_N*datos.i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
 		datos.d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
 		datos.i_Itextra = 1000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		datos.f_Cosangulo = cosf(strtof(argv[2],NULL)); // Este es el coseno de Delta que define la relación entre tópicos.
+		datos.f_Cosangulo = cosf(strtof(argv[2],NULL)*d_AngtRad); // Este es el coseno de Delta que define la relación entre tópicos.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
@@ -44,9 +46,9 @@ int main(int argc, char *argv[]){
 		red.pd_PreOpi = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		red.pd_Diferencia = (double*) malloc((2+datos.i_T*datos.i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		
-		// Voy a abrir dos archivos ahora. Uno para la evolución de opiniones, otro para la evolución del error.
+		// Voy a abrir un archivo ahora para la evolución de opiniones
 		char s_archivo1[255];
-		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.3f",datos.f_alfa,datos.f_Cosangulo);
+		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.5f",datos.f_alfa,datos.f_Cosangulo);
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
@@ -137,7 +139,6 @@ int main(int argc, char *argv[]){
 	time(&tt_fin);
 	f_tardanza = tt_fin-tt_prin;
 	printf("Tarde %.1f segundos \n",f_tardanza);
-	
 	
 	return 0;
  }

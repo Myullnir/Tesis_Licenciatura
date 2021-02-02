@@ -1,0 +1,16 @@
+En esta carpeta voy a estar guardando los archivos donde se observa la trayectoria de las opiniones.
+Este es el primero de los gráficos de Baumann que debería replicar.
+
+.) Trayectoria de las Opiniones_alfa=$_Cdelta=$ : Este gráfico lo que hace es tomar el valor
+de las opiniones de un agente y graficarlas según todas las iteraciones, de manera de armar
+una trayectoria en el espacio de fases. Este gráfico tiene sentido y es sencillo de realizar
+ya que los agentes tienen sólo 2 tópicos. Por tanto, el gráfico se puede realizar en un plano. En
+caso de tener 3 tópicos o más, estos gráficos comenzarán a volverse más complejos y quizás
+debamos buscar otras formas de representar la información.
+
+
+----------------------------------------------------------------------------------------------------
+
+Conclusiones: Los gráficos en la primera tanda se están armando bien. Quizás podría buscar algún 
+detalle extra para graficarlos y ver algo distinto, pero en general se ven muy similares a los
+gráficos de Baumann. Podría supongo reducir el tamaño de los marcadores finales.
