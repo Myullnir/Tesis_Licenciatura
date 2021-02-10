@@ -5,4 +5,5 @@ scroll hacia arriba en el archivo de progreso cada vez que quiero recordar qué t
 
 .) Optimizar más el código. Todo eso está anotado en el
 archivo de Optimización.txt.
+.) Chequear que el sistema no decaiga de manera infinta la Variación Promedio
 

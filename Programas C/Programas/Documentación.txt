@@ -79,3 +79,20 @@ que esa info la puedo deducir sabiendo que la cantidad de tópicos es 2.
 Con cambiar variables me refiero a que ahora los valores que se van a
 definir por input de línea de comando son alfa y Delta, que además son
 los dos floats.
+
+---------------------------------------------------------------------------------
+
+08/02/2021
+
+Agregué la carpeta de Gráfico baumann. Lo que tengo ahí es un programa
+que recibe dos inputs que son el valor de Alfa y el ángulo en grados
+de Delta. La idea de este programa es que tenga los mismos parámetros
+que el modelo que usa Baumann para así poder replicar los mismos gráficos
+que Baumann realiza. Este programa lo que hace es correr el modelo hasta
+que la Variación promedio sea menor a 10^(-6) y en un archivo registra
+la matriz de Adyacencia, la de Superposición y las opiniones de todos los
+agentes en cada paso temporal. Los archivos reciben de nombre:
+"Datos_Opiniones_alfa=$_Cdelta=$".
+Los parámetros de esta red actualmente son N=500, K= 3, T=2, Criterio
+de corte= 10^(-6), Iteraciones Extra = 1000, Máximo de Opiniones
+iniciales = 3, dt = 0.001.

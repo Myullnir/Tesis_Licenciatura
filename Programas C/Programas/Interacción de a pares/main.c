@@ -28,13 +28,13 @@ int main(int argc, char *argv[]){
 		datos.f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
 		datos.f_K = strtof(argv[2],NULL); // Influencia social
 		datos.f_dt = 0.001; // Paso temporal de iteración del sistema
-		datos.f_alfa = 2; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
+		datos.f_alfa = 1; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia.
 		datos.i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		datos.f_Tint = 20; // Este es el valor de tiempo total en el que voy a integrar mi sistema
 		datos.d_NormDif = sqrt(datos.i_N*datos.i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
-		datos.d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
-		datos.i_Itextra = 1000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
+		// datos.d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
+		// datos.i_Itextra = 1000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		// int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes
 		red.pd_Ang = (double*) malloc((2+datos.i_T*datos.i_T)*sizeof(double)); // Matriz simétrica de superposición entre tópicos.
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
 	// Genero las redes de mi sistema
 	GenerarOpi(red,datos); // Esto me inicializa mis vectores de opinión, asignándole a cada agente una opinión en cada tópico
 	GenerarAdy(red,datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
-	GenerarAng(red,datos); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
+	GenerarAng(red); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
 	
 	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
 	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");

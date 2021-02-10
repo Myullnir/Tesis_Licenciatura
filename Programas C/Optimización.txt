@@ -48,3 +48,9 @@ de K que me encuentre en una lista. Convierto la lista a Set para
 eliminar las repeticiones. Después la vuelvo lista de nuevo.
 La ordeno. El primer elemento es el Kmin. El último elemento
 es el Kmax. La diferencia del primero con el segundo es el deltaK.
+
+.) Una forma de reduir el espacio ocupado con los datos es que no me guarde
+los valores de opiniones con precisión a 12 cifras, sino que sólo lo
+haga con precisión seis. Eso reduciría a la mitad el peso de los archivos.
+Me parece razonable, considerando que mi criterio de corte está dado para
+una variación promedio menor a 10^(-6)

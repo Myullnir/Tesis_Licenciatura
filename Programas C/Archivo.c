@@ -2450,7 +2450,7 @@ de cálculo. Algo que necesito fuertemente.
 		// i_contador = 0;
 		// time(&tt_prin);
 		// do{
-			// // Primero realizo unas simples cuentas con ints muchas veces
+			// // Segundo realizo la misma cuenta sumando una tanh muchas veces
 			
 			// for(int register i_i=0; i_i<10000000; i_i++) d_resultado = tanh((i_a*(i_b+i_i)+i_c)/2);
 			// time(&tt_fin);

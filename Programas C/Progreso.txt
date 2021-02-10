@@ -1495,3 +1495,65 @@ correspondientes en Python. Va a haber muuuucho cálculo de fondo.
 la derivada de la función y ver cada cuanto varía. Creo que puedo
 incluso hacer un barrido cada 10^(-5).
 3) Armar efectivamente la función de interpolación.
+
+------------------------------------------------------------------------
+
+06/02/2021
+
+Estos días estuve estudiando E4 fuerte, por eso casi ni me puse con esto.
+Hoy ya me encargué de poner en todos los gráficos subidos al powerpoint
+de la tesis las ecuaciones que indican los valores graficados.
+
+Mañana debería preparar se gráfico explicativo de la forma en que se
+resuelve cada iteración. También estaría bueno ver lo que me preguntó
+Pablo sobre si el sistema sigue reduciendo el valor promedio de 
+variación de opiniones de manera indefinida. Ya comprobé que un double
+te puede guardar hasta 30 decimales sin problemas. Re flashero.
+
+También tendría pronto que empezar a trabajar en el tema de la función de
+interpolación y el armado de la tabla de valores de tanh calculadas.
+
+------------------------------------------------------------------------
+
+07/02/2021
+
+Hoy terminé de subir unas imágenes de los gráficos de trayectorias de
+opiniones que ayer no había subido. Ahroa sí, no me queda nada por
+subir al archivo de power Point. Debería empezar a trabajar en el
+armado de los gráficos para explicarle a Pablo las interacciones entre
+agentes. Y en el armado del archivo que guarde datos para ver que el sistema
+no cae hasta el infinito.
+
+------------------------------------------------------------------------
+
+09/02/2021
+
+Armé un archivo con las opiniones y otro con la variación promedio para un
+número de 200 agentes, un K=5, T=2  y lo hice correr un total de 60000 pasos.
+El objetivo es ver si el error cae infinitamente o en algún momento se plancha.
+
+Ahí armé el gráfico de esto, y de paso corregí el código de Python para que
+cuando arme estos gráficos, si hay un salto en el número de agentes no
+guarde gráficos vacíos. Eso me pasaba porque antes me meovía entre valores
+mínimos y máximos de N, por lo que no sabía que había en el medio.
+Ahora lo corregí para que me arme un conjunto con todos los valores
+de N para los cuales existe un archivo de datos, así sólo grafica
+para valores de N existentes. Es decir, para archivos que tienen
+ese valor de N.
+	De paso, no corregí esto para la sección del código que arma
+los gráficos sacados de la carpeta de interacción de Pares. Así que
+atento a eso.
+
+Cuestión, por lo que vi del gráfico hecho, el error no cae infinitamente.
+Pareciera que llega como hasta 4*10^(-17) y después cae directamente
+a cero. Y eso teniendo en cuenta que guardé hasta 20 decimales. Así
+que pareciera que no cae infinitamente, lo cual es genial
+
+------------------------------------------------------------------------
+
+10/02/2021
+
+Subí los gráficos que hice para el caso de 200 agentes con el objetivo
+de ver si el error del sistema eventualmente caía a cero. También
+lo puse en el archivo de Powerpoint. Los gráficos están en la 
+carpeta de Corte, para que no quede ninguna duda de dónde están.
