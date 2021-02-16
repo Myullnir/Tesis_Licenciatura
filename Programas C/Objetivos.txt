@@ -5,5 +5,10 @@ scroll hacia arriba en el archivo de progreso cada vez que quiero recordar qué t
 
 .) Optimizar más el código. Todo eso está anotado en el
 archivo de Optimización.txt.
-.) Chequear que el sistema no decaiga de manera infinta la Variación Promedio
-
+.) Vamos a hacer el modelo de agentes e integrando el RK4
+.) Armar la red por modelo de actividad
+.) Probar también una red estática. O una red Esparsa.
+.) Graficar la opinión media de los Datos de Corte.
+.) Evoluciono las NxT ecuaciones todas juntas.
+.) Corregí las ecuaciones que están mal
+.) Hacer el modelo de agentes sería discretizar la ecuación diferencial

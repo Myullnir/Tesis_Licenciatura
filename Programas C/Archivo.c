@@ -2480,3 +2480,104 @@ de cálculo. Algo que necesito fuertemente.
 
 
 NUEVO_PROGRAMA
+
+
+Este archivo lo armé el 09/02/2021. La idea era armar un archivo de prueba para guardar
+dobules y ver hasta cuantos decimales puedo guardar sin problemas. Interesantemente
+me guardó hasta 32 decimales y no tuvo errores que yo haya notado. Le hice tomar un 
+número y dividirlo por 2 iterativamente y guardar ese resultado. Por lo visto, funcionó bien
+guardó los 32 decimales correctamente.
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	
+	// // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Prueba_Double");
+	// FILE *pa_archivo=fopen(s_archivo,"w"); // Con esto abro mi archivo y dirijo el puntero a él. Con el +x lo que hago es que no me reescriba el archivo ya creado
+	
+	// double d_valor = 1;
+	
+	// for(register int i=0; i<100; i++){
+		// d_valor = d_valor/2;
+		// fprintf(pa_archivo,"%.32lf\n",d_valor);
+	// }
+	
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// fclose(pa_archivo);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+	
+	
+	// return 0;
+// }
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA
+
+Este archivo lo habré terminado el 10/02/2021. Este código crea un archivo llamado
+Tabla_Valores_TANH el cual tiene los valores pre calculados de tanh para después
+ser levantado y permitir usar una interpolación en vez de un cálculo explícito de la
+tanh. El archivo guarda datos para valores del argumento que varían entre -5 y 5
+con un paso de 10^(-5). Los datos guardados tienen agregados un -1 al principio
+y un 1 al final a propósito, la idea era para aproximar correctamente en caso
+de que el argumento a interpolar en el programa final estuviera fuera del
+rango [-5,5].
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Tabla_Valores_TANH");
+	// FILE *pa_archivo=fopen(s_archivo,"w"); // Con esto abro mi archivo y dirijo el puntero a él. Con el +x lo que hago es que no me reescriba el archivo ya creado
+	
+	// // Ahora con esto me armo los datos para la interpolación. Voy a guardar 12 decimales.
+	// fprintf(pa_archivo,"%lf\t",-1.0);
+	// for(register int i_i=0; i_i<1000001; i_i++) fprintf(pa_archivo,"%lf\t",tanh(-5+0.00001*i_i));
+		
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// fclose(pa_archivo);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+		
+	// return 0;
+// }
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA

@@ -1518,7 +1518,7 @@ interpolación y el armado de la tabla de valores de tanh calculadas.
 07/02/2021
 
 Hoy terminé de subir unas imágenes de los gráficos de trayectorias de
-opiniones que ayer no había subido. Ahroa sí, no me queda nada por
+opiniones que ayer no había subido. Ahora sí, no me queda nada por
 subir al archivo de power Point. Debería empezar a trabajar en el
 armado de los gráficos para explicarle a Pablo las interacciones entre
 agentes. Y en el armado del archivo que guarde datos para ver que el sistema
@@ -1557,3 +1557,54 @@ Subí los gráficos que hice para el caso de 200 agentes con el objetivo
 de ver si el error del sistema eventualmente caía a cero. También
 lo puse en el archivo de Powerpoint. Los gráficos están en la 
 carpeta de Corte, para que no quede ninguna duda de dónde están.
+
+------------------------------------------------------------------------
+
+16/02/2021
+
+Al parecer en algún día antes me armé la tabla de valores de la Tanh.
+El problema es que parece que eso no lo anoté acá, lo cual es una muy
+mala situación. Así que anotemos directamente lo que pasó desde la
+reunión con Pablo el miércoles 10.
+
+Juraría que la Tabla_Valores_TANH la armé antes de juntarme con Pablo.
+Durante la reunión con Pablo y Seba, charlamos sobre que deberíamos
+entonces rearmar el programa para lograr replicar el modelo de Baumann
+entendiendo que hay dos formas de realizar el trabajo.
+La primera sería armando una red impulsada por actividades, con agentes
+que se conectan con m otros agentes siguiendo homofilia e interactúan
+con varios sujetos al mismo tiempo
+La segunda es la que venía haciendo, que es pensar al modelo como un
+modelo de agentes, con interacciones de a pares, quizás habría
+que incorporar a eso también el tema de la homofilia y la red
+impulsada por actividades.
+
+Cuestión, decidimos trabajar sobre el primer caso que sería un poco
+más exactamente lo que hizo Baumann, y luego pasaremos al caso
+dos con más tiempo.
+
+Entonces, lo que voy a tener que hacer ahora es reformar el programa
+que tengo armado, porque tengo que modificar la función Din1 y
+Din2 para que ahora trabajen con más gente, tengo que conectar usando
+a la red de adyacencia, tengo que armar un mecanismo de homofilia y el
+de variación temporal de la red según una cierta cantidad de pasos.
+
+Hay claramente MUCHO por hacer, no parece que vaya a correr el programa
+pronto, en especial considerando que voy a empezar a dar clases, por
+no mencionar el final de E4.
+
+Considerando todos los cambios que voy a tener que hacer al programa
+principal, creo que es una muy buena oportunidad para modificar las
+funciones de manera que no tomen al struct por copia, sino que lo tomen
+por referencia. Me gustaría creer que haciendo eso, ahora esto va 
+a funcionar mejor.
+
+Lo primero que voy a hacer entonces es guardar el programa actual en la
+carpeta de Grafico Baumann dentro de Programas y actualizar la documentación.
+Luego, voy a empezar a hacer pruebas modificando un poco los structs
+y con algunos structs en Prosem. Hecho eso, pasaré a hacer la modificación
+total, desde adentro hacia afuera, arrancando por las funciones Din1 y Din2
+y terminando con una nueva función Paso Temporal que se encargue de
+evolucionar TODO el sistema en cada iteración. O quizás no, quizás 
+mantenga el mismo formato más o menos abierto del código como
+para poder intercalar más fácilmente ciertas cosas.
