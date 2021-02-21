@@ -96,3 +96,17 @@ agentes en cada paso temporal. Los archivos reciben de nombre:
 Los parámetros de esta red actualmente son N=500, K= 3, T=2, Criterio
 de corte= 10^(-6), Iteraciones Extra = 1000, Máximo de Opiniones
 iniciales = 3, dt = 0.001.
+
+---------------------------------------------------------------------------------
+
+16/02/2021
+
+Guardé en la carpeta de Gráfico Baumann la última versión que armé de
+este programa. A partir de ahora voy a empezar a trabajar en armar un
+código que implemente el uso de una red impulsada por actividad,
+selección de vecinos por homofilia e interacción de grupos.
+Por eso es que este código lo dejo acá separado para volver
+en un futuro, y mientras voy a ir armando un nuevo código que en el
+futuro voy a guardar en la carpeta Modelo Impulsado por Actividades.
+Suponiendo que logre entender qué hace que los struct me funcionen
+tan mal.

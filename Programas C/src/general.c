@@ -115,11 +115,11 @@ int Visualizar_i(int *pi_vec){
 
 // Esta función me realiza una iteración del sistema a partir de un RK4.
 // Incluso creo que no es necesario el uso del puntero de funciones, pero quiero aprender a usarlo
-// Ya la función es bastante más general que antes. Ahora no evoluciona todo el vector junto, sino que evoluciona a un elemento del vecto pd_sistema.
+// Ya la función es bastante más general que antes. Ahora no evoluciona todo el vector junto, sino que evoluciona a un elemento del vector pd_sistema.
 // Cuál elemento se va a evolucionar se define por fuera del RK4, en este caso a partir de las variables i_agente, i_agente2 e i_topico.
 // Eso está pasado en el s_Red, y como dije antes, se define por fuera de la función, lo cual permite que esto se implemente mucho más fácilmente
 // La próxima vez sólo tengo que cambiarle la función dinámica y asegurarme que en la función el agente que se va a evolucionar se defina antes de invocar la función.
-int RK4(double *pd_sistema ,s_Red var, s_Param par, double (*fp_funcion)(s_Red var, s_Param par)){
+int RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par)){
 	// Defino las variables y vectores que voy a necesitar
 	int i_F = (int) *pd_sistema; // Este es el número de filas del vector principal
 	int i_C = (int) *(pd_sistema+1); // Este es el número de columnas del vector principal
@@ -140,21 +140,21 @@ int RK4(double *pd_sistema ,s_Red var, s_Param par, double (*fp_funcion)(s_Red v
 	
 	// Armo mi vector DT. Este hay que armarlo uno por uno, si o si.
 	DT[0] = 0;
-	DT[1] = par.f_dt*0.5;
-	DT[2] = par.f_dt*0.5;
-	DT[3] = par.f_dt;
+	DT[1] = ps_par->f_dt*0.5;
+	DT[2] = ps_par->f_dt*0.5;
+	DT[3] = ps_par->f_dt;
 		
 	// Acá hago las iteraciones del RK4 para hallar las pendientes k
 	for(register int i_j=0; i_j<4; i_j++){ // Esto itera para mis 4 k
 		// Calculo el elemento de la pendiente k(i_j+1)
 		for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2)+*(pd_pendientes+i_j+2)*DT[i_j];
-		*(pd_pendientes+i_j+1+2) = (*fp_funcion)(var,par);
+		*(pd_pendientes+i_j+1+2) = (*pf_funcion)(ps_var,ps_par);
 	}
 	
 	// Copio al sistema igual que el inicial para deshacer los cambios que hice en el vector principal al calcular los k
 	for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2);
 	// Ahora que tengo los 4 k calculados, avanzo al sujeto que quiero avanzar.
-	*(pd_sistema+var.i_agente*i_C+var.i_topico+2) = *(pd_inicial+var.i_agente*i_C+var.i_topico+2)+(par.f_dt/6)*(*(pd_pendientes+2)+*(pd_pendientes+3)*2+*(pd_pendientes+4)*2+*(pd_pendientes+5));
+	*(pd_sistema+ps_var->i_agente*i_C+ps_var->i_topico+2) = *(pd_inicial+ps_var->i_agente*i_C+ps_var->i_topico+2)+(ps_par->f_dt/6)*(*(pd_pendientes+2)+*(pd_pendientes+3)*2+*(pd_pendientes+4)*2+*(pd_pendientes+5));
 	
 	
 	// Ahora hagamos algún mecanismo de visualización, para ver que todo esté correctamente calculado. Dios que esto va a ser un bardo.

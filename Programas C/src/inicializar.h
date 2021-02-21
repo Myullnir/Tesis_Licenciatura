@@ -4,9 +4,9 @@
 #define Inicializar_H
 #include <math.h>
 
-int GenerarOpi(s_Red var, s_Param par);
-int GenerarAng(s_Red var, s_Param par);
-int GenerarAdy(s_Red var, s_Param par);
+int GenerarOpi(ps_Red ps_var, ps_Param ps_par);
+int GenerarAng(ps_Red ps_var, ps_Param ps_par);
+int GenerarAdy(ps_Red ps_var, ps_Param ps_par);
 
 #endif
 

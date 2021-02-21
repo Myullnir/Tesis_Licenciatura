@@ -1608,3 +1608,51 @@ y terminando con una nueva función Paso Temporal que se encargue de
 evolucionar TODO el sistema en cada iteración. O quizás no, quizás 
 mantenga el mismo formato más o menos abierto del código como
 para poder intercalar más fácilmente ciertas cosas.
+
+En el archivo de Powerpoint, acabo de agregar unas diapositivas
+de separación, cosa de que quede claro y sin lugar a dudas cuáles
+archivos los hice con cual código.
+
+Luego de un poco de experimentación, ya descubrí qué era lo que
+hacía que los structs funcionaran raro. El problema estaba en 
+la forma de compilación de mi programa que yo hago, el hecho
+de que uso el make all y que este programa es el que decide cómo
+se updatean los archivos.o. En resumen, el problema que tenía
+es que el archivo .o debía de alguna manera guardar registro
+de la posición en el código de las variables. Lo cual no es
+algo tan descabellado. Entonces, al moverlas de lugar se generaban
+todos esos errores de acceder a memorias de manera equivocada.
+La solución que encontré es simplemente reescribir los archivos
+.o cada vez que modifique los structs. Eso se va a encargar de
+armar correctamente las direcciones y todo va a estar bien.
+
+Lo importante, ya no hay motivo para temerle a los structs,
+ya encontramos el motivo de las fallas. Ahora sí, son una
+herramienta bajo mi control. Hermoso
+
+---------------------------------------------------------------------
+
+17/02/2021
+
+Ya hice un archivo para probar el uso de punteros a structs,
+es realmente muy sencilla la cosa, así que no va a haber problema
+en pasar todo el uso de structs a punteros de structs.
+
+Entonces, lo que voy a hacer es lo siguiente:
+Primero voy a cambiar todo el uso de variables de structs por
+punteros de structs. Para esto voy a ir desde afuera hacia
+adentro, arrancando por el main, luego voy a pasar a los demás
+archivos, y una vez que haya modificado todas las funciones en
+los paquetes del main, ahí si regresar al main y desde ahí
+modificar el input de las funciones.
+
+Hecho esto, recién ahí voy a empezar a agregar las funcionalidades
+nuevas al programa. Esto debería terminarse en no demasiado tiempo.
+
+Ya hice los cambios en todos los archivos, el programa funciona tal
+cual como funcionaba antes, ahora sí podemos empezar a trabajar
+en implementar las nuevas ideas. Están todas anotadas en objetivos,
+para que no te olvides. El interpolador de la tanh por ahora
+no lo voy a usar. Cuando digo cambios me refiero a que ahora
+todos los programas corren con punteros a structs, no con
+variables de structs.

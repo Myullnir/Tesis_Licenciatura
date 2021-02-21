@@ -12,3 +12,12 @@ archivo de Optimización.txt.
 .) Evoluciono las NxT ecuaciones todas juntas.
 .) Corregí las ecuaciones que están mal
 .) Hacer el modelo de agentes sería discretizar la ecuación diferencial
+.) Comparar con el paper original de la red y ver que funcione bien el algortimo que crea la red
+
+-------------------------------------------------------------------------------------------------
+
+Mail Pablo
+
+Correrlo en una red de Erdos-Renyi (<k>=8), con N=10, 100 y 1000
+K=1.
+Barrer en alfa y delta y se tienen que ver la transicion entre consenso y polarizacion dada por la ecuacion 5.
