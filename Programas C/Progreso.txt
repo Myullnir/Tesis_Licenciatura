@@ -1656,3 +1656,221 @@ para que no te olvides. El interpolador de la tanh por ahora
 no lo voy a usar. Cuando digo cambios me refiero a que ahora
 todos los programas corren con punteros a structs, no con
 variables de structs.
+
+--------------------------------------------------------------------
+
+21/02/2021
+
+Ya estuve revisando el tema de cómo armar la red de Erdos Renyi.
+Mi interés principal hoy es organizar claramente el trabajo para
+hacer mañana y el martes, cosa de llevar algo programado para el martes
+para mostrarle a Pablo.
+
+Primero, voy a querer crear redes de Erdos Renyi. Eso es bastante fácil,
+ya tengo el generador de la matriz de Adyacencia. Lo único que tengo que
+hacer es definir un nuevo parámetro que sea el grado medio y con ese
+definir la probabilidad de interacción, una sencillez.
+
+Luego, voy a querer que los sujetos operen sobre esa red. Así que voy a tener
+que ir a revisar la función Din1 y cambiar su interacción entre sujetos de
+manera que ahora interactúe con varios a la vez.
+
+Lo siguiente, que es un poco más enrevesado, es lograr que el RK4 me
+evolucione el sistema de forma sincrónica. La forma en que evoluciona
+el vector actualmente me gusta. Lo que voy a tener que ver es cómo guardar
+correctamente la parte evolucionada. Lo que podría hacer es intentar guardar
+los datos en un vector extra, como el preOpi. Pero no me gusta la idea
+de tener 15 vectores dando vueltas. Aunque creo que podría agregar un vector
+de estado final y usar eso. Habrá que ver.
+
+Con esto creo que ya el sistema podría funcionar correctamente. Y estaría
+listo para hacer simulaciones. Lo de variar Alfa, Delta y N es tema de la
+instanciación nomás.
+
+------------------------------------------------------------------------
+
+22/02/2021
+
+Trabajando en el código, ya hice que el programa genere mi red de adyacencia
+con una probabilidad que va variando según la cantidad de agentes. 
+Visualicé la red y en efecto se genera de manera correcta. De paso, 
+también agregué en el generador de la red una línea que pone ceros
+en la diagonal. Por si acaso nomás, no estaba seguro de si se ponían
+ceros al principio. CORRECCIÓN: Ya lo vi, en la inicialización del
+vector ya se colocan ceros en todos lados, así que no debería haber
+ningún problema con eso. Igualmente, no pierdo nada por hacerlo dos
+veces. Digo, es algo bastante rápido de hacer.
+
+Revisé la función Din1. La modifiqué para agregar el factor de 
+la matriz de Adyacencia, de manera que ahora toma en cuenta los
+agentes con los que está conectados. También le agregué un if
+que cancele la cuenta en caso de que los agentes no estén conectados.
+Porque para qué hacer toda la cuenta con la tanh si al final
+el cero de la matriz de Adyacencia lo mata.
+También modifiqué la función Din2, para que haga la sumatoria 
+sobre los todos los agentes de manera que la tanh se calcula 
+sobre toda la red y se van sumando todas las tanh que correspondan.
+
+Ahora estoy modificando también la iteración, de manera de incluir
+una nueva matriz que sea la que itere y en cada paso me guarda el nuevo
+valor de opinión en la matriz de Opinión final. La idea es esta:
+.) Antes de iterar, saco una foto a todo con mi vector PreOpi.
+.) Inicio la función Iteración.
+.) En la función iteración, antes de mandar a ejecutar el RK4,
+primero copio mi foto (El vector PreOpi) en el vector que SÍ voy
+a iterar, el vector ItOpi.
+.) Evoluciono para un agente y un tópico al vector ItOpi.
+.) Luego de evolucionar el valor de opinión de un agente respecto de
+un tópico, copio ese valor en la matriz Opi.
+.) Repito los últimos tres pasos hasta haber recorrido todos los agentes
+y tópicos.
+.) Termino la iteración, teniendo ahora en el vector Opi el estado
+del siguiente paso temporal, en el cual todas las opiniones fueron
+evolucionadas a partir de una foto.
+.) A continuación guardo los valores que correspondan, calculo las
+diferencias y vuelvo a empezar.
+
+Al final logré modificar a la Iteración de manera de no necesitar
+un tercer vector de opiniones. Para eso lo que hice fue modificar el
+RK4 de manera de que la evolución de la función ahora no se guarde
+en el vector que le paso al RK4, sino que ese valor sea returneado por
+mi función. Luego, lo que hice fue guardar ese valor en el vector
+Opi, de manera que el Opi que se construye sea mi siguiente paso temporal.
+Entonces, la "foto" que le paso al RK4 de mi sistema en el paso actual
+es el PreOpi. Y lo genial de esto es que el RK4 NO modifica de ninguna
+forma el vector que le estás pasando, entonces ese vector puede servir
+sin problemas como una foto estática del sistema.
+
+En otros temas, descubrí un craso error en las pendientes usadas 
+al calcular el RK4. No puedo creer que no hubiera notado esto antes.
+Me da bastante bronca que esto haya pasado por fuera de mi radar,
+esto es un error importante en las cuentas. La cosa es que por como
+yo armé el RK4, tengo un vector de k, que son las pendientes intermedias
+que calcula el RK4 para evolucionar el sistema. Por una cuestión de simpleza
+en el código, yo hice que existan 5 k, donde la primera es siempre cero.
+Por eso yo las había numerado desde k0 hasta k4 mis k, entendiendo que la
+k0 es un fantasma creado por mi. El problema es que cuando calculaba el paso
+siguiente del modelo, en vez de usar el conjuntos que va desde k1 hasta k4,
+usaba el conjunto que va desde k0 hasta k3. Ya lo corregí, espero que
+no haya más sorpresas de este estilo.
+
+Falta ponerlo a prueba, pero la idea es que el código ya está reformado
+para ponerlo a probar con lo que decía Pablo. Anotemos entonces las características
+de este nuevo código:
+.) Ahora el ejecutable recibe tres valores como input por línea de comando.
+Estos valores, en orden, son el número de agentes N, el valor de Alfa*10
+y el valor de Cosdelta*10. Los valores de Alfa y Cosdelta están multiplicados
+por 10 porque no descubrí como pasar en línea de comando números fraccionarios,
+así que paso números más grandes y lo que hago es en el programa de C
+dividirlos para que sean lo que tienen que ser.
+.) El programa genera una red de Erdós-Renyi con grado medio igual a 8.
+.) Al evolucionar a los agentes, el programa mira ahora la opinión de todos
+los vecinos de un agente, en vez de mirar la opinión de un sólo "vecino".
+.) El programa genera archivos con nombres:
+"Datos_Opiniones_alfa=$_Cdelta=$_N=$" (Los $ significan números").
+.) Los parámetros son K=1, T=2, dt=0.001, Máxima Opinion inicial = 3,
+Criterio de Corte = 10^(-6), Iteraciones Extra = 2000.
+
+Hagamos una primer prueba del programa. Pareciera que funciona lo más bien,
+habría que graficarlo para ver que todo está en orden. Hagámoslo hoy eso.
+Así ya para mañana tengo los datos hechos, y a lo sumo dedico la mañana
+a hacer el commiteo correcto de los archivos.
+
+Para hoy entonces queda crear las carpetas para guardar los archivos de datos,
+crear la carpeta para las imágenes, modificar el Mover.sh, modificar el 
+Instanciar.sh y largarlo a correr, por lo menos para 10 y 100 agentes.
+Es más, siendo sincero, no pongas al N como un valor de Input, sacalo
+por ahora, y que el Instanciar sólo recorrar en Alfa y Delta. Porque
+siendo sincero, no vas a poder calcular con tiempo las simulaciones
+para N=1000. Vos y yo lo sabemos muy bien. Esto no es un tema de
+pajero, es simplemente una cuestión de que no quiero comprometerme
+a cálculos que después no se puedan terminar.
+
+---------------------------------------------------------------------------
+
+23/02/2021
+
+Creo que hoy tampoco voy a hacer el trabajo más burocrático, seguro lo
+termine haciendo después del final.
+
+Hoy voy a intentar implementar una función que lo que haga es detectar
+grupos en mi red. La idea es que pueda detectar si la red es conexa. Con
+eso creo que ya voy a poder hacer correr los casos de N=10 y N=100 que me
+dijo Pablo. Luego, mejoraré eso para que en caso de que la red no sea conexa
+pueda artificialmente crear una red conexa. En el sentido de generar enlaces
+en lugares específicos para que quede todo conexo. Más que nada
+porque sino creo que hay grandes chances de que el sistema se quede mucho
+tiempo intentando crear de manera aleatoria una red que justo resulte conexa.
+Estoy seguro que esa probabilidad se puede calcular, pero ahora no quiero
+perder tiempo en eso, pero después lo veré.
+
+Armé la función, la probé y parece que funca bárbaro. La probé arrancando
+desde cualquier nodo, con grupos que yo sé exáctamente cuáles son. Funciona
+muy bien, siempre identifica correctamente el tamaño del grupo. En el futuro
+me gustaría que además identificara todos los grupos que hay, no sólo el
+que está revisando, pero para eso voy a tener que trabajar más el código.
+Por no decir que la forma en que funciona ahora es con un montón de
+ifs y eso no em gusta una mierda. Después veré de corregirlo de una manera
+que resulte más fluída y razonable. Pero lo importante es que funciona y
+ya podría implementarla en la función del main, con el objetivo de que compruebe
+que el grupo sea de tamaño N. De esa manera, garantiza que el sistema sea conexo.
+
+-------------------------------------------------------------------------------
+
+24/02/2021
+
+Como la función que mide el tamaño de la componente a la cual pertenece un nodo
+parecía funcionar bastante bien, decidí poner a prueba cuánto tiempo podría tardar
+el programa en crear una red conexa para los valores de N que iba a usar. Por suerte,
+para N=10 y N=100 las chances de crear una red conexa son grandes, así que básicamente
+en un intento lo hacía siempre. Para N=1000 ya necesitaba dos o tres intentos algunas
+veces. Para N=10000 le costó muchos intentos crear una sola red conexa.
+Como mi intención era medir cuanto tardaba en crear redes conexas, y como mi
+ignorancia me hacía pensar que iba a costarle hacerlo, le puse un while para
+que lo repitiera 10 veces confiando en que eso me iba a dar una medida de tiempo.
+Lo hizo muy rápido en general como para que tardara más de un segundo.
+
+.) Este Programa con esta descripción entonces lo tengo que pasar al Archivo
+todavía.
+
+Luego implementé la función de Tamaño_Comunidad en el programa principal
+y lo estoy mandando a correr para 10 y 100 agentes. Las simulaciones para
+10 agentes me están tomando entre 1 y 4 segundos, promedio 2. Las de 100
+agentes están tomando entre 12 y 240 segundos, promedio 25. Considerando
+que en total estoy realizando 200 simulaciones, al variar Alfa y Cdelta,
+La corrida total para N=10 me toma unos siete minutos, mientras que
+la corrida para N=100 me toma 1 hora y 20 minutos. Un poco más de 10 veces
+el tiempo de lo que tomó para N=10, justamente. Para N=1000 entonces, me
+va a tomar razonablemente unas 13 o 15 horas. Lo puedo separar en dos
+tandas, y hacerlo en dos días distintos, eso no es problema. Mi problema
+va a ser el levantar los datos. El jupyter Notebook estuvo teniendo problemas
+la última vez con programas que pesaban más de 1 Giga. Así que voy a tener que
+pensar enformas de levantar mejor esos datos, o pasarme al Python propiamente
+dicho, dejar por un rato el Notebook más que nada para pruebas. No me copa
+mucho eso. Eso me está pasando desde que me pasé al navegador Opera. Quizás
+Opera tiene algún mecanismo de corte de memoria en cuanto ve que está
+consumiendo demasiado. No hice pruebas como para saber si el problema
+estaba en la lectura o en la manipulación de los datos, tendré que
+revisar eso cuando tenga mis datos calculados. Hay bastante para ver
+en este aspecto.
+
+En Python simplemente copié un código ya existente para realizar estos
+gráficos y lo modifiqué para que levante los archivos de la nueva carpeta
+guarde los gráficos en la nueva carpeta y que corrija los nombres de
+manera acorde. De paso, modifiqué la función que asigna colores, porque
+me pareció que no los estaba asignando de manera correcta. Por ahora
+parece que funciona, pero definitivamente tengo que revisarla de nuevo
+y hacer las cuentas, ya no confío en eso. Más que nada porque al modificarla
+no hice las cuentas, simplemente escalé los parámetros. Lo cual no
+me da mucha confianza. Así que eso, atento, es algo a mejorar.
+
+Todavía no hice los commits correspondientes. Es obvio que al haber
+hecho una simulación masiva, obviamente usé los Instanciar.sh
+y Mover.sh, por tanto esos están modificados. También me falta
+crear el archivo de Documentación en la carpeta de imágenes de
+Erdos-Renyi. De paso, a esta altura me parece una buena idea revisar
+la carpeta original de Programas C y Programas Python, ver si
+hay algo rescatable y si no borrarla.
+
+También falta subir los gráficos al Power point y hacer las anotaciones
+correspondientes sobre los parámetros del modelo y demás.

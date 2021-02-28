@@ -11,11 +11,11 @@ read decision
 
 if [ -z $decision ]
 then
-	for Alfa in {0..10}
+	for Alfa in {0..20..1}
 	do
-		for Delta in {0..90..3}
+		for Delta in {0..10}
 		do
-			./$1.e $Alfa $Delta
+			./$1.e 100 $Alfa $Delta
 		done
 	done
 	
