@@ -39,25 +39,6 @@ double Norma_d(double *pd_x){
 	return d_norm;
 }
 
-// Esta función me calcula la diferencia entre dos vectores
-int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
-	// Compruebo primero que mis dos vectores sean iguales en tamaño
-	if(*pd_x1!=*pd_x2 || *(pd_x1+1)!=*(pd_x2+1) || *pd_x1!=*pd_Dx || *(pd_x1+1)!=*(pd_Dx+1)){
-		printf("Los vectores son de tamaños distintos, no puedo restarlos\n");
-		return 0;
-	}
-	
-	// Defino las variables de tamaño de mis vectores
-	int i_C,i_F;
-	i_F = *pd_x1;
-	i_C = *(pd_x1+1);
-	
-	// Calculo la diferencia entre dos vectores
-	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
-	
-	// Me anoto la diferencia en un vector que está en el main del programa, y luego libero el espacio usado.
-	return 0;
-}
 
 //Funciones de Visualización
 //----------------------------------------------------------------------------------------
@@ -113,17 +94,21 @@ int Visualizar_i(int *pi_vec){
 }
 //--------------------------------------------------------------------------------------------
 
-// Esta función me realiza una iteración del sistema a partir de un RK4.
-// Incluso creo que no es necesario el uso del puntero de funciones, pero quiero aprender a usarlo
-// Ya la función es bastante más general que antes. Ahora no evoluciona todo el vector junto, sino que evoluciona a un elemento del vector pd_sistema.
-// Cuál elemento se va a evolucionar se define por fuera del RK4, en este caso a partir de las variables i_agente, i_agente2 e i_topico.
-// Eso está pasado en el s_Red, y como dije antes, se define por fuera de la función, lo cual permite que esto se implemente mucho más fácilmente
-// La próxima vez sólo tengo que cambiarle la función dinámica y asegurarme que en la función el agente que se va a evolucionar se defina antes de invocar la función.
-int RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par)){
+// La función RK4 evoluciona un sólo elemento de todo un sistema. La idea de esto es que la función sea completamente
+// modular, y que en caso de querer evolucionar todo el sistema, desde fuera la llame múltiples veces y listo.
+// Además, ahora lo que hace es devolver el cálculo de la evolución del número en vez de asignarlo al vector provisto.
+// Esto ofrece mayor libertad a la hroa de implementarlo. Justamente la idea de esto es que me permite pasarle una
+// foto del sistema en un cierto paso temporal, y guardar los datos evolucionados en un segundo vector, de manera
+// que la foto no varía al ser evolucionada. Eso me permite que con sólo dos vectores, uno del paso temporal actual
+// y uno del paso temporal siguiente me alcance para poder hacer una evolución sincrónica del sistema.
+// Fijate que la foto se ve intacta, porque en la línea antes de calcular el resultado final, vuelvo a reescribir
+// mi foto con el valor inicial que tenía, de manera de que esta foto entra y sale igual.
+double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par)){
 	// Defino las variables y vectores que voy a necesitar
 	int i_F = (int) *pd_sistema; // Este es el número de filas del vector principal
 	int i_C = (int) *(pd_sistema+1); // Este es el número de columnas del vector principal
 	float DT[4]; // Esto me ayuda a meter el paso temporal que se usa para calcular cada pendiente.
+	double d_resultado = 0; // Este número es el que voy a returnear a la salida de la función
 	
 	double *pd_inicial; // Este me guarda las condiciones iniciales del vector, que las voy a necesitar al calcular cada paso del RK4
 	pd_inicial = (double*) malloc((i_F*i_C+2)*sizeof(double));
@@ -153,8 +138,9 @@ int RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)
 	
 	// Copio al sistema igual que el inicial para deshacer los cambios que hice en el vector principal al calcular los k
 	for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2);
+	
 	// Ahora que tengo los 4 k calculados, avanzo al sujeto que quiero avanzar.
-	*(pd_sistema+ps_var->i_agente*i_C+ps_var->i_topico+2) = *(pd_inicial+ps_var->i_agente*i_C+ps_var->i_topico+2)+(ps_par->f_dt/6)*(*(pd_pendientes+2)+*(pd_pendientes+3)*2+*(pd_pendientes+4)*2+*(pd_pendientes+5));
+	d_resultado = *(pd_inicial+ps_var->i_agente*i_C+ps_var->i_topico+2)+(ps_par->f_dt/6)*(*(pd_pendientes+3)+*(pd_pendientes+4)*2+*(pd_pendientes+5)*2+*(pd_pendientes+6));
 	
 	
 	// Ahora hagamos algún mecanismo de visualización, para ver que todo esté correctamente calculado. Dios que esto va a ser un bardo.
@@ -176,7 +162,7 @@ int RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)
 	free(pd_inicial);
 	free(pd_pendientes);
 	
-	return 0;
+	return d_resultado;
 }
 
 //--------------------------------------------------------------------------------------------
@@ -207,6 +193,90 @@ int Escribir_i(int *pi_vec, FILE *pa_archivo){
 	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%d",*(pi_vec+i_i+2));
 	fprintf(pa_archivo,"\n");
 	
+	return 0;
+}
+
+// Esta función me mide el tamaño del grupo al cual pertenece el nodo inicial: i_inicial
+int Tamaño_Comunidad(int *pi_adyacencia, int i_inicial){
+	// Defino la variable del tamaño del grupo, el número de filas de la matriz de Adyacencia, el número de agentes
+	// restantes por visitar; y los inicializo
+	int i_tamaño, i_F, i_restantes;
+	i_tamaño = 0;
+	i_F = *pi_adyacencia;
+	i_restantes = 0;
+	
+	// Defino un puntero que registre cuáles agentes están conectados y lo inicializo
+	int *pi_Grupo;
+	pi_Grupo = (int*) malloc((2+i_F)*sizeof(int));
+	
+	*pi_Grupo = 1;
+	*(pi_Grupo+1) = i_F;
+	for(register int i_i=0; i_i<i_F; i_i++) *(pi_Grupo+i_i+2) = 0;
+	
+	// Defino un puntero que me marque los nuevos sujetos que visitar. Lo hago de tamaño i_F para poder asignar un 1 al visitar el agente en cada posición correcta.
+	int *pi_Visitar;
+	pi_Visitar = (int*) malloc((2+i_F)*sizeof(int));
+	
+	*pi_Visitar = 1;
+	*(pi_Visitar+1) = i_F;
+	for(register int i_i=0; i_i<i_F; i_i++) *(pi_Visitar+i_i+2) = 0;
+	
+	// Empiezo recorriendo la matriz desde un nodo inicial, que será el primero siempre.
+	for(register int i_i=0; i_i<i_F; i_i++){
+		*(pi_Grupo+i_i+2) = *(pi_adyacencia+i_i+i_inicial*i_F+2);
+		*(pi_Visitar+i_i+2) = *(pi_adyacencia+i_i+i_inicial*i_F+2);
+	}
+	
+	do{
+		i_restantes = 0;
+		// Primero reviso mi lista de gente por visitar
+		for(register int i_i=0; i_i<i_F; i_i++){
+			// Si encuentro un uno en la lista, reviso esa fila de la matriz de adyacencia. Es decir, la fila i_i
+			if(*(pi_Visitar+i_i+2) == 1){
+				// Si en esa fila encuentro un uno, tengo que agregar eso al grupo y a la lista de Visitar. Pero no siempre.
+				// La idea es: Si el sujeto no estaba marcado en grupo, entonces lo visito y lo marco en el grupo.
+				// Si ya estaba marcado, es porque lo visité o está en mi lista de visitar.
+				// La idea de esto es no revisitar nodos ya visitados.
+				for(register int i_j=0; i_j<i_F; i_j++){
+					if(*(pi_adyacencia+i_j+i_i*i_F+2) == 1){
+						if(*(pi_Grupo+i_j+2) == 0) *(pi_Visitar+i_j+2) = 1; // Esta línea me agrega el sujeto a visitar sólo si no estaba en el grupo
+						*(pi_Grupo+i_j+2) = *(pi_adyacencia+i_j+i_i*i_F+2); // Esta línea me marca al sujeto en el grupo, porque al final si ya había un uno ahí, simplemente lo vuelve a escribir.
+					}
+				}
+				*(pi_Visitar+i_i+2) = 0;
+			}
+		}
+		for(int register i_i=0; i_i<i_F; i_i++) i_restantes += *(pi_Visitar+i_i+2);
+	}
+	while(i_restantes > 0);
+	
+	// Finalmente mido el tamaño de mi grupo
+	for(register int i_i=0; i_i<i_F; i_i++) i_tamaño += *(pi_Grupo+i_i+2);
+	
+	// Libero las memorias malloqueadas
+	free(pi_Grupo);
+	free(pi_Visitar);
+	
+	return i_tamaño;
+}
+
+// Esta función me calcula la diferencia entre dos vectores
+int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
+	// Compruebo primero que mis dos vectores sean iguales en tamaño
+	if(*pd_x1!=*pd_x2 || *(pd_x1+1)!=*(pd_x2+1) || *pd_x1!=*pd_Dx || *(pd_x1+1)!=*(pd_Dx+1)){
+		printf("Los vectores son de tamaños distintos, no puedo restarlos\n");
+		return 0;
+	}
+	
+	// Defino las variables de tamaño de mis vectores
+	int i_C,i_F;
+	i_F = *pd_x1;
+	i_C = *(pd_x1+1);
+	
+	// Calculo la diferencia entre dos vectores
+	for(register int i_i=0; i_i<i_C*i_F; ++i_i) *(pd_Dx+i_i+2) = *(pd_x1+i_i+2)-*(pd_x2+i_i+2);
+	
+	// Me anoto la diferencia en un vector que está en el main del programa, y luego libero el espacio usado.
 	return 0;
 }
 

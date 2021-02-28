@@ -27,12 +27,13 @@ typedef s_Red *ps_Red;
 typedef struct Parametros{
 	double d_NormDif; // Este es el factor de normalización de la Variación Promedio.
 	double d_CritCorte; // Este número es el piso que tiene que cruzar el Varprom para que se corte la iteración
-	float f_Beta; // Exponente que regula el grado de homofilia
+	// float f_Beta; // Exponente que regula el grado de homofilia
 	float f_Pint; // Probabilidad de que se forme el enlace de manera aleatoria
 	float f_K; // Influencia social
 	float f_alfa; // Controversialidad de los temas
 	float f_dt; // Paso temporal de iteración del sistema
 	float f_Cosangulo; // Este es el coseno del ángulo entre los tópicos.
+	float f_Gradomedio; // Este es el grado medio de los agentes de la red.
 	int i_N; // Número de agentes en la red
 	int i_T; // Cantidad de tópicos
 	int i_Mopi; // Máximo inicial de opiniones
@@ -46,13 +47,14 @@ typedef s_Param *ps_Param;
 double Random();
 double Gaussiana(float f_mu, float f_sigma);
 double Norma_d(double *pd_x);
-int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx);
-int RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par));
+double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par));
 int Visualizar_d(double *pd_vec);
 int Visualizar_f(float *pf_vec);
 int Visualizar_i(int *pi_vec);
 int Escribir_d(double *pd_vec, FILE *pa_archivo);
 int Escribir_i(int *pi_vec, FILE *pa_archivo);
+int Tamaño_Comunidad(int *pi_adyacencia,int i_inicial);
+int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx);
 
 #endif
 

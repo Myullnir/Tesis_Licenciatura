@@ -24,22 +24,23 @@ int main(int argc, char *argv[]){
 		ps_Red ps_red; // No te vayas a confundir, que ps_Red es el tipo de dato definido por usuario como un puntero al struct Red. En cambio, ps_red es un puntero
 		ps_red = malloc(sizeof(s_Red)); 
 		
-		double d_AngtRad = (double) (2*M_PI)/360; // La idea es que con el instanciar le paso el ángulo en grados al archivo y esta es la constante para pasarlo a radianes.
+		// double d_AngtRad = (double) (2*M_PI)/360; // La idea es que con el instanciar le paso el ángulo en grados al archivo y esta es la constante para pasarlo a radianes.
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
-		ps_datos->i_N = 50; // Cantidad de agentes en el modelo
+		ps_datos->i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		ps_datos->i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
-		ps_datos->f_Beta = 0.5; // Exponente que regula homofilia. Arranquemos con homofilia intermedia.
-		ps_datos->f_Pint = 0.6; // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
-		ps_datos->f_K = 3; // Influencia social
+		ps_datos->f_Gradomedio = 8; // Valor de grado medio de los agentes de la red
+		ps_datos->f_Pint = ps_datos->f_Gradomedio/(ps_datos->i_N-1); // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
+		ps_datos->f_K = 1; // Influencia social
 		ps_datos->f_dt = 0.001; // Paso temporal de iteración del sistema
-		ps_datos->f_alfa = strtof(argv[1],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
+		ps_datos->f_alfa = strtof(argv[2],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		ps_datos->i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la varaiación promedio de las opiniones.
 		ps_datos->d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
-		ps_datos->i_Itextra = 1000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		ps_datos->f_Cosangulo = cosf(strtof(argv[2],NULL)*d_AngtRad); // Este es el coseno de Delta que define la relación entre tópicos.
+		ps_datos->i_Itextra = 2000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		ps_datos->f_Cosangulo = strtof(argv[3],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
+		int i_tamaño = 0; // Esta variable mide el tamaño de la componente gigante de mi red.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes.
 		// También hay una matriz de paso previo del sistema y un vector para guardar la diferencia entre el paso previo y el actual.
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]){
 		
 		// Voy a abrir un archivo ahora para la evolución de opiniones
 		char s_archivo1[255];
-		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.5f",ps_datos->f_alfa,ps_datos->f_Cosangulo);
+		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.5f_N=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N);
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
@@ -83,6 +84,7 @@ int main(int argc, char *argv[]){
 		// Inicializo el Agente y Tópico a mirar. Esto no significa mucho porque después lo voy a cambiar.
 		ps_red->i_agente = 0;
 		ps_red->i_topico = 0;
+		ps_red->i_agente2 = 0;
 		
 		// Puntero a la función que define mi ecuación diferencial
 		double (*pf_EcDin)(ps_Red var, ps_Param par) = &Din2;
@@ -90,8 +92,14 @@ int main(int argc, char *argv[]){
 	
 	// Genero las redes de mi sistema
 	GenerarOpi(ps_red,ps_datos); // Esto me inicializa mis vectores de opinión, asignándole a cada agente una opinión en cada tópico
-	GenerarAdy(ps_red,ps_datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
 	GenerarAng(ps_red,ps_datos); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
+	
+	// Me armo una red conexa, por eso voy a repetir el proceso de creación hasta que el tamaño de la componente gigante sea toda la red.
+	do{
+		GenerarAdy(ps_red,ps_datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
+		i_tamaño = Tamaño_Comunidad(ps_red->pi_Ady,0);
+	}
+	while(i_tamaño != ps_datos->i_N);
 	
 	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
 	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
@@ -102,6 +110,7 @@ int main(int argc, char *argv[]){
 	Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 	
 	// Evolucionemos el sistema utilizando un mecanismo de corte
+	// Queda para el futuro ver si vale la pena meter esto en una sola función.
 	while(i_contador<ps_datos->i_Itextra){
 		// Inicializo el contador
 		i_contador = 0;
@@ -129,7 +138,7 @@ int main(int argc, char *argv[]){
 		// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
 		// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
 	}
-
+	
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(ps_red->pd_Ang);
 	free(ps_red->pi_Ady);
