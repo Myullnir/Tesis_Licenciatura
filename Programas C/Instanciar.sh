@@ -11,12 +11,9 @@ read decision
 
 if [ -z $decision ]
 then
-	for Alfa in {0..20..1}
+	for Alfa in {0..5..1}
 	do
-		for Delta in {0..10}
-		do
-			./$1.e 100 $Alfa $Delta
-		done
+		./$1.e 100 $Alfa 2
 	done
 	
 	./Mover.sh

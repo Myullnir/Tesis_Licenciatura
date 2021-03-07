@@ -1,0 +1,65 @@
+En esta carpeta voy a estar guardando los archivos donde se observa la trayectoria de las opiniones.
+Este es el primero de los gráficos de Baumann que debería replicar.
+
+.) Trayectoria de las Opiniones_alfa=$_dt=$_Cdelta=$_N=$ : Este gráfico lo que hace es tomar el valor
+de las opiniones de un agente y graficarlas según todas las iteraciones, de manera de armar
+una trayectoria en el espacio de fases. Este gráfico tiene sentido y es sencillo de realizar
+ya que los agentes tienen sólo 2 tópicos. Por tanto, el gráfico se puede realizar en un plano. En
+caso de tener 3 tópicos o más, estos gráficos comenzarán a volverse más complejos y quizás
+debamos buscar otras formas de representar la información.
+Estos gráficos están hechos para cada caso de Alfa y dt distinto
+.) Variaciones Promedio_alfa=$: Este gráfico muestra la variación del vector opinión
+en función del tiempo simulado. Este tiempo es la cantidad de tiempo que el sistema evoluciona,
+no es un tiempo de cómputo. La idea es ver cuánto tiempo de simulación le toma al sistema llegar
+a cumplir el criterio de Corte. En estos gráficos hago una curva para cada dt, y tengo un gráfico
+para cada valor de Alfa.
+.) Iteraciones vs dt: Este gráfico tiene una curva para cada Alfa. El motivo de ponerlo en log log 
+es para una mejor visualización de todos los valores. La idea es tomar la cantidad de iteraciones
+como una medida del tiempo que tarda el sistema en finalizar la simulación para cada valor
+de dt. 
+
+
+
+----------------------------------------------------------------------------------------------------
+
+Conclusiones: En lo que a los gráficos de trayectoria de las opiniones refiere, los resultados
+alcanzados al variar el dt son prácticamente los mismos. En los casos de Alfas cercanos a 
+los valores críticos se dió que había una dispersión mayor de los valores para los dt más
+bajos. Esto podría deberse a que para bajos valores de dt el sistema cumplía el criterio 
+de corte con mayor facilidad, lo cual lo hacía cortar antes de permitir que el sistema
+decayera a un estado donde todos los agentes caían al mismo exacto estado final.
+Fuera de este caso, los resultados finales alcanzados eran exactamente iguales sin
+importar el valor de dt utilizado. Esto muestra que podemos con total tranquilidad
+tomar dt=0.1 para los casos lejos de la región de alfas críticos, y en esa región
+podríamos reducir dt a 0.01 o 0.02 para realizar un cálculo un poco más fino.
+
+Las variaciones promedio muestran que independientemente del valor de dt, 
+todas las simulaciones tienen una tendencia decreciente para la Variación
+Promedio y que además todos cumplen correctamente con el criterio de corte,
+pero si surge que al aumentar el dt, el tiempo simulado que se necesita
+para cumplir con el criterio de corte es mayor.
+
+También se puede observar que hay una cierta elevación que se produce en
+los gráficos de variación que aparece para los gráficos con alfas mayores
+al alfa crítico, y que para el valor de alfa=0 no se observa.
+Además, en el caso del valor de alfa crítico, se observa un claro cambio
+en la pendiente de la Variación promedio a partir de cierto punto, lo cual
+parece indicar que el sistema evoluciona de cierto modo hasta que sufre
+un cambio en su dinámica y se vuelve más brusco. Esto es debido a que 
+ahora la variación decrece más lentamente.
+
+Por último, en el gráfico de iteraciones vs dt, se puede ver con total
+claridad una ganancia sustancial en la cantidad de iteraciones requeridas
+para que el sistema termine la simulación, siendo que tanto para 
+alfas por encima del crítico, como para alfas por debajo, el sistema
+pasa de requerir entre 8000 y 10000 iteraciones con un dt de 0.001
+a apenas cientos de iteraciones con un dt de 0.1, lo cual implica
+una reducción de un entre un 97% a un 98% en la cantidad de cuentas.
+
+En el caso del alfa crítico, el número de iteraciones baja de
+~80000 con un dt de 0.001,a ~20000 con un dt de 0.01
+y a ~8000 con un dt de 0.1. Lo cual es una reducción de entre
+un 75% y un 90% de las cuentas. Claramente podemos darnos el lujo
+entonces de trabajar con dt de 0.1 para los cálculos fuera de 
+la región crítica, y podemos pasar a usar dt de 0.01 o 0.02
+para la región de transición

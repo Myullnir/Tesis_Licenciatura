@@ -4,5 +4,5 @@
 
 for nombre in Datos_*
 do
-	mv $nombre ../"Programas Python"/"Modelo Erdos-Renyi"/$nombre
+	mv $nombre ../"Programas Python"/"Cambios dt"/$nombre
 done

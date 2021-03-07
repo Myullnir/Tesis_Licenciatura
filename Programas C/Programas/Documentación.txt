@@ -110,3 +110,39 @@ en un futuro, y mientras voy a ir armando un nuevo código que en el
 futuro voy a guardar en la carpeta Modelo Impulsado por Actividades.
 Suponiendo que logre entender qué hace que los struct me funcionen
 tan mal.
+
+-------------------------------------------------------------------------------
+
+28/02/2021
+
+El código de la carpeta Modelo Erdós-Renyi arma redes estáticas
+con grado medio 8, para distintos valores de agentes: N=10,100,1000.
+Además los otros parámetros del sistema son: K=1, T=2, Crit Corte = 10^(-6)
+Máxima opinión inicial = 3. El dt es 0.001 actualmente, pero estamos
+pensando en cambiarlo. Además el código ahora sólo corre sobre redes
+conexas a partir del uso de la función Tamaño_Comunidad.
+
+Además el sistema ahora evoluciona la opinión de la red de manera
+sincrónica, no como antes que los iba evolucionando a cada uno
+a la vez. Para esto justamente modifiquñe la fuinción de RK4
+para que devuelva a la salida el valor evolucionado del vector
+y que el vector que le pasás no se modifique.
+
+-------------------------------------------------------------------------------
+
+07/03/2021
+
+El código de la carpeta "Cambios dt" trabaja también con redes armadas
+con el modelo de Erdós-Renyi con un grado medio de 8. El resto de los
+parámetros también son iguales. El tema es que este código lo que hace
+es recibir valores de N y Alfa, y en el interior del código tiene
+agendado varios valores de dt. La idea es que crea inicialmente una
+red y un set de valores de opiniones iniciales. A ese sistema inicial
+lo evoluciona varias veces cambiando únicamente el valor de dt, de
+manera de ver cómo cambia la evolución del sistema al cambiar ese 
+parámetro.
+
+Por tanto, el código funciona de manera de que guarda los valores
+iniciales de Opinión y que luego a partir de estos vuelve a reiterar
+el sistema. La red está guardada en la matriz de Adyacencia, y como
+la red es estática, una vez creada no hay que hacerle nada.

@@ -19,3 +19,8 @@ programa que voy a usar para replicar los gráficos de Baumann funciona bien.
 .) Trayectoria Opiniones: Esto me grafica con líneas grises la trayectoria que recorre la opinión de un sujeto a lo
 largo del espacio de tópicos, y me coloca al final del recorrido un punto. Lo ideal sería poder convertir ese punto
 en un punto cuyo color indique el tipo de opinión final del sujeto
+
+.) Alfa Crítico: Lo que está graficado acá es el valor de Alfa crítico en función del cos(delta), siguiendo
+la fórmula para el alfa crítico obtenida a partir de la aproximación de campo medio del paper de Baumann,
+pero reemplazando el grado medio que él usa, 2m<a> por el grado medio de la red de Erdós-Renyi <k>, que para
+las redes armadas es 8.

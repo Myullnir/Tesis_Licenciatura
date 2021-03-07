@@ -38,24 +38,21 @@ int main(int argc, char *argv[]){
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la variación promedio de las opiniones.
 		ps_datos->d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
 		ps_datos->i_Itextra = 2000; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		ps_datos->f_Cosangulo =  strtof(argv[3],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
+		ps_datos->f_Cosangulo =  0.2; // Este es el coseno de Delta que define la relación entre tópicos.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
 		int i_tamaño = 0; // Esta variable mide el tamaño de la componente gigante de mi red.
-		
-		if(ps_datos->f_dt == 0) ps_datos->f_dt = 0.001;
+		float DT[5] = {0.001,0.005,0.01,0.05,0.1}; // Estos son los valores de DT en los cuales voy a iterar
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes.
-		// También hay una matriz de paso previo del sistema y un vector para guardar la diferencia entre el paso previo y el actual.
+		// También hay una matriz de paso previo del sistema, un vector para guardar la diferencia entre el paso previo y el actual y uno para los
+		// valores de opiniones iniciales del sistema, para que todos arranquen del mismo lugar.
 		ps_red->pd_Ang = (double*) malloc((2+ps_datos->i_T*ps_datos->i_T)*sizeof(double)); // Matriz simétrica de superposición entre tópicos.
 		ps_red->pi_Ady = (int*) malloc((2+ps_datos->i_N*ps_datos->i_N)*sizeof(int)); // Matriz de adyacencia de la red. Determina quienes están conectados con quienes
 		ps_red->pd_Opi = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Lista de vectores de opinión de la red, Tengo T elementos para cada agente.
 		ps_red->pd_PreOpi = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		ps_red->pd_Diferencia = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
+		ps_red->pd_OpiInicial = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Lista de vectores de opiniones iniciales de la red, Tengo T elementos para cada agente.
 		
-		// Voy a abrir un archivo ahora para la evolución de opiniones
-		char s_archivo1[255];
-		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_dt=%.3f",ps_datos->f_alfa,ps_datos->f_dt);
-		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Inicializo mis cinco "matrices".
 		// Matriz de Adyacencia. Es de tamaño N*N
@@ -82,6 +79,11 @@ int main(int argc, char *argv[]){
 		for(register int i_i=0; i_i<ps_datos->i_N*ps_datos->i_T+2; i_i++) ps_red->pd_Diferencia[i_i] = 0;
 		ps_red->pd_Diferencia[0] = ps_datos->i_N; // Pongo el número de filas en la primer coordenada
 		ps_red->pd_Diferencia[1] = ps_datos->i_T; // Pongo el número de columnas en la segunda coordenada
+		
+		// Matriz de vectores de opiniones iniciales. Es de tamaño N*T
+		for(register int i_i=0; i_i<ps_datos->i_N*ps_datos->i_T+2; i_i++) ps_red->pd_OpiInicial[i_i] = 0;
+		ps_red->pd_OpiInicial[0] = ps_datos->i_N; // Pongo el número de filas en la primer coordenada
+		ps_red->pd_OpiInicial[1] = ps_datos->i_T; // Pongo el número de columnas en la segunda coordenada
 				
 		// Inicializo el Agente y Tópico a mirar. Esto no significa mucho porque después lo voy a cambiar.
 		ps_red->i_agente = 0;
@@ -103,44 +105,62 @@ int main(int argc, char *argv[]){
 	}
 	while(i_tamaño != ps_datos->i_N);
 	
-	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
-	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
-	Escribir_i(ps_red->pi_Ady,pa_archivo1); // Matriz de Adyacencia
-	fprintf(pa_archivo1, "\tMatriz de Superposicion\n");
-	Escribir_d(ps_red->pd_Ang,pa_archivo1); // Matriz de Superposición
-	fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
-	Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+	for(register int i_i=0; i_i<ps_datos->i_N*ps_datos->i_T; i_i++) ps_red->pd_OpiInicial[i_i+2] = ps_red->pd_Opi[i_i+2]; // Me guardo mi versión original del sistema
 	
-	// Evolucionemos el sistema utilizando un mecanismo de corte
-	// Queda para el futuro ver si vale la pena meter esto en una sola función.
-	while(i_contador<ps_datos->i_Itextra){
-		// Inicializo el contador
+	for(register int i_i=0; i_i<5; i_i++){
+		
+		ps_datos->f_dt = DT[i_i]; // Establezco el nuevo dt
+		
+		// Reinicio las opiniones
+		for(register int i_j=0; i_j<ps_red->pd_Opi[0]*ps_red->pd_Opi[1]; i_j++) ps_red->pd_Opi[i_j+2] = ps_red->pd_OpiInicial[i_j+2];
+		
+		
+		// Voy a abrir un archivo ahora para la evolución de opiniones
+			char s_archivo1[255];
+			sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_dt=%.3f",ps_datos->f_alfa,ps_datos->f_dt);
+			FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+		
+		// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
+		fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
+		Escribir_i(ps_red->pi_Ady,pa_archivo1); // Matriz de Adyacencia
+		fprintf(pa_archivo1, "\tMatriz de Superposicion\n");
+		Escribir_d(ps_red->pd_Ang,pa_archivo1); // Matriz de Superposición
+		fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
+		Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+		
+		// Evolucionemos el sistema utilizando un mecanismo de corte
+		// Queda para el futuro ver si vale la pena meter esto en una sola función.
+		while(i_contador<ps_datos->i_Itextra){
+			// Inicializo el contador
+			i_contador = 0;
+			
+			// Evoluciono el sistema hasta que se cumpla el criterio de corte
+			do{
+				for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
+				Iteracion(ps_red,ps_datos,pf_EcDin);
+				Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+				Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+				ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			}
+			while(ps_red->d_Varprom > ps_datos->d_CritCorte);
+			
+			// Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
+			while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
+				for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
+				Iteracion(ps_red,ps_datos,pf_EcDin);
+				Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+				Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+				ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+				i_contador +=1;
+			}
+			// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
+			// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
+			// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
+		}
+		fclose(pa_archivo1);
 		i_contador = 0;
-		
-		// Evoluciono el sistema hasta que se cumpla el criterio de corte
-		do{
-			for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
-			Iteracion(ps_red,ps_datos,pf_EcDin);
-			Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
-			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
-			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-		}
-		while(ps_red->d_Varprom > ps_datos->d_CritCorte);
-		
-		// Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
-		while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
-			for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
-			Iteracion(ps_red,ps_datos,pf_EcDin);
-			Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
-			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
-			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-			i_contador +=1;
-		}
-		// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
-		// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
-		// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
-	}
 	
+	}
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(ps_red->pd_Ang);
 	free(ps_red->pi_Ady);
@@ -149,7 +169,6 @@ int main(int argc, char *argv[]){
 	free(ps_red->pd_Diferencia);
 	free(ps_red);
 	free(ps_datos);
-	fclose(pa_archivo1);
 	
 	// Finalmente imprimo el tiempo que tarde en ejecutar todo el programa
 	time(&tt_fin);

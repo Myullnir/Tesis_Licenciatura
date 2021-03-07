@@ -1,0 +1,24 @@
+En esta carpeta voy a guardar los gráficos armados con las redes estáticas de Erdós-Renyi. Los gráficos
+van a ser gráficos de trayectoria de las opiniones.
+
+.) Trayectoria de las Opiniones_alfa=$_Cdelta=$_N=$ : Este gráfico lo que hace es tomar el valor
+de las opiniones de un agente y graficarlas según todas las iteraciones, de manera de armar
+una trayectoria en el espacio de fases. Este gráfico tiene sentido y es sencillo de realizar
+ya que los agentes tienen sólo 2 tópicos. Por tanto, el gráfico se puede realizar en un plano. En
+caso de tener 3 tópicos o más, estos gráficos comenzarán a volverse más complejos y quizás
+debamos buscar otras formas de representar la información.
+
+
+----------------------------------------------------------------------------------------------------
+
+Conclusiones: Los gráficos armados hasta ahora para la cantidad de agentes N= 10 y 100 
+parecen estar bien hechos. Se puede ver que los casos de Alfa cero caen al (0,0), y que
+después a medida que el alfa crece el sistema toma valores de "polarización". (Recordá
+que no podés afirmar que haya estado ideológico o polarización con una sola corrida.)
+
+Lo único malo por ahora es que realizar las simulaciones de todos los valores alfa
+y Cdelta considerados toma mucho tiempo, pero planeamos reducir este tiempo aumentando
+el valor de dt. Eso será pronto
+
+Al final todos estos gráficos van a quedar con dt=0.001, los nuevos gráficos los haré
+en nuevas carpetas.

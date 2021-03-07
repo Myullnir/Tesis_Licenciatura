@@ -1874,3 +1874,128 @@ hay algo rescatable y si no borrarla.
 
 También falta subir los gráficos al Power point y hacer las anotaciones
 correspondientes sobre los parámetros del modelo y demás.
+
+-------------------------------------------------------------------------
+
+28/02/2021
+
+Hoy lo que hice fue commitear cosas al Github, Agregar archivos de 
+documentación en las carpetas de imágenes, Modificar el archivo
+de Documentación de Programas y agregar notas en el archivo
+Archivo.c. Lo que me queda para terminar la burocracia de organizar
+mis cosas es agregar notas en el powerpoint.
+
+Seguro haga eso el martes, y ya mañana voy a tener que armar
+una carpeta extra donde guardar archivos en los que voy a hacer
+unas pruebas con distintos valores de dt, para ver cómo quedan
+los gráficos al ir aumentando el valor de dt. La idea es que
+eso me permita reducir el tiempo de cómputo, el tamaño de mis
+archivos y demás.
+
+------------------------------------------------------------------------
+
+01/03/2021
+
+Hoy voy a arrancar armando el gráfico del alfa crítico en función del
+coseno de delta. Luego de eso voy a armar una tira de datos en los que
+voy a hacer cálculos mientras varío el dt.
+
+Bien, ya tengo hecho el gráfico del Alfa, ahora vamos a subirlo
+al Power Point y empezar a armar las tiradas de varios valores de 
+dt.
+
+Voy a armar las nuevas tiradas cambiando el dt. Para un cos(delta)=0.2
+voy a hacer cálculos con alfa entre 0 y 0.5. Voy a usar 100 agentes
+y variar el dt entre los siguientes valores:
+[0.001,0.005,0.01,0.05,0.1]
+Estos datos los voy a guardar en una nueva carpeta llamada "Cambios dt".
+
+Ya estoy correctamente armando los archivos. Ahora voy a tener
+que armar los gráficos asociados. Para eso voy a levantar los datos
+en Python, graficar las trayectorias de opiniones, y podría además
+hacer un gráfico de cantidad de iteraciones según dt y según alfa,
+que permita visualmente comparar la cantidad de iteraciones de cada
+combinación, como una forma de medida del tiempo ahorrado 
+entre iteraciones.
+
+Me acabo de dar cuenta que los gráficos que voy a comparar son todos
+distintos, eso no me sirve. Necesito que la comparación de los dt
+surja sobra las mismas redes, y sobre los mismos estados iniciales,
+para ver que lleguen a los mismos valores finales. Por eso es que
+voy a rearmar el main para que itere en los dt DENTRO del programa
+y no en el instanciar. Eso va a hacer que mueva muchas cosas de lugar.
+Igual el Erdós-Renyi lo guardé ya en programas, para evitar problemas.
+Este código lo usaré para esto y luego lo guardaré en una carpeta 
+aparte en Programas.
+
+Perfecto, ahora el programa funciona generando una red de adyacencia
+y una serie de opiniones iniciales, y sobre esos datos el sistema
+corre evolucionando, únicamente cambiando el dt. (Técnicamente lo
+que también varía es el random porque no reseteo el random, pero
+creo que no vuelvo a lanzar dados en ninguna otra cuenta)
+
+Estoy trabajando en Python. La idea es armar tres gráficos a partir
+de estos datos:
+.) Trayectoria de Opiniones, para ver que tan bruscos son los saltos
+al evolucionar el sistema
+.) Variación de las opiniones, para ver cuánto tarda cada sistema
+en llegar a cero y comparar eso en un gráfico. Además para ver
+que efectivamente se cumpla el criterio de llegar a una variación
+menor al criterio de Corte.
+.) Cantidad de iteraciones en función de dt y de Alfa, para ver 
+gráficamente una medida del tiempo ahorrado dependiendo del valor
+de dt.
+
+Mañana continuar desde el gráfico de Variación de las opiniones.
+Creo que ya tengo el orden del programa correctamente armado
+
+-------------------------------------------------------------------------
+
+07/03/2021
+
+En algún momento en la semana resolví el tema de que el código
+de Python me arme los gráficos de Trayectoria de Opiniones,
+el de Variación de las opiniones y el de Cantidad de iteraciones
+vs dt. Así que ya tengo los gráficos correctamente armados,
+guardados en sus carpetas correspondientes y con los archivos
+de Documentación pertinentes.
+
+Estudiando los datos, pareciera que lo más razonable actualmente
+es usar valores de dt = 0.1 fuera de la región de transición y
+usar valores de dt = 0.01 o 0.02 en la región de transición.
+
+Las trayectorias de opiniones no parecen en lo más mínimo afectadas
+por el cambio de dt, tanto en los caminos tomados como en los
+resultados finales alcanzados. Sí es importante notar que el número
+de iteraciones se reduce dramáticamente, y es mi entender que de 
+aumentar el dt por encima de 0.1 el número de iteraciones podría
+reducirse a apenas decenas, lo cual resultaría muy poco para
+poder hacer estudio de la evolución del sistema.
+
+La idea para hacer hoy, no sé si llegaré a hacerlo todo, es
+primero hacer el commit a Github con todas las actualizaciones de
+archivos.
+
+Luego, tendría que armar un nuevo programa para empezar a simular
+datos con el nuevo valor de dt y barriendo valores de Alfa y 
+cos(delta) como los mencionados en el pdf que le mandé a Pablo.
+Estos datos los voy a tener que guardar en una nueva carpeta
+y además voy a tener que hacer varias corridas para cada valor
+de Alfa y cos(Delta), de manera de empezar a producir estadística.
+Para arrancar, yo diría hacer entre 20 y 40 corridas. Confío que
+40 puedo hacer sin problemas.
+
+Lo siguiente será levantar estos datos de manera correcta y
+graficar las trayectorias de todos en un mismo gráfico, para 
+ver qué pasa en promedio. Y de ser posible, armar una función que
+reconozca en función de los valores finales, qué está ocurriendo con
+el sistema.
+(Cuando digo graficar la trayectoria de todos en un gráfico, me
+refiero a tomar todas las instanciaciones de un valor particular
+de alfa y cos(delta) y esas instanciaciones guardarlas en un
+solo gráfico, no digo de mezclar datos de alfas o cos(delta)
+distintos)
+
+Hecho eso, ya tendría todas mis herramientas para ir armando los
+gráficos de Baumann, así que tendría prácticamente la mitad de
+la tesis hecha. Digo yo, inocentemente.
