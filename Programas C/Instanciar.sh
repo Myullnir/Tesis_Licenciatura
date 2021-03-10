@@ -11,9 +11,19 @@ read decision
 
 if [ -z $decision ]
 then
-	for Alfa in {0..5..1}
-	do
-		./$1.e 100 $Alfa 2
+	for N in 1000
+		do
+		for Alfa in {1..10}
+		do
+			for Cdelta in {0..10}
+			do
+				echo Estoy trabajando el alfa $Alfa y el Cdelta $Cdelta
+				for iteracion in {1..40}
+				do
+					./$1.e $N $Alfa $Cdelta $iteracion
+				done
+			done
+		done
 	done
 	
 	./Mover.sh

@@ -1810,7 +1810,7 @@ muy bien, siempre identifica correctamente el tamaño del grupo. En el futuro
 me gustaría que además identificara todos los grupos que hay, no sólo el
 que está revisando, pero para eso voy a tener que trabajar más el código.
 Por no decir que la forma en que funciona ahora es con un montón de
-ifs y eso no em gusta una mierda. Después veré de corregirlo de una manera
+ifs y eso no me gusta una mierda. Después veré de corregirlo de una manera
 que resulte más fluída y razonable. Pero lo importante es que funciona y
 ya podría implementarla en la función del main, con el objetivo de que compruebe
 que el grupo sea de tamaño N. De esa manera, garantiza que el sistema sea conexo.
@@ -1999,3 +1999,90 @@ distintos)
 Hecho eso, ya tendría todas mis herramientas para ir armando los
 gráficos de Baumann, así que tendría prácticamente la mitad de
 la tesis hecha. Digo yo, inocentemente.
+
+La nueva fase del proyecto la voy a llamar "ER2". Los parámetros
+de esta nueva fase son: N = 10,100,1000. K = 1, T = 2, <k> = 8,
+dt = 0.1 para valores fuera de la región de transición
+( 0 < Alfa < 0.2) y dt = 0.01 para la región de transición.
+El Criterio de corte lo baje a 10^(-8), El máximo de opiniones
+iniciales es 3, El cos(delta) varía entre 0 y 1 de a 0,1, la 
+cantidad de iteraciones extra las bajé a 50.
+
+Los archivos creados tienen nombres: 
+"Datos_Opiniones_alfa=$_Cdelta=$_N=$_Iter=$".
+Los estoy guardando en la carpeta ER2 dentro de la carpeta de
+Python. Para cada terna de valores N, Alfa y Cdelta estoy 
+armando 40 iteraciones cosa de armar estadística con eso
+por ahora. En el futuro serán más.
+
+Lo que estoy pensando apra ahorrar tiempo en el futuro es que
+podría tomar el Archivo de instanciar y definir por cases
+los códigos para cacular los datos del sistema en las distintas
+regiones. Es decir, los datos fuera de la región de transición
+y los datos en la región de transición. Así con uno simples 
+números o comentando y descomentando puedo mandar a correr
+todo. Pensalo.
+
+Ahora creo que lo que debería hacer es ir actualizando el 
+Power Point con las cosas de Cambio dt y la nueva fase del
+proyecto, mientras el programa corre eternamente montones
+de cálculos extra de fondo.
+
+-------------------------------------------------------------------
+
+08/03/2021
+
+Hoy mandé a correr el programa para todos los alfas a partir
+de 0,2 hasta 1; todos los cos(delta) entre 0 y 1, y todos los
+N = 10,100,1000. Esto tomó unas 12 o 13 horas de cálculo.
+En este caso dt=0,1. Las iteraciones extra son sólo 50.
+
+No hice ninguna cuenta al respecto, porque el tiempo no me alcanzó.
+
+--------------------------------------------------------------------
+
+09/03/2021
+
+Hoy mandé a correr el programa para todos los alfa entre 0,01 y
+0,2; moviendo el alfa de a 0,01. El cos(delta) lo moví entre 0 y 1
+y N = 10,100. El de 1000 lo dejé para hacerlo otro día. Es más,
+creo que eso va a tomar más de un día. El dt=0,01 y las iteraciones
+extra son 2000.
+
+-------------------------------------------------------------------
+
+10/03/2021
+
+Borré todos los archivos con N=10 que estuve calculando. Pablo dijo,
+y con mucha razón, que esos no sirven realmente. Los de 100 tampoco
+son realmente útiles, pero en lo que voy armando los de N=1000
+prefiero tenerlos para ir haciendo algún cálculo.
+
+Hoy lo que voy a hacer es armar algún código que me permita graficar
+en una sola imagen todo un ensamble de simulaciones para cada
+Alfa y coseno(Delta). La idea va a ser trabajar con una reducción
+de la opacidad de las líneas, y simplemente mandarlo todo a correr.
+
+Si tengo tiempo, voy a arrancar a armar una función que pueda
+decidir si el estado final es uno de polarización, estado
+ideológico o consenso central.
+
+También debería subir algunas imágenes más al power point y 
+hacer la burocracia de estos días, que no debería ser mucha
+porque hace varios días que lo único que vengo haciendo es 
+crear archivos en simulaciones, no actualizo el código.
+Excepto para algún cambio de Iteraciones extra y cosas.
+
+De paso, TODAS las simulaciones hechas tienen dt=0,1. 
+Al revisar el archivo del main acabo de observar que eso
+nunca lo cambié. Fue un error, pero un buen error porque
+me ahorró tiempo de cálculo.
+
+De paso, las simulaciones les había puesto que corten
+cuando la variación promedio era menor a 10^(-8).
+Pero lo repensé y me parece un trabajo innecesario, así que a 
+las siguientes simulaciones no se lo exijo. En
+pocas palabras, las simulaciones que tienen criterio
+de corte 10^(-8) todas las de N=100 y las de
+Alfa =0 y N=1000. El resto de las de N=1000
+tienen criterio de corte 10^(-6)

@@ -97,7 +97,7 @@ int Visualizar_i(int *pi_vec){
 // La función RK4 evoluciona un sólo elemento de todo un sistema. La idea de esto es que la función sea completamente
 // modular, y que en caso de querer evolucionar todo el sistema, desde fuera la llame múltiples veces y listo.
 // Además, ahora lo que hace es devolver el cálculo de la evolución del número en vez de asignarlo al vector provisto.
-// Esto ofrece mayor libertad a la hroa de implementarlo. Justamente la idea de esto es que me permite pasarle una
+// Esto ofrece mayor libertad a la hora de implementarlo. Justamente la idea de esto es que me permite pasarle una
 // foto del sistema en un cierto paso temporal, y guardar los datos evolucionados en un segundo vector, de manera
 // que la foto no varía al ser evolucionada. Eso me permite que con sólo dos vectores, uno del paso temporal actual
 // y uno del paso temporal siguiente me alcance para poder hacer una evolución sincrónica del sistema.

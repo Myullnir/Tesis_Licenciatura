@@ -19,8 +19,7 @@ porque las líneas grises sobreescriben los puntos y los tapan un poco. Podrías r
 los puntos al final, LUEGO de haber graficado las líneas, de esa manera los puntos
 se pondrian por encima de las líneas.
 
-.) Probar usar deltas más chicos
-.) Hacer el gráfico del alfa crítico en función del coseno de Delta
+.) Normalizar por el máximo Los gráficos de Trayectoria de Opiniones.
 
 -------------------------------------------------------------------------------------------------
 

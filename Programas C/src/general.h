@@ -14,7 +14,6 @@ typedef struct Red{
 	double *pd_PreOpi; // Vector que guarda la matriz de opiniones del sistema en el paso temporal Previo.
 	double *pd_Diferencia; // Vector que guarda las diferencias entre PreOpi y Opi.
 	double *pd_Opi; // Vector de opinión de cada individuo
-	double *pd_OpiInicial; //Vector de Opinión desde el cual parten todas las simulaciones.
 	double *pd_Ang; // Matriz de superposición entre tópicos. Tiene tamaño T*T
 	int *pi_Ady; // Matriz de adyacencia que define mis conexiones. Tiene tamaño N*N
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
