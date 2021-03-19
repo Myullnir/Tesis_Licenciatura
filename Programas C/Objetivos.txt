@@ -14,12 +14,18 @@ archivo de Optimización.txt.
 
 .) Revisar el programa que asigna colores a los estados finales de los agentes (aunque parece funcionar
 bien, no confío plenamente en las cuentas, revisalas).
-.) Modificar la forma en que se colocan los puntos de los estados finales del sistema
-porque las líneas grises sobreescriben los puntos y los tapan un poco. Podrías repasar
-los puntos al final, LUEGO de haber graficado las líneas, de esa manera los puntos
-se pondrian por encima de las líneas.
 
-.) Normalizar por el máximo Los gráficos de Trayectoria de Opiniones.
+.) Organizar los gráficos para mostrar las cosas en la medida que se varía Alfa o Coseno Delta.
+Sería mágico armar una super gigantografía que contenga a todas las otras imágenes. Me pregunto
+si habrá una forma de hacer eso.
+.) Armar los gráficos para N=1000. Toda la tanda de gráficos que hice antes
+.) Hacer el gráfico de fases con un colormap, eso estaría bueno.
+.) En el gráfico de Fases hacer lo que dijo Pablo de intentar graficar
+una cuerva que sea como la frontera de la transición experimental entre
+el estado de polarización y el de consenso.
+.) Mandarle un mail a Silvina Ponce Dawson.
+
+
 
 -------------------------------------------------------------------------------------------------
 

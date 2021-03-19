@@ -2083,6 +2083,328 @@ cuando la variación promedio era menor a 10^(-8).
 Pero lo repensé y me parece un trabajo innecesario, así que a 
 las siguientes simulaciones no se lo exijo. En
 pocas palabras, las simulaciones que tienen criterio
-de corte 10^(-8) todas las de N=100 y las de
+de corte 10^(-8) son todas las de N=100 y las de
 Alfa =0 y N=1000. El resto de las de N=1000
 tienen criterio de corte 10^(-6)
+
+Ya tengo en buena medida armado el código para hacer los 
+gráficos de trayectoria combinando todas las iteraciones
+en un sólo gráfico. Ahora mismo lo que estoy haciendo es
+comparar distintas transparencias de las líneas para ver
+cuál hace que el gráfico se vea mejor. Básicamente, lo que
+quiero es que las líneas grises no me tapen el resultado
+final. Después lo que voy a tener que agregar es el 
+normalizar los gráficos.
+
+Creo igual que el Alfa cómodo de la transparencia es
+0,1
+
+También se me ocurre armar un diccionario con los nombres
+de todos los archivos de manera de que el diccionario contenga
+los nombres de los archivos con los valores de Alfa, Cdelta
+y N correspondientes. La idea de eso es no tener que repasar
+TODA la lista de nombres para cada gráfico. Además me puedo
+sacar de encima los if que comparan Alfas y Cdeltas y demás.
+
+Creo que voy a tener que corregir la forma en que se marcan
+los puntos finales. Porque las líneas grises terminan tapando
+los puntos.
+
+Una vez que eso esté hecho, ahí si vas a tener que hacer lo
+que sigue, armar el gráfico del espacio de fases. Eso va a
+ser un poco complejo de determinar.
+
+------------------------------------------------------------------------
+
+11/03/2021
+
+Bien, ya tengo armado el código que me grafica las trayectorias
+de opiniones. Ahora hay que darle a eso. Me da un poco de miedo
+mandarlo a correr eso ahora. Lo voy a dejar para mañana y así
+lo mando todo de una desde la mañana, y lo voy vigilando cada
+tanto. En caso de tener problemas con el tema de la memoria del
+programa, veré de descargar el programa como un archivo py y mandar
+a correr todo de una desde un archivo py, eso no debería cortar
+por temas de memoria.
+
+Dios, la ansiedad que me está generando el hecho de que me ocupe
+toda la memoria el trabajar con estos archivos. Ya tengo más de
+200 Gigas de datos en la carpeta ER2 nomás. Esto se está descontrolando
+fuerte.
+
+Casi me olvido, necesito primero ver de normalizar los valores 
+que estoy graficando. Así que voy a ver de tomar el máximo
+de todas las opiniones, y al guardarlas en el diccionario OdT
+ahí aplicar el factor de normalización. Aunque atento con eso
+porque entonces los valores de los puntos finales no van
+a estar normalizados. Voy a tener que normalizar esos
+también.
+
+Pablo dice de normalizar los gráficos. Hay un tema que
+me parece bueno marcar antes de hacer eso. Acabo de mirar
+un gráfico hecho en el caso de un valor en la región
+de transición. O cerca por lo menos. Cuestión, que el
+gráfico tenía las opiniones finales sobre la diagonal
+del estado ideológico, pero lo importante es que los 
+valores máximos de opiniones que tomaba eran (3,3) y
+(-2,-2). También tomaba valores intermedios. Ahora, esto
+me resulta muy difícil de creer, si entendemos que el
+sistema está tendiendo a valores que sean el grado
+del nodo. Es decir, de alguna manera la distribución
+de opiniones finales debería, aunque nunca lo corroboramos,
+ser similar a la distribución de grado del sistema. El sistema
+tiene un grado medio ocho, eso es incuestionable. (Podría
+comprobarlo de ser necesario mirando la matríz de adyacencia.
+Gracias Dios por no haber dejado de anotar eso nunca.)
+Cuestión, mi impresión es que lo que está pasando es
+que el valor de alfa en esta región es el justo de manera
+de que la tanh no cappea, entonces lo que aporta son
+valores fraccionarios que hacen que el sistema no
+tienda a K*(Nº 1eros vecinos), sino a cosas más
+pequeñas. Entonces si yo normalizo eso, ese comportamiento
+se va a perder en la normalización. Mencionárselo a Pablo
+
+---------------------------------------------------------------------------
+
+12/03/2021
+
+Hagamos una lista de las cosas por hacer.
+
+
+.) Armar función que identifique el estado final del
+sistema en función de las opiniones finales de los
+agentes.
+.) Estudiar la Variación Promedio de los sistemas, para ver
+si el sistema converge.
+.) Armar distribuciones de los valores finales de los
+agentes, de manera de caracterizar la zona de transición
+del sistema
+
+Ya tengo hecho le mecanismo de normalización de los gráficos
+Ahora pasemos a identificar estados finales.
+
+Ahí armé la función, parece funcionar bien, habría que ver 
+si identifica correctamente los gráficos. Para ponerla a 
+prueba voy a empezar a armar algunos gráficos y que les
+ponga un texto diciendo cómo los califica.
+
+Todavía tengo que mirar mejor los casos, pero pareciera
+estar haciendo una clasificación correcta. Creo que va 
+a quedar realmente claro cuando haga un estudio de la
+distribución de los valores finales de los agentes.
+Hasta entonces lo único que puedo hacer es ver algunos
+archivos directamente con el Notepad.
+Ahora, tengo que admitir que mirando los archivos del
+Notepad en uno de los casos en que manda consenso, se
+nota que como el programa dice, muchos casos cayeron al
+consenso y unos pocos llegaron a estado ideológico.
+
+Bajé el programa y lo corrí con el Python Spyder.
+Al parecer el programa del consumo excesivo de memoria
+se daba específicamente por los gráficos. Voy a ver
+si quitando los delete sigue funcionando igual,
+más que nada para poder seguir trabajando como hacía
+siempre.
+
+El problema central parece ser la creación de los gráficos.
+Es como si en el Notebook se estuvieran guardando 
+los gráficos que deberían cerrarse. Entonces esa 
+acumulación de gráficos es el problema que se está
+comiendo la memoria. Al trabajarlo en el Python
+Spyder, esa memoria consumida se resetea cada
+vez que se genera un nuevo gráfico. Así que
+creo que lo mejor de ahora en adelante es
+en Notebook probar funciones e ir viendo que tal,
+y después en el Python Spyder correr todo.
+
+----------------------------------------------------------------------
+
+14/03/2021
+
+Probé hacer que los gráficos se realizaran dentro
+del mismo Spyder, pero eso de nuevo crea el problema
+de que la memoria se sobrecarga. Así que por ahora mi
+mejor opción es dejar que el programa arme los gráficos
+de manera externa, es decir en ventanas extra, y luego
+los vaya cerrando. Al hacer eso, pareciera que con
+cada nueva ventana que abre, el consumo de memoria
+se reinicia y de esa manera no me come toda la pc.
+Aunque sigue comiendo un poco.
+
+Lo malo de esto, es que cada nuevo gráfico que arma
+me genera una ventana emergente que tapa lo que 
+estaba haciendo. Voy a ver que tanto puedo ignorar
+eso, aunque pareciera ser que va a ser una paja.
+Igual, mejor eso y que el programa pueda laburar
+todos los gráficos de una, a tener que andar con
+el culo en la mano y sin poder usar la pc mientras
+hace de algunos pocos.
+
+Bueno, discutido esto, ahora viene el siguiente
+punto. La función de identificar estado final 
+no estaría funcionando perfectamente como yo
+esperaba. Estoy notando que el problema está
+en cómo interpreté yo que debería funcionar.
+Así que por eso, la voy a modificar. El error
+crucial que está teniendo parte de que la función
+mira el estado final de UNA simulación. El tema
+con esto, es que una simulación tiene dos opciones:
+O cae al (0,0) o sus estados se alejan en una
+direccion diagonal. El tema con eso es que una sóla
+dirección diagonal jamás generaría el estado de
+polarización. Por eso mi programa sólo reconoce
+Consenso e Ideológico como estados finales. Entonces
+lo que voy a tener que hacer es armar un vector
+que guarde los estados finales de las 40 (O más
+en un futuro) simulaciones y a esas les aplique el
+mismo exacto algortimo que vengo usando. En ese caso, vas a ver
+que los estados de Polarización aparecen.
+
+Ahí lo corregí, o eso creo. Habrá que ponerlo a prueba.
+En cuanto termine con el siguiente alfa, lo mando
+a ver que tal. Lo que hice fue ir sumando las listas,
+que entiendo que eso lo que hace es a la lista actual
+ponerle todos los elementos de la lista nueva al final.
+Eso me arma una única lista con las opiniones finales
+de los agentes de todas las simulaciones realizadas
+con un mismo conjunto de parámetros alfa y Cdelta.
+
+Lo puse a prueba, ahora identifica correctamente las 
+polarizaciones. Así que eso ya funciona.
+
+Lo siguiente entonces es armar un código que me arme
+las Variaciones Promedio y otro que me arme la distribución
+de valores.
+
+Empecemos por la Variación, aunque la variación no me veo
+graficándola hoy. Mañana lo que haré será graficar la variación
+Y las TdO todo de nuevo. Lo que voy a necesitar es guardar
+en algún lugar la Info del estado final del sistema. Quizás
+en el título de las imágenes. Eso es importante, porque
+sino la próxima vez que quiera hacer el gráfico de fases
+voy a necesitar revisar TODOS los archivos de nuevo. 
+Aunque quizás no me tarde tanto porque como no esté graficando
+sino sólo mirando el último sujeto de la fila, quizás la
+cosa se haga rápido. Bueno, igualmente no me gustaría 
+arriesgarme. Supongo que antes de mandarlo a correr podría
+revisar cómo hacer para guardar eso en un archivo de datos.
+
+Por otro lado, sospecho que esa forma de clasificar los gráficos
+no va a ser del todo buena, porque lo que observe en los gráficos
+de distribución de valores va a resultar más definitorio.
+Así que esto va a ser más que nada una cuestión previa antes
+de usar los verdaderos criterios para definir Consenso, Ideología
+y Polarización.
+
+Creo que ahí incorporé correctamente el graficado de las
+Variaciones Promedio. Habría que ver que tal queda. Ahí lo
+puse a prueba, se ve bastante bien. Ahora, suerte estudiando
+eso. Van a ser 290 gráficos para mirar. No sé si va a haber
+tanto que puedas sacar de ahí. ¿Podría poner los distintos 
+alfas en un mismo gráfico?
+
+De paso, resolver las Variaciones Promedio resultó una
+boludez en tiempo. Por lo que claramente lo complicado
+es el graficar todos los datos, eso es lo más complejo.
+Así que superado el gráfico de los TdO, creo que no
+voy a tener tantos problemas de cómputo.
+
+Ahora debería armar un módulo que se encargue de graficar la 
+distribución de valores finales. Para eso voy a querer que
+tome los estados finales, arme un histograma con eso y luego
+
+Bueno ahí lo armé y lo probé. Terminé usando 30 bins para el histograma.
+Parece un número bueno para que no me aparezcan bines vacío en
+el medio de una curva de distribución. Lo bueno es que en la
+curva que grafiqué se puede ver a ojo que la distribución es
+una distribución media centrada en 8 para los valores de opiniones,
+que es lo que esperábamos ver dada la forma de la ecuación
+diferencial.
+
+Listo, ya están hechos todos los preparativos. Mañana simplemente
+mandá a correr el programa y este tendría que armar todos los
+gráficos de Distribución de opiniones, Variación Promedio y
+TdO del sistema. También, deberías primero borrar todas las imágenes
+que están en la carpeta de imágenes. Para que no haya imágenes
+repetidas y demás. Y por supuesto, primero una plegaria a 
+todos los santos que conozcas, como para que no le pase nada durante
+la ejecución y arme todos los gráficos.
+
+-----------------------------------------------------------------------------
+
+15/03/2021
+
+Vamos a ver de ir armando el gráfico de fases del sistema.
+Para eso voy a necesitar de la función que identifica 
+si el estado final del sistema
+
+Ahí armé la parte del código que hace el gráfico de Fases.
+Lo cual está bien, ahora el tema es mejorarlo para que se vea más lindo.
+Pero más allá de eso, el gráfico se ve genial, respeta muy bien
+la línea del Alfa Crítico y además la región de polarización e ideología
+parece estar en sintonía con lo de Baumann. Yo diría que la diferencia
+entre lo de Baumann y lo mío es un tema del barrido.
+
+Creo que lo que voy a hacer hoy es dejarlo terminar de armar los
+gráficos y después de jugar la partida con Diego me voy a poner
+a armar los gráficos que voy a mostrar mañana. Hay muchos gráficos
+para mostrar, no estoy seguro de cómo lo voy a hacer.
+
+--------------------------------------------------------------------------------
+
+18/03/2021
+
+Estoy tratando de armar los gráficos para una mejor muestra de los
+datos que charlamos la otra vez. Para eso, me interesa de alguna forma
+intentar levantas las imágenes con Python y colocarlas en algún subplot.
+Se me ocurre que una idea copada para mostrar serían las Trayectorias
+de Opiniones y las Variaciones Promedio de los siguientes valores:
+Alfa = [0; 0,05; 0,1; 0,15; 0,2; 0,3; 0,4]
+Cos(delta) = [0; 0,2; 0,4; 0,6; 0,8; 1]
+
+Eso me quedaría un gráfico total de 7x6. Me parece un buen número
+son 42 gráficos todos juntos. El problema que estoy encontrando
+ahora es un tema de una caída en la calidad de la imagen
+mostrada en comparación con la imagen original.
+
+Bueno, ya logré levantar una imagen y ahora se ve bien. Por lo menos
+no noto problemas en la calidad. Para que la imagen salga copada
+uso el plt.imshow con el comando interpolation="spline16". Posiblemente
+esto le consuma algo de tiempo, pero eso en leer y graficar unos simples
+42 gráficos no será mucho drama. Digo que va a consumir tiempo en
+comparación a alguna interpolación más cruda.
+Después para simplificar en términos de la imagen use el plt.axis
+para quitarle los ejes que se me producen por el plt.show().
+
+Lo siguiente es probar en hacer subplots. Fueron varias pruebas, pero
+ya tengo algo que funciona más o menos bien. Habrá que ver de ir 
+mejorándolo, pero eso es un detalle. Cuestión que la idea es partir
+de una figura hecha con plt.figure. Luego, esa la divido en pedazos
+usando add_gridspec. Por último, al elemento gridspec creado le
+ejecuto el comando subplot para obtener los axes sobre los cuales
+voy a hacer mis gráficos y listo, tengo todo hecho.
+
+Después puedo iterar los axes para graficar en ellos cada imagen que
+quiero y listo. Por último guardo la imagen, la cierro y trabajo completado.
+Me queda quizás la idea de armar a mi figura los ejes que indiquen 
+cómo varía Alfa y Cos(delta)
+
+---------------------------------------------------------------------------
+
+19/03/2021
+
+Esto es continuación de lo de ayer. Terminé de colocar los ticks
+de mis gráficos de manera correcta. Para eso le tuve que poner
+explícitamente ejes al gráfico con plt.axes(). Luego con
+plt.xlim() y plt.ylim() definí los máximos y mínimos de graficación
+de los ejes. Sobre estos ejes armados y de tamaño definido usé
+plt.xticks() y plt.yticks() para ubicar a los ticks en el lugar correcto
+y ponerle los números que yo quería.
+
+Después de eso simplemente grafiqué como venía haciendo hasta ahora, 
+usando el imread y el imshow para levantar y graficar la imagen.
+
+Hoy estuve haciendo la burocracia correspondiente anotando las cosas
+acá y en Documentación en ER2. Ahora voy a subir todo con Github y
+revisar qué queda por hacer. Y si vale la pena empezar algo hoy o dejarlo
+para mañana.

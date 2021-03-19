@@ -11,9 +11,9 @@ read decision
 
 if [ -z $decision ]
 then
-	for N in 1000
+	for N in 100
 		do
-		for Alfa in {1..10}
+		for Alfa in {0..20}
 		do
 			for Cdelta in {0..10}
 			do

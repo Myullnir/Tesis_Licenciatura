@@ -1,0 +1,90 @@
+En esta carpeta voy a estar guardando los archivos donde se observa la trayectoria de las opiniones
+a partir de ensambles de simulaciones. Estos gráficos van a estar hechos para 100 y 1000 agentes,
+con pasos temporales dt = 0,1, Criterios de Corte 10^(-8) para todos los N=100 y Alfa = 0
+de los N=1000, mientrasque para el resto de los N=1000 uso un Criterio de Corte 10^(-6).
+
+Como siempre son 2 tópicos, estoy usando redes estáticas Erdós Renyi con grado medio 8.
+Este es el primero de los gráficos de Baumann que debería replicar.
+
+.) TdO_alfa=$_Cdelta=$_N=$ : Este gráfico lo que hace es tomar el valor
+de las opiniones de un agente y graficarlas según todas las iteraciones, de manera de armar
+una trayectoria en el espacio de fases. Este gráfico tiene sentido y es sencillo de realizar
+ya que los agentes tienen sólo 2 tópicos. Por tanto, el gráfico se puede realizar en un plano. En
+caso de tener 3 tópicos o más, estos gráficos comenzarán a volverse más complejos y quizás
+debamos buscar otras formas de representar la información.
+Lo que tengo graficado en estos casos son ensambles de simulaciones, con 40 simulaciones de un 
+sistema con los mismos parámetros iniciales. Los puntos coloridos representan el punto final
+de opiniones que el agente tenía cuando la simulación terminó. 
+El cuadro de texto que indica Consenso, Polarización o Ideología se define usando todos
+los puntos finales del ensamble, donde si el máximo módulo de opinión es menor a 0,1 se
+define como consenso, si el producto de las opiniones 1 con 2 da siempre un mismo signo
+entonces el sistema está en estado Ideológico y si ese mismo producto da a veces positivo 
+y a veces negativo, entonces es Polarización descorrelacionada.
+
+.) Variaciones Promedio_alfa=$_Cdelta=$_N=$: En estos gráficos lo que grafico es la suma sobre
+las opiniones del cuadrado de la diferencia entre la opinión en un paso temporal y esa opinión
+en el paso temporal anterior. Además en este caso estoy haciendo estos gráficos para el ensamble
+de 40 simulaciones que hice para cada par de valroes Alfa y Cos(Delta). Las Variaciones Promedio
+están graficadas en función del tiempo simulado. 
+
+.) Distribución opiniones_N=$_alfa=$: Este es un gráfico de distribución de las opiniones.
+Cada curva representa la distribución para un dado valor de Cos(Delta) de las opiniones de todos
+los agentes. Considerando que se tienen 100 agentes y 40 simulaciones, esto me determina un total
+de 8000 opiniones para graficar. Para los gráficos con N=100 terminé usando 30 bins uniformemente 
+distribuidos para armar las curvas. Cada gráfico está hecho para cada valor de Alfa
+
+.) Tabla Graficos TdO: Esto es una tabla que tiene 42 gráficos organizados de TdO con el fin
+de poder ver en una sola imagen el comportamiento del sistema al ir variando los parámetros 
+alfa y cos(delta)
+
+.) Tabla Gráficos Variaciones: Esto es una tabla que tiene 42 gráficos organizados de Variaciones
+con el fin de poder ver en una sola imagen el comportamiento de las Variaciones Promedio al ir
+variando los parámetros de alfa y cos(delta).
+
+
+----------------------------------------------------------------------------------------------------
+
+Conclusiones: 
+En las TdO primero que nada puedo decir que la función para diferenciar estados finales
+funciona bien, o al menos yo no encontré ningún caso en el que se equivoque. Además se obsevan claramente
+y con lindos colores los tres estados finales posibles, el Consenso, Polarización e Ideológico.
+Algo interesante es ver que en la región de transición algunos de los ideológicos terminan escapando
+del cero pero quedan a medio camino del valor K*(1º Vecinos). Como los gráficos de TdO están normalizados
+la forma de poder observar esto es tomar en cuenta el cuadrado de opiniones iniciales que se sabe cubre
+valores en la región [-3,3]x[-3,3]. Entonces viendo el proporcional que esta región ocupa, se puede tener una
+idea de si los valores finales escapan de esto o se mantienen cerca del cero.
+También se observan algunos gráficos raros donde el caso de polarización cubre tres puntas y no las cuatro.
+Estos casos asumimos que se deben a falta de estadística en el ensamble y que con un poco más de estadística
+habrían surgido.
+También se observa que la aparición de casos de polarización es baja, y esto hace pensar que el motivo de Baumann
+de hacer gráficos con alfa hasta 4 es para que la polarización pueda aparecer con valores de cos(delta) 
+más grandes. En mi caso aparecieron sólo para cos(delta) = 0 y para 0,1 algunos.
+
+En las Variaciones Promedio se puede ver que en un mismo alfa el aumento del coseno(delta) produce
+que las puntas de las variaciones se separen, lo cual muestra que al ir aumentando el coseno(delta)
+la variabilidad del sistema con las condiciones iniciales también aumenta.
+Por el otro lado, el ir aumentando el alfa magnifica este mismo efecto, de manera que al aumentar
+ambos juntos el efecto es aún mayor. En algún punto, este efecto empieza a doblar las curvas de
+Variación Promedio hasta que cerca de la región de transición la curva se dispara y deja de 
+ser dos rectas para ser una recta que abruptamente se vuelve una parábola con vertice
+hacia arriba. De paso, hablo de rectas y parábolas, pero no olvides que el gráfico está en 
+escala lineal en X y logarítmica en Y. Cuestión, lo que empezó siendo una única recta, 
+se convierte en dos rectas en el sentido de que baja con una pendiente y después la
+pendiente cambia, y después se convierte en una recta con una parábola.
+Superada la región de transición, los gráficos pasan a tener todos una lomita
+que es esa parábola que tenía antes, pero mucho menos pronunciada. Tanto menos
+que los tiempos simulados vuelven a reestablecerse en valores cercanos a 40,
+siendo que en la región de transición puede alcanzar cerca de 2000.
+
+En las Distribuciones de Opiniones se puede observar claramente cómo para los primeros
+alfas todas las opiniones están centradas en 0, y recién para el alfa 0,06 las opiniones
+empiezan a separarse en dos picos diferenciados. En la región de transición ocurre que
+se tienen dos picos y también una distribución cerca del cero, mientras que una vez
+atravesada la transición se tienen dos picos claramente diferenciados que se encuentran
+centrados en -8 y 8, lo cual era lo esperable ya que el grado medio de la red es 8.
+Espero que estas curvas se vean mucho mejor y permitan usar una mayor cantidad de bines
+al hacerlos para el caso con 1000 agentes. Es razonable eso porque la cantidad de opiniones
+para graficar va a aumentar en 10.
+
+La tabla de Gráficos OdT y de Variaciones no aportan algo nuevo, simplemente son una forma
+copada de ver en una sola imagen lo ya observado previamente.
