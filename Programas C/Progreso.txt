@@ -2408,3 +2408,204 @@ Hoy estuve haciendo la burocracia correspondiente anotando las cosas
 acá y en Documentación en ER2. Ahora voy a subir todo con Github y
 revisar qué queda por hacer. Y si vale la pena empezar algo hoy o dejarlo
 para mañana.
+
+Por lo que veo, la idea es usar pcolormesh. Realmente ahora no me veo con ganas
+de hacer esto. Por otro lado, creo que básicamente o lo hago mañana o no lo
+hago. Interesante lo rápido que puede pasar una semana.
+
+-----------------------------------------------------------------------------
+
+20/03/2021
+
+Trabajando con el pcolormesh armé el gráfico de fases, ahora se 
+ve bastante más lindo. Además, me guardé con el np.savetext 
+los datos de la matriz ZZ con los datos de si en ese punto
+el sistema tiene Consenso, Polarización o Ideológico.
+
+Ahora lo lindo sería poder hacer que esto tenga los colores
+que quiero yo. Y ver de graficar la curva que dice Pablo.
+La curva de la región de transición empírica.
+
+--------------------------------------------------------------------------------
+
+23/03/2021
+
+Ayer fue que logré hacer que el gráfico tenga los colores que
+quería, le armé el colormap según mis intereses. El que yo armé
+tiene básicamente tres colores para todo el rango de valores,
+y esos colores están en orden verde, azul y rojo de manera
+de que los colores se distribuyan al consenso, polarización
+e ideología correctamente. Si no entiendo mal, de querer
+poner más colores tendría que agregar más de esas tuplas
+de tres elementos que me generen nuevos colores. Por otra
+parte, si quisiera un degradado más lindo entre el rango
+de valores, lo que tendría que hacer es aumentar el binneado,
+es decir el N en el LinearColorsegment.
+
+A este gráfico le agregué en amarillo la curva que define 
+la frontera experimental entre el estado de consenso y 
+polarización general. También le puse unos gráficos de TdO
+de cada región para ejemplificar el comportamiento del sistema.
+
+Cabe aclarar, estoy hablando del que llamo, incorrectamente,
+"Gráfico de Fases". En realidad es un mapa de colores de los estados
+finales del sistema en el espacio de parámetros Alfa-Cos(delta).
+
+Algo que estuve pensando, es sobre armar este gráfico para el caso de N=1000.
+Porque el mapa de colores se arma tomando la lista de Conjunto_Alfa
+y Conjunto_Cdelta. Pero estas listas toman en cuenta TODOS los alfa
+en la carpeta de archivos con datos. Entonces el problema es que
+N=100 tiene más alfas calculados que los N=1000. Es decir, va a
+armarme una matriz ZZ más grande de lo necesario. Esto no es un 
+problema para los otros gráficos porque cuando paso por esos Alfa
+no existentes para N=1000 el código simplemente intenta iterar listas
+vacías, lo cual hace que los saltee. En este caso lo que va a pasar
+es que mi matriz va a quedar mal armada, porque va a asignar resultados
+a valores que no están ahí.
+
+Partamos de que el ZZ se crea como una matriz de ceros, es decir que los
+valores que no se retoquen correctamente quedarán como ceros por default.
+Es decir, esto no va a generar un error que frene el programa, sino que
+lo que va a hacer es graficar cosas equivocadas.
+Luego, el ZZ se va escribiendo en cada fila y columna en la medida que
+recorre la lista Conjunto_Alfa y Conjunto_Cdelta. En conclusión eso
+va a generar que haya elementos de mi matriz que no sean correctamente
+reescritos. Por tanto voy a tener que ver la forma correcta de hacer
+esto.
+
+Se me ocurre lo siguiente, en vez de usar las listas Conjunto_Alfa
+y Conjunto_Cdelta de la manera en que las armo actualmente, podría
+usar las keys del SuperDiccionario como una forma de crear esas
+listas. Suena como una opción viable.
+
+------------------------------------------------------------------------------
+
+25/03/2021
+
+Ahí revisé la función que asignaba colores. Funcionaba en términos de que
+no generaba errores, pero en realidad tenía cierto problema en el cálculo
+del resto. Creo que eso podía afectar en distorsionar el cómo estaban separados
+los 360º en pedazos, pero no era algo terrible. Igual ahí lo corregí, el
+problema estaba en el cálculo del Resto. Básicamente, por lo que entiendo,
+este resto resultaba más chico de lo que debería, entonces podría hacer que
+el if que separaba en caso de que fuera más chico o más grande que 
+Delta/2 diera siempre para el caso de R más chico.
+
+Ya que estoy, voy a cambiar el número de divisiones al doble,
+en vez de 72 que sean 144. Así los pedazos de región tienen un
+tamaño de 2,5º.
+
+Estoy haciendo muchísimos cambios en el código para guardar una versión del
+Graficador ER2.py que sea un poco más eficiente y más importante, que lo pueda
+cargar para correr y listo. Lo primero y principal es que modifiqué el 
+SuperDiccionario de manera de que sólo arme entradas en los diccionarios
+para los Alfas y Cdeltas que el N correspondiente tenga. Esto es porque
+mis archivos con N=1000 no tienen tantos alfas calculados como el de
+N=100, entonces cuando quisiera armar el gráfico del estado final
+en el espacio de parámetros con un mapa de colores eso sería un problema a 
+futuro.
+
+Por otro lado, corrí para más arriba el inicio de la iteración en agentes porque
+justamente quería meter la creación de la matríz ZZ dentro de esa iteración.
+Comenté la creación de las matrices de Superposición y Adyacencia porque me parecen
+totalmente innecesarias. O mejor dicho, jamás las usé.
+
+Modifiqué la lista de Opi, ahora lo que tiene no son listas con floats, sino arrays
+con floats. Confío que eso acelere algunos procesos. Aprovechando esto es que modifiqué
+el cómo se arma la lista de valores Var aprovechando que lo que tengo son arrays y no
+listas.
+
+Ya que estoy haciendo varios cambios, podría aprovechar y directamente transformar
+el Opi en una matriz. Eso me permitiría construir las listas del
+diccionario OdT con muchísima más facilidad y rapidez.
+
+Fijate que la lista PuntosFinales debería poder resolverse de una forma
+más simple que con un for. Revisá cómo se hace para concatenar arrays.
+
+Che, ahora que lo miro OpinionesFinales es una lista que es lo mismo
+que PuntosFinales, pero no está normalizada. Fijate eso, quizás
+podemos juntar todo en un solo array.
+
+El resto lo voy a revisar una vez que haya cambiado mis listas por arrays.
+Pero creo que la graficación es la que menos problemas tiene. Me gustan
+estos cambios que estoy haciendo. Mañana confío tener esto solucionado
+y ya el sábado me pondré con lo que dije que iba a hacer.
+
+
+--------------------------------------------------------------------------------------
+
+26/03/2021
+
+Probé armar un array de zeros e ir definiendo sus filas a partir
+de listas con strings. El tipo parece tomar la lista de string y
+convertirla a float todo en una sin dramas. Parece que podría
+tomar tranquilamente la lista de Datos y convertirla en un array.
+
+¿Podría hacerlo todo en un saque en vez de con un for? Por lo que
+estuve mirando creo que no se puede. Dejémoslo, no vale tanto la pena
+eso.
+
+Ya armé Opi para que ahora sea un array, no una lista de listas.
+Ahora que esto es un array, creo que ni necesito armar el diccionario
+OdT. Creo que eso ya lo puedo sacar directo a partir de mi array Opi.
+Sacar ese for va a ganar tiempo, pero más que seguro.
+
+Ahroa voy a sacarme de encima la lista PuntosFinales, me quedo sólo
+con la de Opiniones Finales, porque en definitiva esas dos se 
+diferencian sólo en un factor de normalización.
+
+Ya puse para que OpinionesFinales se arme concatenando arrays.
+Casi me olvido de hacer que los puntos finales de los gráficos
+estén normalizados. También acabo de sacarle los números y
+ticks a los gráficos. La idea es que cuando quiera armar
+mis supergráficos ahora se vean mucho mejor. También les
+saqué los títulos dentro de la figura. Pasé los datos del alfa,
+cdelta y N a las leyendas dentro del gráfico.
+
+Aún así no borré los comandos que ponen nombres y demás a
+los ejes, porque eso lo puedo necesitar después.
+
+También modifiqué algo en la creación del histograma, pero es 
+una boludez. Básicamente antes tenía que convertir al
+OpinionesFinales en un array, pero como ya lo es me ahorré
+ese paso.
+
+Bueno, ya están hechas todas las modificaciones, probémoslo.
+Luego de corregir varios errores tontos, y algunos no tanto,
+ya el programa funciona bárbaro. Hay un pequeño problema con
+el tema del plt.legend, no me está tomando el texto como quería,
+pero eso se puede solucionar. Lo importante es que no sólo
+funciona, la ganancia de tiempo pareciera ser más que
+considerable. Si no hice mal la cuenta, eso debería
+permitirme reducir las 8 horas de trabajo que calculé
+antes a simplemente 2 horas. Es bastante, valió la pena
+el modificar el código.
+
+Bueno, lo último que me faltó fue colocar en un cuadro dentro
+del gráfico los valores de Alfa, cos(delta) y N del gráfico
+realizado. Con esto ubicado, ya mis gráficos pueden reconocerse 
+de qué tratan a pesar de no tener título.
+
+Bueno, mañana lo que haré es rehacer todos los gráficos para
+N=100 de manera que no tengan los títulos ni nada. De esa manera
+podré armar mi super gráfico un poco más nítido. Luego, los rearmaré
+para que queden como estaban y listo. Mientras la pc trabaja en eso
+en el Spyder, en el Notebook estaré haciendo los gráficos que charlé
+con Sebas y Pablo el martes pasado.
+
+Fijate que el armado del colormap no lo guarda.
+
+-----------------------------------------------------------------------
+
+27/03/2021
+
+Ya mandé a hacer todos los gráficos, y por ahora está funcionando. Esperemos
+que mis cuentas hayan estado bien y esto realmente tarde unas dos horas
+nomás. Bueno, planteado esto, ahora me queda ponerme a hacer lo que desde
+el martes dije que iba a hacer. Los gráficos de caracterización de la región
+de transición.
+
+El cuadro que indicaba el alfa, coseno(delta) y el N estaba un poco salido,
+ahí lo corregí. Estaba un poco en la duda, pero voy a dejar el legend en
+las distribuciones de opinión. En el peor de los casos, después lo corrijo.
+

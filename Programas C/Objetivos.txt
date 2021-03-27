@@ -12,18 +12,18 @@ archivo de Optimización.txt.
 .) Hacer el modelo de agentes sería discretizar la ecuación diferencial
 .) Comparar con el paper original de la red y ver que funcione bien el algortimo que crea la red
 
-.) Revisar el programa que asigna colores a los estados finales de los agentes (aunque parece funcionar
-bien, no confío plenamente en las cuentas, revisalas).
 
-.) Organizar los gráficos para mostrar las cosas en la medida que se varía Alfa o Coseno Delta.
-Sería mágico armar una super gigantografía que contenga a todas las otras imágenes. Me pregunto
-si habrá una forma de hacer eso.
 .) Armar los gráficos para N=1000. Toda la tanda de gráficos que hice antes
-.) Hacer el gráfico de fases con un colormap, eso estaría bueno.
-.) En el gráfico de Fases hacer lo que dijo Pablo de intentar graficar
-una cuerva que sea como la frontera de la transición experimental entre
-el estado de polarización y el de consenso.
-.) Mandarle un mail a Silvina Ponce Dawson.
+
+.) Armar todos los nuevos graficos de caracterización de la región de transición
+en un lugar aparte.
+
+.) Analizar la variancia de los tiempos de Convergencia a partir de los datos de Variación Promedio
+como forma de caracterizar la región de transición.
+.) Medir los máximos valores alcanzados para determinar la región de triple encuentro
+.) Usar la distribución por cuadrantes para determinar la convivencia entre 
+la región de Polarización Descorrelacionada y la región de Estado Ideológico
+
 
 
 

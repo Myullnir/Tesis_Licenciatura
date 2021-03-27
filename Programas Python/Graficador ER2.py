@@ -2,14 +2,15 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
-from scipy.optimize import minimize
-from mpl_toolkits.mplot3d import Axes3D
+#from scipy.optimize import minimize
+#from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
-import random
+#import random
 import time
-import pandas as pd
+#import pandas as pd
 import math
-import csv
+#import csv
 import os
 
 t0=time.time()
@@ -61,6 +62,24 @@ T=2 # Tengo que definir el número de tópicos en algún lado, lo hago ahora por
 
 #--------------------------------------------------------------------------------------
 
+# Defino primero mi función de AlfaC
+
+def AlfaC(x):
+    T = 2 # Número de tópicos
+    GM = 8 # Grado medio
+    K = 1 # Influencia social
+    if(x>0):
+        alfa = (T-1)/((GM*K)*(T-1+x))
+    else:
+        alfa = (T-1)/((GM*K)*(T-1-x))
+    return alfa
+
+# Ya probé la función y ahora sí calcula perfecto. Hubo un pequeño
+# error al principio.
+
+#------------------------------------------------------------------
+
+
 # Voy a definir una función para usar en esta celda, que me permite asignar
 # a cada ángulo un color. La idea es que esta función reciba como datos
 # el vector a clasificar y la cantidad de pedacitos en la cual divido los
@@ -87,13 +106,13 @@ def Indice_Color(vector,Divisiones):
         Delta = (2*math.pi)/Divisiones
         Dividendo = Angulo/Delta
         D = math.floor(Dividendo)
-        R = Dividendo - D
+        R = (Dividendo - D) * Delta
 
         # Compruebo en qué casillero cae el ángulo y returneo el índice
         if R <= Delta/2:
             return D # En este caso el ángulo se encuentra entre (D*Delta-Delta/2,D*Delta+Delta/2]
         elif R > Delta/2:
-            return (D+1)%72 # En este caso el ángulo se encuentra entre ((D+1)*Delta-Delta/2,(D+1)*Delta+Delta/2]
+            return (D+1)%Divisiones # En este caso el ángulo se encuentra entre ((D+1)*Delta-Delta/2,(D+1)*Delta+Delta/2]
     else:
         return 0;
     
@@ -112,16 +131,13 @@ def Indice_Color(vector,Divisiones):
 # Finalmente, si algunos de estos productos me dan positivos y otros negativos,
 # entonces estoy en Polarización Descorrelacionada.
 
-def EstadoFinal(Lista):
+def EstadoFinal(Array):
     
-    # Tomo la lista y la convierto en array para trabajarla mejor
-    Array = np.array(Lista)
     
-    #----------------------------------------------------------
     # Primero veo el caso de que hayan tendido a cero
     
     ArrayAbs = np.absolute(Array)
-    if max(ArrayAbs)<0.1:
+    if max(ArrayAbs)<0.01:
         return "Consenso"
     
     #----------------------------------------------------------
@@ -148,15 +164,15 @@ def EstadoFinal(Lista):
 # Acá lo que voy a hacer es preparar los colores que voy a usar para definir los puntos finales
 # de las trayectorias de las opiniones
 
-Divisiones = 72
+Divisiones = 144
 color=cm.rainbow(np.linspace(0,1,Divisiones))
 
 
 # Lo que hice acá es definir una ¿lista? que tiene en cada casillero los datos que definen un color.
-# Tiene diferenciados 720 colores, es decir que tengo un color para cada región de 0.5 grados. Estas regiones
+# Tiene diferenciados 144 colores, es decir que tengo un color para cada región de 2.5 grados. Estas regiones
 # las voy a distribuir centrándolas en en cada ángulo que cada color representa. Por lo tanto,
-# Los vectores que tengan ángulo entre -0.25º y 0.25º tienen el primer color. Los que tengan entre
-# 0.25º y 0.75º tienen el segundo color. Y así. Por tanto yo tengo que hallar una fórmula que para
+# Los vectores que tengan ángulo entre -1.25º y 1.25º tienen el primer color. Los que tengan entre
+# 1.25º y 3.75º tienen el segundo color. Y así. Por tanto yo tengo que hallar una fórmula que para
 # cada ángulo le asigne el casillero que le corresponde en el vector de color. Luego, cuando grafique
 # el punto, para el color le agrego un input que sea: c = color[n]
     
@@ -228,9 +244,19 @@ SuperDiccionario = dict()
 for AGENTES in Conjunto_N:
     SuperDiccionario[AGENTES] = dict()
     for ALFA in Conjunto_Alfa:
-        SuperDiccionario[AGENTES][ALFA] = dict()
         for CDELTA in Conjunto_Cdelta:
-            SuperDiccionario[AGENTES][ALFA][CDELTA] = []
+            for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+                alfa = float(nombre.split("_")[2].split("=")[1])
+                Cdelta = float(nombre.split("_")[3].split("=")[1])
+                N = int(nombre.split("_")[4].split("=")[1])
+                if N==AGENTES and alfa==ALFA and Cdelta==CDELTA:
+                    if alfa not in SuperDiccionario[AGENTES].keys():
+                        SuperDiccionario[AGENTES][ALFA] = dict()
+                    if Cdelta not in SuperDiccionario[AGENTES][ALFA].keys():
+                        SuperDiccionario[AGENTES][ALFA][CDELTA] = []
+                    else:
+                        break
+                
             
 
 for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
@@ -238,31 +264,82 @@ for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
     Cdelta = float(nombre.split("_")[3].split("=")[1])
     N = int(nombre.split("_")[4].split("=")[1])
     SuperDiccionario[N][alfa][Cdelta].append(nombre)
-
-
-#---------------------------------------------------------------------------------------------
-
-# Voy a iterar esto para todos los archivos de datos que tengo
-
+    
+# Ya mejoré el armado del SuperDiccionario de manera de que me cada N tenga los Alfa y cada
+# Alfa tenga los Cdelta correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
+# de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
+# Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
+# armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
+# definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
+# iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
+    
+#--------------------------------------------------------------------------------------------
+    
+# Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
+# la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
+# las keys de mi SuperDiccionario.
+    
 for AGENTES in [100]:
-    for ALFA in Conjunto_Alfa:
+    
+    Conjunto_Alfa = list(SuperDiccionario[AGENTES].keys())
+    
+    Conjunto_Cdelta = list(SuperDiccionario[AGENTES][Conjunto_Alfa[0]].keys())
+
+    # Primero me armo los grid para el gráfico de las fases. Para eso
+    # primero tengo que armarme un array y con el np.meshgrid armarme 
+    # los grids del pcolormesh.
+    
+    Conjunto_Alfa.reverse() # Lo invierto para que me quede el uno arriba y no abajo
+    
+    x = np.array(Conjunto_Cdelta)
+    y = np.array(Conjunto_Alfa)
+    
+    Conjunto_Alfa.reverse() # Lo vuelvo a invertir para que de nuevo esté como siempre.
+    
+    XX,YY = np.meshgrid(x,y)
+    
+    ZZ = np.zeros(XX.shape)
+    
+    # Con esto ya tengo armados los grids de XX,YY y de paso me armo el grid
+    # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
+    # los datos que ya guardé de antes. Para eso es el módulo siguiente
+    
+    #---------------------------------------------------------------------------------------------
+    
+    # Levanto los datos del csv usando el pandas y luego paso los datos al ZZ
+    
+    #DF = pd.read_csv("Grafico Fases N={}.csv".format(AGENTES),delimiter = ",",header = None)
+    #
+    #if DF.shape == ZZ.shape:
+    #    for fila in range(ZZ.shape[0]):
+    #        for columna in range(ZZ.shape[1]):
+    #            ZZ[fila,columna] = DF.iloc[fila,columna]
+    #else:
+    #    print("Hubo problemas con el ZZ.")
+        
+    # Con esto tengo armado el ZZ usando los datos del archivo que ya había armado antes.
+    
+    #---------------------------------------------------------------------------------------------
+
+    # Voy a iterar esto para todos los archivos de datos que tengo
+    
+    for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
         
         # Abro el gráfico de Distribución de Opiniones Finales.
         
         plt.figure("Distribucion de Valores",figsize=(20,12))
         
-        for CDELTA in Conjunto_Cdelta:
+        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
             
             #-----------------------------------------------------------------------------------
             
             # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
             # que voy a necesitar para después
             
-#            plt.figure("Trayectoria Opiniones",figsize=(20,12))
-#            plt.figure("Variaciones Promedio",figsize=(20,12))
-#            PuntosFinales = []
-            OpinionesFinales = []
-#            Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[AGENTES][ALFA][CDELTA])))
+            plt.figure("Trayectoria Opiniones",figsize=(20,12))
+            plt.figure("Variaciones Promedio",figsize=(20,12))
+            OpinionesFinales = np.array([])
+            Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[AGENTES][ALFA][CDELTA])))
             
             #-------------------------------------------------------------------------------------
             for nombre,numero in zip (SuperDiccionario[AGENTES][ALFA][CDELTA],np.arange(len(SuperDiccionario[AGENTES][ALFA][CDELTA]))):
@@ -274,15 +351,17 @@ for AGENTES in [100]:
 
                 Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
 
-                Ady = Datos[1][1:len(Datos[1])] # Lista con elementos de la matriz de Adyacencia
-                Ady = [int(x) for x in Ady]
-
-                Sup = Datos[3][1:len(Datos[3])] # Lista con elementos de la matriz de Superposición
-                Sup = [float(x) for x in Sup]
+#                Ady = Datos[1][1:len(Datos[1])] # Lista con elementos de la matriz de Adyacencia
+#                Ady = [int(x) for x in Ady]
+#
+#                Sup = Datos[3][1:len(Datos[3])] # Lista con elementos de la matriz de Superposición
+#                Sup = [float(x) for x in Sup]
 
                 # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
                 # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                Opi = [[float(x) for x in fila[1:len(fila)]] for fila in Datos[5:len(Datos)]]
+                Opi = np.zeros((len(Datos[5::]),len(Datos[5])-1))
+                for fila,ifila in zip (Datos[5::],np.arange(len(Datos[5::]))):
+                    Opi[ifila] = fila[1::]
 
                 # Mis listas ya se arman correctamente, tengo separados sin dramas los valores de mis tres matrices.
 
@@ -292,7 +371,7 @@ for AGENTES in [100]:
                 # puedo calcularlas, total tengo todos los datos de opiniones del sistema. El renglón de
                 # Var define la lista por comprensión.
 
-#                Var = [math.sqrt(np.sum(np.array([((x2-x1)**2)/len(Opi[i]) for x1,x2 in zip (Opi[i],Opi[i+1])]))) for i in range(len(Opi)-1)]
+                Var = [math.sqrt(np.sum((Opi[i+1]-Opi[i])*(Opi[i+1]-Opi[i])*(1/len(Opi[i])))) for i in range(Opi.shape[0]-1)]
 
 
                 # Para algunos valores de dt me ocurre que el sistema llega a valores de variación cero muy rápido.
@@ -300,15 +379,16 @@ for AGENTES in [100]:
                 # cuales no hay nada graficado. Comprimiendo de manera artificial mi gráfico a la izquierda, y 
                 # dificultando por tanto su lectura. Por ello es que al Var le voy a cortar todo valor que tenga
                 # a partir de que uno de sus valores se haga cero
-#                 for i in range(len(Var)):
-#                     if Var[i]==0:
-#                         break
-#                 Var = Var[0:i]
+                
+                for i in range(len(Var)):
+                    if Var[i]==0:
+                        break
+                Var = Var[0:i]
 
-#                X = np.arange(0,len(Var))*0.1 # El dt usado en todos los archivos es 0.1
-#
-#                plt.figure("Variaciones Promedio")
-#                plt.semilogy(X,Var, "--",c = Colores2[numero],linewidth = 2)
+                X = np.arange(0,len(Var))*0.1 # El dt usado en todos los archivos es 0.1
+
+                plt.figure("Variaciones Promedio")
+                plt.semilogy(X,Var, "--",c = Colores2[numero],linewidth = 2)
 
                 # El programa sigue funcionando bárbaro, lo cual es buenísimo. Corta en el momento
                 # adecuado y el comportamiento es razonbale. El guardado y el cerrado de la figura
@@ -323,10 +403,10 @@ for AGENTES in [100]:
                 # Acá voy a calcular al sujeto que voy a usar para normalizar mis gráficos. Tiene que ser el máximo
                 # valor de opinión que haya alcanzado cualquier sujeto en cualquier momento.
                 
-#                MaxNorm = 0
-#                for Opiniones in Opi:
-#                    MaxNorm = max(MaxNorm,max(np.absolute(np.array(Opiniones))))
-#                MaxNorm = 1/MaxNorm
+                MaxNorm = 0
+                for Opiniones in Opi:
+                    MaxNorm = max(MaxNorm,max(np.absolute(Opiniones)))
+                MaxNorm = 1/MaxNorm
                 
                 # Esto funciona perfecto. El único tema a considerar es que este valor MaxNorm se traspasa
                 # a otros módulos, entonces eso hace que esos módulos no sean tan independientes. En particular
@@ -335,23 +415,6 @@ for AGENTES in [100]:
                 # vector de opiniones. Entonces los otros trabajaría por su cuenta sin mezclar cosas
                 # de módulos que podrían no copiarse en futuros códigos.
                 
-                #----------------------------------------------------------------------------------------------
-
-                # Voy a intentar replicar el gráfico de Baumann. Para eso voy a querer graficar la trayectoria
-                # de todos los agentes. Como van a ser muchos agentes, me conviene que esas trayectorias se grafiquen
-                # con líneas finitas
-
-#                OdT = dict() # OdT es Opiniones del Tópico.
-#                for agente in range(N):
-#                    for topico in range(T):
-#                        OdT[topico+T*agente] = []
-#                        for iteracion in range(len(Opi)):
-#                            OdT[topico+T*agente].append(Opi[iteracion][agente*T+topico]*MaxNorm)
-
-                # Esto levanta correctamente los valores de las opiniones de los agentes para cada uno de sus tópicos.
-                # De paso, le agregué ahora que las listas del diccionario no se sobreescriban. Eso me va a permitir
-                # graficar los puntos finales sin necesidad de revisar una segunda vez la lista Opi
-
                 #-----------------------------------------------------------------------------------------------
 
                 # Como todavía tengo dos tópicos, puedo graficar esto en un plano. Así que ahora voy a hacer
@@ -360,23 +423,16 @@ for AGENTES in [100]:
                 # Como ahora las listas en el diccionario no se sobreescriben, puedo hacer esto con un for aparte
                 # de lo anterior
 
-#                plt.figure("Trayectoria Opiniones")
-#                for agente in range(N):
-#                    plt.plot(OdT[0+T*agente],OdT[1+T*agente], color="gray",linewidth = 0.6, alpha=0.2)
+                plt.figure("Trayectoria Opiniones")
+                for agente in range(AGENTES):
+                    plt.plot(Opi[::,0+T*agente]*MaxNorm,Opi[::,1+T*agente]*MaxNorm, color="gray",linewidth = 0.6, alpha=0.2)
                     
-                #-------------------------------------------------------------------------------------------------
-                
-                # Voy a guardar las posiciones finales de todos mis sujetos para poder marcar los puntos finales
-                # por encima de las líneas grises.
-                
-#                PuntosFinales.append([x*MaxNorm for x in Opi[len(Opi)-1]])
-                
                 #-------------------------------------------------------------------------------------------------
                 
                 # Ahora lo que voy a hacer es tomar el estado final del sistema y usar la función EstadoFinal
                 # para determinar si el sistema llegó a un Consenso, Polarización o Estado Ideológico.
                 
-                OpinionesFinales = OpinionesFinales+Opi[len(Opi)-1]
+                OpinionesFinales = np.concatenate((OpinionesFinales,Opi[len(Opi)-1]), axis=None)
                 
                 # Con esto me armo la lista de estados finales de mi sistema
                 
@@ -385,11 +441,10 @@ for AGENTES in [100]:
             # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
             # colocar puntos marcando el final de mis trayectorias.
 
-#            plt.figure("Trayectoria Opiniones")
-#            for iteracion in range(len(PuntosFinales)):
-#                for agente in range(N):
-#                    indice = Indice_Color([PuntosFinales[iteracion][0+T*agente],PuntosFinales[iteracion][1+T*agente]],Divisiones)
-#                    plt.plot(PuntosFinales[iteracion][0+T*agente],PuntosFinales[iteracion][1+T*agente], "o" ,c = color[indice], markersize=10)
+            plt.figure("Trayectoria Opiniones")
+            for x1,x2 in zip (OpinionesFinales[0::2]*MaxNorm,OpinionesFinales[1::2]*MaxNorm):
+                indice = Indice_Color(np.array([x1,x2]),Divisiones)
+                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
 
 
             #----------------------------------------------------------------------------------------------
@@ -398,31 +453,55 @@ for AGENTES in [100]:
             # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
             # TdO.
             
-#            plt.figure("Trayectoria Opiniones")
-#            plt.rcParams.update({'font.size': 18})
+            plt.figure("Trayectoria Opiniones")
+            plt.tick_params(left=False,
+                bottom=False,
+                labelleft=False,
+                labelbottom=False)
+            plt.rcParams.update({'font.size': 24})
 #            plt.xlabel("Tópico 1")
 #            plt.ylabel("Tópico 2")
 #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
-#            xmin,xmax = plt.xlim()
-#            ymin,ymax = plt.ylim()
-#            plt.text((xmax+xmin)/2*0.9,ymax*0.9,EstadoFinal(OpinionesFinales), bbox=dict(facecolor='White', alpha=0.7))
-#            plt.savefig("../Imagenes/ER2/Trayectoria de las opiniones_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
-#            plt.close("Trayectoria Opiniones")
+            xmin,xmax = plt.xlim()
+            ymin,ymax = plt.ylim()
+            plt.text((xmax+xmin)/2*0.9,ymax*0.9,EstadoFinal(OpinionesFinales), bbox=dict(facecolor='White', alpha=0.7))
+#            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.savefig("../Imagenes/ER2/Trayectoria de las opiniones_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.close("Trayectoria Opiniones")
 
             #------------------------------------------------------------------------------------------------
             
             # Esto me guarda el gráfico de variaciones Promedio
-#            plt.figure("Variaciones Promedio")
-#            plt.rcParams.update({'font.size': 18})
+            plt.figure("Variaciones Promedio")
+            plt.rcParams.update({'font.size': 24})
+            plt.tick_params(left=False,
+                bottom=False,
+                labelleft=False,
+                labelbottom=False)
 #            plt.xlabel("Tiempo Simulado")
 #            plt.ylabel("Variación promedio de las opiniones")
 #            plt.axis("tight")
 #            plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
-#            plt.grid()
-#            plt.savefig("../Imagenes/ER2/Variaciones Promedio_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
-#            plt.close("Variaciones Promedio")
+#            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.grid()
+            plt.savefig("../Imagenes/ER2/Variaciones Promedio_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.close("Variaciones Promedio")
             
-            #------------------------------------------------------------------------------------------------------------------
+            #-------------------------------------------------------------------------------------------------
+        
+        
+            # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
+            # opiniones finales
+            
+            ResultadoEF = EstadoFinal(OpinionesFinales)
+            EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
+            
+            for estado in EC:
+                if ResultadoEF == estado[0]:
+                    ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1] 
+        
+        
+            #--------------------------------------------------------------------------------------------------
         
             # Puedo armar acá el gráfico de distribución de valores. Además, para esto puedo usar una lista que
             # ya armé antes que es la de Opiniones Finales. A partir de esta voy a hacer las distribuciones del
@@ -430,9 +509,7 @@ for AGENTES in [100]:
             # Como tengo 100 agentes y 40 simulaciones, entonces tengo 4000 opiniones para cada tópico. Me parece
             # razonable separar esto en 40 bins.
             
-            ArrayOpifin = np.array(OpinionesFinales)
-            
-            Histo,Bordes_Bin = np.histogram(ArrayOpifin,bins=30)
+            Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=30)
             
             EjeX = [(Bordes_Bin[i+1]+Bordes_Bin[i])/2 for i in range(len(Bordes_Bin)-1)]
             
@@ -443,15 +520,68 @@ for AGENTES in [100]:
         plt.xlabel("Valores de Opiniones")
         plt.ylabel("Ocurrencias")
         plt.title(r"Distribucion de las opiniones para $\alpha$={:.2f} y N={}".format(ALFA, AGENTES))
+        plt.legend()
         plt.grid()
         plt.savefig("../Imagenes/ER2/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,ALFA),bbox_inches = "tight")
         plt.close("Distribucion de Valores")
             
         #-----------------------------------------------------------------------------------------------------------
         
-        
-        print("Ya terminé con el Alfa:{:.2f}".format(ALFA))
-        Tiempo()
+    # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
+    
+    # Armo mi colormap. Para eso armo una lista con los colores que voy a usar,
+    # los cuales son una tuplas de tres elementos que combinan colores en proporción
+    # donde el primer número es el color rojo, el segundo el verde y el tercero el azul.
+    # Con eso luego uso la función de LinearSegmentedeColormap para que me traduzca
+    # mi lista de colores a un colormap, y como sólo voy a graficar tres valores
+    # en N pongo un 3 para separar el binneado de mi mapa de colores en sólo 3.
+    # Luego le mando ese colormap al pcolormesh y listo.
+    
+    
+    colors = [(0, 0.7, 0), (0, 0.3, 1), (1, 0.3, 0)]  #  R -> G -> B 
+    cmap_name = 'Mi_lista'
+    ColMap = LinearSegmentedColormap.from_list(cmap_name, colors, N=3)
+    
+    # Defino los parámetros usuales de mi gráfico
+    
+    plt.figure("Espacio parametros",figsize=(20,12))
+    plt.rcParams.update({'font.size': 24})
+    plt.xlabel(r"cos($\delta$)")
+    plt.ylabel(r"$\alpha$")
+    plt.title("Estados finales en el espacio de parametros")
+    
+    # Grafico la línea del Alfa Crítico teórico
+    
+    Xa = np.arange(-0.05,1.05,0.01)
+    Ya = np.array([AlfaC(x) for x in Xa])
+    plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+    
+    # Armo el gráfico del Alfa Crítico experimental
+    
+    Xb = Conjunto_Cdelta
+    Yb = []
+    
+    for columna in range(ZZ.shape[1]):
+        for fila in range(ZZ.shape[0]-1):
+            if ZZ[fila,columna]!=0 and ZZ[fila+1,columna]==0:
+                Yb.append((YY[fila,columna]+YY[fila+1,columna])/2)
+                break
+                
+    plt.plot(Xb,Yb,"--",color = "yellow",linewidth = 4, label = r"$\alpha_c$ experimental")
+    
+    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
+    
+    plt.legend()
+    plt.pcolormesh(XX,YY,ZZ,shading="nearest", cmap = ColMap)
+    plt.savefig("../Imagenes/ER2/Estados finales EP.png", bbox_inches = "tight")
+    plt.close("Espacio parametros")
+    
+    #---------------------------------------------------------------------------------------------------
+    
+    # Me falta guardar los valores de ZZ en un archivo, por si necesito hacerle un retoque al archivo y no 
+    # quiero volver a correr todo de una
+    
+    np.savetxt("Grafico Fases N={}.csv".format(AGENTES), ZZ, delimiter = ",")
 
 
 # -------------------------------------------------------------------------------------------------
