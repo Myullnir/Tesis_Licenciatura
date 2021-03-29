@@ -2609,3 +2609,71 @@ El cuadro que indicaba el alfa, coseno(delta) y el N estaba un poco salido,
 ahí lo corregí. Estaba un poco en la duda, pero voy a dejar el legend en
 las distribuciones de opinión. En el peor de los casos, después lo corrijo.
 
+Mirando los gráficos que se estaban armado de las TdO me doy cuenta que
+al final voy a necesitar el array de PuntosFinales, quiera o no. El 
+problema que surgió es que los puntos finales no pueden quedar
+en el lugar correcto, porque el MaxNorm asociado varía en cada simulación,
+entonces al final los puntos terminan en cualquier lugar y a veces incluso
+no tienen líneas que lleven a ellos o las líneas van a parar a lugares que
+no tienen punto.
+
+Por el otro lado, armé ya el código para graficar en un mapa de colores 
+la varianza en el tiempo de simulación de todas las simulaciones asociadas
+a un mismo par de valores Alfa y Cdelta. Lo que se puede observar es que 
+los tiempos de simulación crecen únicamente en la región de transición entre
+el estado de consenso y el estado de polarización, lo cual me marca que
+este parámetro sirve únicamente para distinguir Consenso de Polarización General.
+
+De paso, estoy modificando un poco el gráfico para que el colorbar asociado
+sea exactamente la varianza del tiempo simulado y no la varianza de iteraciones.
+
+Cuando termine el spyder de rearmar todos los gráficos, debería mandar a correr
+al programa que me arma el SuperGráfico. Antes de eso debería guardar en
+un lugar seguro los originales, no sea que esos se me arruinen y no tenga
+nada nuevo mejor. Luego los comparo y listo.
+
+Hechos mis nuevos supergráficos, tendría que mandar el Spyder para que
+una vez más rearme TODOS los gráficos y con eso dejar ahora sí mis 
+gráficos con los nombres en los ejes y el cuadrito dentro del gráfico
+indicando qué valores de Alfa y cos(delta) se están usando.
+
+Ya hice todo este tema de armar y rearmar los gráficos, creo que quedó
+mejor sinceramente, aunque el cuadrito de anotaciones un poquito tapa
+algunos puntos, pero bueno, eso es un detalle.
+
+Veamos de armar un estudio del sistema en función de los máximos que alcanza
+como para ver si el máximo valor que alcanza el sistema es un indicador
+de su cambio de regiones.
+
+El código está armado y lo mandé a correr. Ahora queda ver si estoy funciona
+o si la cagué. El código funcionó bárbaro, el colormap muestra lo que yo decía,
+sólo diferencia Polarización General de Consenso,
+
+--------------------------------------------------------------------------------
+
+28/03/2021
+
+Ahora debería armar la parte final, lo del esudio de las opiniones por cuadrantes.
+Tengo entonces que tomar las OpinionesFinales, anotarlas en un vector según si
+están en primer, segundo, tercer o cuarto cuadrante y luego con esos números 
+armarme un histograma.
+
+---------------------------------------------------------------------------------
+
+29/03/2021
+
+Ayer había más o menos terminado el código. Hoy lo pasé a Python
+y empecé a armar todos los gráficos de distribución de opinión por cuadrantes,
+el gráfico de Máximos en EP y Varianza de tiempo de Simulación.
+
+El código que armé no resultó tan adecuado, removí todo el trabajo
+en axes y subplots, y lo pasé a trabajar directamente con fig. Luego
+descubrí que estaba armando mal los bottom de los gráficos de barras,
+tenía mal definido el nombre del gráfico y eso me armaba sobre un 
+único gráfico todos los dibujos. Cuestión, alto bardo se me generó.
+
+Lo solucioné, armé los gráficos correctos, ahroa sólo me queda
+pasarlo al PowerPoint para charlarlo con Pablo y Sebas. Por
+desgracia, me da que excepto por el gráfico de las varianzas,
+los otros dos son un poco inconclusos, no parecen mostrar mucha
+info que se pueda usar para estudiar el sistema.
