@@ -8,7 +8,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 #import random
 import time
-#import pandas as pd
+import pandas as pd
 import math
 #import csv
 import os
@@ -145,15 +145,14 @@ def EstadoFinal(Array):
     # un array que tenga las opiniones del tópico 1, y otro
     # con las opiniones del tópico 2.
     
-    ArrayT1 = Array[0:len(Array):2]
-    ArrayT2 = Array[1:len(Array):2]
+    ArrayT1 = Array[0::2]
+    ArrayT2 = Array[1::2]    
+    ArrayProd = np.sign(np.multiply(ArrayT1,ArrayT2))
     
-    ArrayProd = np.multiply(ArrayT1,ArrayT2)
-    for producto in ArrayProd[1:len(ArrayProd)-1]:
-        if producto*ArrayProd[0]<0:
-            return "Polarizacion"
-    
-    return "Ideologico"
+    if -1 in ArrayProd:
+        return "Polarizacion"
+    else:
+        return "Ideologico"
 
 # Lo probé con algunos vectores de prueba y parece funcar bárbaro. Habrá que probar
 # más en detalle. Se me ocurre usar esto para que los gráficos estén etiquetados y
@@ -279,7 +278,7 @@ for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
 # las keys de mi SuperDiccionario.
     
-for AGENTES in [100]:
+for AGENTES in [1000]:
     
     Conjunto_Alfa = list(SuperDiccionario[AGENTES].keys())
     
@@ -308,14 +307,14 @@ for AGENTES in [100]:
     
     # Levanto los datos del csv usando el pandas y luego paso los datos al ZZ
     
-    #DF = pd.read_csv("Grafico Fases N={}.csv".format(AGENTES),delimiter = ",",header = None)
-    #
-    #if DF.shape == ZZ.shape:
-    #    for fila in range(ZZ.shape[0]):
-    #        for columna in range(ZZ.shape[1]):
-    #            ZZ[fila,columna] = DF.iloc[fila,columna]
-    #else:
-    #    print("Hubo problemas con el ZZ.")
+    DF = pd.read_csv("Grafico Fases N={}.csv".format(AGENTES),delimiter = ",",header = None)
+    
+    if DF.shape == ZZ.shape:
+        for fila in range(ZZ.shape[0]):
+            for columna in range(ZZ.shape[1]):
+                ZZ[fila,columna] = DF.iloc[fila,columna]
+    else:
+        print("Hubo problemas con el ZZ.")
         
     # Con esto tengo armado el ZZ usando los datos del archivo que ya había armado antes.
     
@@ -478,7 +477,7 @@ for AGENTES in [100]:
             ymin,ymax = plt.ylim()
             plt.text((xmax+xmin)/2*0.9,ymax*0.9,EstadoFinal(OpinionesFinales), bbox=dict(facecolor='White', alpha=0.7))
             plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../Imagenes/ER2/Trayectoria de las opiniones_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.savefig("../Imagenes/ER2/N={}/Trayectoria de las opiniones_alfa={:.2f}_Cdelta={}_N={}.png".format(AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
             plt.close("Trayectoria Opiniones")
 
             #------------------------------------------------------------------------------------------------
@@ -496,7 +495,7 @@ for AGENTES in [100]:
 #            plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
             plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
             plt.grid()
-            plt.savefig("../Imagenes/ER2/Variaciones Promedio_alfa={:.2f}_Cdelta={}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.savefig("../Imagenes/ER2/N={}/Variaciones Promedio_alfa={:.2f}_Cdelta={}_N={}.png".format(AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
             plt.close("Variaciones Promedio")
             
             #-------------------------------------------------------------------------------------------------
@@ -521,12 +520,13 @@ for AGENTES in [100]:
             # Como tengo 100 agentes y 40 simulaciones, entonces tengo 4000 opiniones para cada tópico. Me parece
             # razonable separar esto en 40 bins.
             
-            Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=30)
+            Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=20)
             
             EjeX = [(Bordes_Bin[i+1]+Bordes_Bin[i])/2 for i in range(len(Bordes_Bin)-1)]
             
             plt.figure("Distribucion de Valores")
             plt.plot(EjeX,Histo,"--",linewidth = 3, label = r"$cos(\delta)$ = {}".format(CDELTA))
+            
             
         plt.rcParams.update({'font.size': 18})
         plt.xlabel("Valores de Opiniones")
@@ -534,7 +534,7 @@ for AGENTES in [100]:
         plt.title(r"Distribucion de las opiniones para $\alpha$={:.2f} y N={}".format(ALFA, AGENTES))
         plt.legend()
         plt.grid()
-        plt.savefig("../Imagenes/ER2/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,ALFA),bbox_inches = "tight")
+        plt.savefig("../Imagenes/ER2/N={}/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,AGENTES,ALFA),bbox_inches = "tight")
         plt.close("Distribucion de Valores")
             
         #-----------------------------------------------------------------------------------------------------------
@@ -560,7 +560,7 @@ for AGENTES in [100]:
     plt.rcParams.update({'font.size': 24})
     plt.xlabel(r"cos($\delta$)")
     plt.ylabel(r"$\alpha$")
-    plt.title("Estados finales en el espacio de parametros")
+    plt.title("Estados finales en EP")
     
     # Grafico la línea del Alfa Crítico teórico
     
@@ -585,7 +585,7 @@ for AGENTES in [100]:
     
     plt.legend()
     plt.pcolormesh(XX,YY,ZZ,shading="nearest", cmap = ColMap)
-    plt.savefig("../Imagenes/ER2/Estados finales EP.png", bbox_inches = "tight")
+    plt.savefig("../Imagenes/ER2/N={}/Estados finales EP.png".format(AGENTES), bbox_inches = "tight")
     plt.close("Espacio parametros")
     
     #---------------------------------------------------------------------------------------------------

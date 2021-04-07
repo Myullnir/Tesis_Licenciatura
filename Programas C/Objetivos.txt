@@ -13,16 +13,11 @@ archivo de Optimización.txt.
 .) Comparar con el paper original de la red y ver que funcione bien el algortimo que crea la red
 
 
-.) Armar los gráficos para N=1000. Toda la tanda de gráficos que hice antes
-
-.) Armar todos los nuevos graficos de caracterización de la región de transición
-en un lugar aparte.
-
-.) Analizar la variancia de los tiempos de Convergencia a partir de los datos de Variación Promedio
-como forma de caracterizar la región de transición.
-.) Medir los máximos valores alcanzados para determinar la región de triple encuentro
-.) Usar la distribución por cuadrantes para determinar la convivencia entre 
-la región de Polarización Descorrelacionada y la región de Estado Ideológico
+.) Tomar las distribuciones de opiniones por cuadrantes y medir la entropía de esas
+distribuciones. Armar con eso un mapa de colores.
+.) Usar el Random Regular Networks de Python para armar redes de 10000 agentes con 
+un cierto grado medio que sean conexas.
+.) Armar el informe de Tesis
 
 
 

@@ -2677,3 +2677,94 @@ pasarlo al PowerPoint para charlarlo con Pablo y Sebas. Por
 desgracia, me da que excepto por el gráfico de las varianzas,
 los otros dos son un poco inconclusos, no parecen mostrar mucha
 info que se pueda usar para estudiar el sistema.
+
+--------------------------------------------------------------------------------
+
+02/04/2021
+
+Desde ayer estoy intentando hacer los cálculos para el sistema
+con N=1000. En general venía trabajando bien, pero el programa
+tuvo una imposibilidad para poder trabajar con unos archivos
+cuyo peso estaba entre 1 y 2 GB. Por lo que lo que hice fue
+directamente borrar esos archivos. Fueron 5 archivos,
+tres del Alfa 0,11 y Cdelta 0, y otros dos de valores 
+cercanos. Técnicamente afecta a la estadística eso, pero
+al carajo, no los pudo ni leer. Qué sentido tiene mantenerlos
+si no los puedo leer. Vamos a ver si ahora el programa puede
+terminar con todo.
+
+Al final logré hacer los gráficos de todas las TdO. Mañana queda
+hacer las Variaciones Promedio y si puedo los gráficos de Caracterización
+de la región de transición.
+
+-------------------------------------------------------------------------------
+
+03/04/2021
+
+Hoy seguí armando los gráficos para el sistema con 1000 agentes.
+Ya tengo todos los gráficos de Variación Promedio de las
+opiniones, los de Distribución de las opiniones y ahora estoy
+haciendo los de Distribución por cuadrantes, y los mapas de colores
+de los Máximos y Varianza de Tiempo de Simulación en EP.
+
+Decidí que ahora me iba a poner a cambiar el gráfico de los Máximos
+de Opiniones en EP para que lo que grafique sea el valor esperado
+de los sujetos. La idea es ver que los agentes en efecto tienden a K*<k>.
+
+¿Cuál sería el valor esperado? No es el promedio, ¿o sí? Sí, termina siendo
+un promedio. Modifiquemos eso en el código entonces.
+
+Copié el código de Caracterización Transición en Análisis Datos y lo modifiqué
+para incorporar el cálculo de los promedios. Ahora vale la pena mencionar
+que el cálculo de los promedios está dado en el caso de que primero tomo
+todas las opiniones y les tomo valor absoluto. Hago esto porque lo que
+quiero ver es directamente si el sistema tiende a K*<k>, y como el sistema
+tiende a opiniones cuyos valores de T1 y T2 son iguales, entonces
+no me afecta meter todo en una misma bolsa. Incluso, si tuviera dudas de
+esto, podría armar dos mapas de color, uno para T1 y otro para T2, y ver
+que efectivamente en promedio tienden a lo mismo.
+
+---------------------------------------------------------------------------------
+
+04/04/2021
+
+Voy a dejar en posibilidades la idea de graficar dos mapas de colores,
+uno para cada tópico. Arranquemos primero con el tema de la entropía.
+
+Se terminó el cálculo de los valores medios, y parece que correctamente
+el sistema tiende al valor K*<k>, así que eso va bárbaro.
+
+Sobre la entropía, no llegué a armarlo hoy. Cuestión que lo pensé,
+la idea va a ser armar un array de Probabilidades, que lo podés
+tomar del Yhisto, ese que usas para graficar la distribución por
+cuadrantes. Luego, a Probabilidades le tomás el np.log2() cosa
+de que te quede el log2 de cada uno de los elementos. Luego haces
+un dot product, supongo, con el array de Probabilidades y a eso lo
+multiplicás por -1 y listo. Estás hecho.
+
+Eso te va a dar la entropía para un conjunto de valores Alfa y Cdelta.
+Luego, le asignás eso a la matriz ZZE, y por último lo graficás en el 
+mapa de colores con un pcolormesh.
+
+----------------------------------------------------------------------------------
+
+05/04/2021
+
+Bueno, estoy graficando el tema de la entropía ahora. Hice unas modificaciones
+que son las siguientes.
+
+En el tema de graficación de la varianza de los tiempos de Simulación, le tomé
+logaritmo en base diez a los valores para graficarlo en términos de números más
+sencillos de visualizar. Para eso, al valor de la varianza graficada le sume
+1 primero ya que algunos valores de Varianza estaban muy cerca de cero y entonces
+el logaritmo hubiera cadía a valores muy negativos y no hubieramos ganado nada.
+
+Sobre la entropía, hice tal cual lo que escribí más arriba. Usé el np.matmul
+para hacer el producto de los arrays y desde ahí lo ubiqué en la matriz
+ZZE. Al final copié el código de graficación de Promedios para graficar
+esta nueva matriz y listo.
+
+Estuve mirando los gráficos que tengo, increíblemente no hice un gráfico de
+fases, ese tengo que hacerlo. También tengo que hacer los gráficos recopilación
+del resto de gráficos, eso lo puedo hacer con Python en un pedo. Eso es lo que
+necesito para mostrar mañana.
