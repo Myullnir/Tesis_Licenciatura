@@ -11,14 +11,14 @@ read decision
 
 if [ -z $decision ]
 then
-	for N in 100
+	for N in 1000
 		do
-		for Alfa in {0..20}
+		for Alfa in 90
 		do
-			for Cdelta in {0..10}
+			for Cdelta in 6
 			do
 				echo Estoy trabajando el alfa $Alfa y el Cdelta $Cdelta
-				for iteracion in {1..40}
+				for iteracion in {101..200}
 				do
 					./$1.e $N $Alfa $Cdelta $iteracion
 				done

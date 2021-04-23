@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
 	// Empecemos con la base. Defino variables de tiempo para medir cuanto tardo y cosas básicas
 	time_t tt_prin,tt_fin;
 	time(&tt_prin);
-	srand(time(NULL));
+	srand(strtol(argv[4],NULL,10)); // Voy a definir la semilla a partir de un número entero que es el número de iteración  srand(time(NULL));
 	float f_tardanza; // Este es el float que le paso al printf para saber cuanto tardé
 	
 	// Creo mis punteros a structs y los malloqueo.

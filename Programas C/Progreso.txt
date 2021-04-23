@@ -2768,3 +2768,40 @@ Estuve mirando los gráficos que tengo, increíblemente no hice un gráfico de
 fases, ese tengo que hacerlo. También tengo que hacer los gráficos recopilación
 del resto de gráficos, eso lo puedo hacer con Python en un pedo. Eso es lo que
 necesito para mostrar mañana.
+
+------------------------------------------------------------------------------------
+
+19/04/2021
+
+En estas dos semanas estuve entre armando el informe, tomando más datos y
+replicando los gráficos que tengo para N=1000. Hoy aprovecho para decir
+que había armado un nuevo programa .py que el objetivo es que armara
+directamente la tabla de gráficos en vez de tomar imágenes y cargarlas.
+El problema es que el gráfico no se pudo hacer todo, así que hay dos
+opciones, dejarlo para cuando lo pasemos a las máquinas, o no volver a usarlo
+nunca más. Lo que se me ocurre es primero volver a probarlo, esta vez
+con una tabla de 2x2, a ver si eso me lo corre. Confío en que sí.
+
+Ahora estoy viendo de hacer los gráficos que necesito para la tabla
+de TdO, y después haré los gráficos de Variaciones Promedio.
+Todavía faltaría entonces hacer lo de generar datos usando
+una semilla fijada para ver si por casualidad vuelve a surgir
+un dato absurdamente largo en comparación con el resto.
+
+-------------------------------------------------------------------------------------
+
+20/04/2021
+
+Ya armé el gráfico de Variaciones Promedio para Alfa=0,9 y Cdelta=0,6
+usando las 100 iteraciones que calculé. Por lo visto, sigue habiendo
+una única instancia que se separa mucho del sistema. Igualmente, por
+si acaso, voy a realizar otras 100 iteraciones, pero esta vez definiendo
+la semilla random a partir de un número entero que es el número de iteración.
+La idea es ver si vuelve a surgir este extraño caso en el cual el sistema
+tarda una cantidad absurdamente grande de tiempo en converger.
+
+Mientras esto se resuelve, podría intentar revisar la librería de 
+redes en Python, la nx.network, o algo así. La idea es ver de poder construir
+redes en Python con ciertas propiedades, guardar las redes de adyacencia
+en alguna carpeta y usar esas redes para armar las redes en C a la hora
+de trabajar. Espero que funcione

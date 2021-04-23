@@ -13,19 +13,19 @@ archivo de Optimización.txt.
 .) Comparar con el paper original de la red y ver que funcione bien el algortimo que crea la red
 
 
-.) Tomar las distribuciones de opiniones por cuadrantes y medir la entropía de esas
-distribuciones. Armar con eso un mapa de colores.
+
 .) Usar el Random Regular Networks de Python para armar redes de 10000 agentes con 
 un cierto grado medio que sean conexas.
-.) Armar el informe de Tesis
+.) Estudiar el sujeto de la iteración que resultó muy raro. Fijate si es un agente o varios
+que tardan en converger
+.) Erdos Renyi, Random Regular y Barabassi con redes de 4,8,12,16. Armar las redes y alimentar
+el programa para que corra con eso. A ver que ocurre.
 
+-----------------------------------------------------------------------------------------------
 
+INFO DE LA CUENTA REMOTA:
+Usuario externo: faviodiciocco2@login.df.uba.ar
+Usuario interno: faviodic@setubal.df.uba.ar
 
-
--------------------------------------------------------------------------------------------------
-
-Mail Pablo
-
-Correrlo en una red de Erdos-Renyi (<k>=8), con N=10, 100 y 1000
-K=1.
-Barrer en alfa y delta y se tienen que ver la transicion entre consenso y polarizacion dada por la ecuacion 5.
+PARA ENTRAR:
+ssh faviodiciocco2@login.df.uba.ar -t ssh faviodic@setubal.df.uba.ar
