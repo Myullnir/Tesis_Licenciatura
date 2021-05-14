@@ -1,0 +1,49 @@
+En esta carpeta voy a estar guardando los archivos donde se observa la trayectoria de las opiniones
+a partir de ensambles de simulaciones. Estos gráficos van a estar hechos para 1000 agentes,
+con pasos temporales dt = 0,1, Criterios de Corte 10^(-6).
+
+Como siempre son 2 tópicos, estoy usando redes estáticas de Barabasi con grado medio 4, 8, 12 y 16.
+Los gráficos los voy a separar en carpetas según el grado medio. 
+
+Este es el primero de los gráficos de Baumann que debería replicar.
+
+.) TdO_alfa=$_Cdelta=$_N=$ : Este gráfico lo que hace es tomar el valor
+de las opiniones de un agente y graficarlas según todas las iteraciones, de manera de armar
+una trayectoria en el espacio de fases. Este gráfico tiene sentido y es sencillo de realizar
+ya que los agentes tienen sólo 2 tópicos. Por tanto, el gráfico se puede realizar en un plano. En
+caso de tener 3 tópicos o más, estos gráficos comenzarán a volverse más complejos y quizás
+debamos buscar otras formas de representar la información.
+Lo que tengo graficado en estos casos son ensambles de simulaciones, con 40 simulaciones de un 
+sistema con los mismos parámetros iniciales. Los puntos coloridos representan el punto final
+de opiniones que el agente tenía cuando la simulación terminó. 
+El cuadro de texto que indica Consenso, Polarización o Ideología se define usando todos
+los puntos finales del ensamble, donde si el máximo módulo de opinión es menor a 0,1 se
+define como consenso, si el producto de las opiniones 1 con 2 da siempre un mismo signo
+entonces el sistema está en estado Ideológico y si ese mismo producto da a veces positivo 
+y a veces negativo, entonces es Polarización descorrelacionada.
+
+.) Variaciones Promedio_alfa=$_Cdelta=$_N=$: En estos gráficos lo que grafico es la suma sobre
+las opiniones del cuadrado de la diferencia entre la opinión en un paso temporal y esa opinión
+en el paso temporal anterior. Además en este caso estoy haciendo estos gráficos para el ensamble
+de 40 simulaciones que hice para cada par de valores Alfa y Cos(Delta). Las Variaciones Promedio
+están graficadas en función del tiempo simulado. 
+
+.) Distribución opiniones_N=$_alfa=$: Este es un gráfico de distribución de las opiniones.
+Cada curva representa la distribución para un dado valor de Cos(Delta) de las opiniones de todos
+los agentes. Considerando que se tienen 1000 agentes y 40 simulaciones, esto me determina un total
+de 80000 opiniones para graficar. Para los gráficos con N=1000 terminé usando 30 bins uniformemente 
+distribuidos para armar las curvas. Cada gráfico está hecho para cada valor de Alfa
+
+.) Tabla Graficos TdO: Esto es una tabla que tiene 42 gráficos organizados de TdO con el fin
+de poder ver en una sola imagen el comportamiento del sistema al ir variando los parámetros 
+alfa y cos(delta)
+
+.) Tabla Gráficos Variaciones: Esto es una tabla que tiene 42 gráficos organizados de Variaciones
+con el fin de poder ver en una sola imagen el comportamiento de las Variaciones Promedio al ir
+variando los parámetros de alfa y cos(delta).
+
+
+----------------------------------------------------------------------------------------------------
+
+Conclusiones: 
+

@@ -115,7 +115,7 @@ tan mal.
 
 28/02/2021
 
-El código de la carpeta Modelo Erdós-Renyi arma redes estáticas
+El código de la carpeta "Modelo Erdós-Renyi" arma redes estáticas
 con grado medio 8, para distintos valores de agentes: N=10,100,1000.
 Además los otros parámetros del sistema son: K=1, T=2, Crit Corte = 10^(-6)
 Máxima opinión inicial = 3. El dt es 0.001 actualmente, pero estamos
@@ -146,3 +146,35 @@ Por tanto, el código funciona de manera de que guarda los valores
 iniciales de Opinión y que luego a partir de estos vuelve a reiterar
 el sistema. La red está guardada en la matriz de Adyacencia, y como
 la red es estática, una vez creada no hay que hacerle nada.
+
+------------------------------------------------------------------------------
+
+07/05/2021
+
+El código en la carpeta "ER2" es la versión oficial de Erdós-Renyi.
+Fue usado para trabajar con redes de 100 y 1000 agentes, 2 tópicos,
+Influencia social igual a 1, dt de 0,1, Grado medio de la red 8,
+Criterio de Corte en la mayoría de los casos igual a 10^(-6) y
+Máximo de opiniones iniciales igual a 3. Este código se encargó
+de armar los datos para redes variando los valores de Alfa entre
+0 y 1 y cos(delta) también entre 0 y 1. El cos(delta) varió
+de a 0,1, mientras que el alfa entre 0,2 y 1 varió de a 0,1
+y entre 0 y 0,2 varió de a 0,01. Eso es porque en esa región
+se encontraba la región de transición del sistema que hacía
+que el sistema pase del consenso a la polarización.
+
+Para resumir lo que hacía el código, recibía como Input el número
+de agentes N, el valor de Alfa y cos(delta), aunque no recibía los
+valores exactos sino que recibía números grandes que después en el
+archivo C corregía. También recibía el número de iteración, que indicaba
+el número de elemento del ensamble que correspondía a esa simulación.
+Luego con todos los datos recibidos, armaba aleatoriamente las matrices
+de Adyacencia y de Opiniones, definía la de Superposición usando el valor
+de cos(delta) correspondiente. También armaba dos vectores para utilizar más
+tarde, que eran el de opiniones previas y el de Diferencia de opiniones.
+Definía un puntero a la función que me aplicaba la ecuación diferencial,
+comprobaba que la matriz de Adyacencia fuera conexa, luego abría mi archivo,
+escribía los datos iniciales importantes y desde ahí empezaba a evolucionar
+el sistema usando un correspondiente método de RK4. Cuando veía que el sistema
+variaba las opiniones de los sujetos en promedio una cantidad menor a 
+10^(-6), entonces cortaba, cerraba todo y listo.

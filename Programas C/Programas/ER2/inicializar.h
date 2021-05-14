@@ -7,7 +7,6 @@
 int GenerarOpi(ps_Red ps_var, ps_Param ps_par);
 int GenerarAng(ps_Red ps_var, ps_Param ps_par);
 int GenerarAdy(ps_Red ps_var, ps_Param ps_par);
-int Lectura_Adyacencia(int *pi_vec, FILE *pa_archivo);
 
 #endif
 

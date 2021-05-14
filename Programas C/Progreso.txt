@@ -2805,3 +2805,179 @@ redes en Python, la nx.network, o algo así. La idea es ver de poder construir
 redes en Python con ciertas propiedades, guardar las redes de adyacencia
 en alguna carpeta y usar esas redes para armar las redes en C a la hora
 de trabajar. Espero que funcione
+
+--------------------------------------------------------------------------------------
+
+23/04/2021
+
+Voy a empezar a probar el armado de redes en Python con la biblioteca networkx.
+Arranquemos armando redes y logrando que el programa las levante correctamente.
+Entonces el trabajo de esta semana es armar un código en Python que arme las
+redes, tanto de Erdos-Renyi, las random, las de Barabassi y las regulares.
+Es decir, son 4 tipos de redes distintos. A partir de ahora me parece
+razonable hablar de una nueva fase del trabajo, y por tanto cambiarle
+el nombre a los archivos que vaya usando y guardar los que deje de usar de
+manera prolija.
+
+En algún momento tengo que ver cómo me organizo lo que hablamos con Pablo de
+ir leyendo bibliografía y hacerme resúmenes de la biblio. Lo principal es concentrarme
+en la biblio de Baumann y la de la red de Actividades.
+
+------------------------------------------------------------------------------------
+
+26/04/2021
+
+Retoque el Graficador ER2, eso tenelo en cuenta cuando lo vayas a copiar todo para
+la nueva fase. Igual, si lo mirás con detalle creo que te vas a dar cuenta de los
+detalles allá y acá.
+
+En python estuve intentando analizar un poco el distema que tiene la gran varianza.
+Logré establecer que el problema está dado por sujetos cuya distancia con su estado
+final es MUCHO mayor que la del resto. Ahora lo interesante sería poder estudiar ese
+sujeto y ver cuales son las condiciones de sus primeros vecinos que hacen que 
+tarde tanto en caer a cero. Igual, repito, lo lindo sería primero identificarlo.
+Hecho eso, podría intentar mirar su columna en la matriz Opi, eso me ayudaría para
+tener claro QUÉ pasa con sus valores.
+
+Supongo que mañana me pondré a trabajar con el generador de redes y veré de investigar
+al sujeto o los sujetos que están muy alto en la distancia hacia su estado final.
+
+-----------------------------------------------------------------------------------------
+
+29/04/2021
+
+Ahí armé en Profunc un código que se encarga de crear redes de Erdos-Renyi y de guardar
+la matriz como un txt de una única fila con todos enteros. Así que lo siguiente es armar
+una función en C que se encargue de levantar los datos y arme la matriz de adyacencia
+con eso.
+
+Una vez teniendo eso, me voy a encargar de preparar el programa para que me cree todas las
+redes que pueda necesitar, ya sea de Erdos-Renyi, Barabassi y Random Regular. Lo que no
+recuerdo es cuántas redes debería crear. ¿Es una para cada elemento de cada ensamble?
+Preguntar esto a Pablo.
+
+Después debería ver de hacer lo de estudiar a dónde tienden los sujetos del elemento del
+ensamble que tarda tanto en converger.
+
+----------------------------------------------------------------------------------------
+
+04/05/2021
+
+Estoy trabajando en Prosem para armar una función que pueda levantar de un txt la matriz
+de Adyacencia. Me cuesta un poco llamarlo una función porque básicamente lo que hace
+es usar el fscanf y con un while lo recorre. Y listo, eso es todo.
+
+De paso, de casualidad descubrí que había un error en el armado del txt. Menos mal que
+lo vi, casi me mando alta macana. Básicamente elegí mal el sustituto para el newline
+y algunos pares de números terminaban juntos. Ahora que lo pienso, me extraña que eso
+no se haya notado.
+
+Cuestión que estaba pensando en agregar a la función esta que avise si lee de menos o de más,
+como para avisar si agarré un archivo equivocado. Para saber si leí de menos, puedo simplemente
+comprobar si alcancé el EOF del archivo y si el indice es menor o no al tamaño del vector.
+
+Ahí agregué algo que debería decirme si el archivo tiene una matriz más grande 
+que el vector. Eso es por si me mando alguna cagada para cortar el programa y volver
+a arrancar. Lo probé y dentro de todo funcionó bien. Copado
+
+----------------------------------------------------------------------------------------
+
+05/05/2021
+
+Intentemos escribir este código que levanta los datos de un archivo en forma de función.
+Además veamos si podemos encontrar la forma correcta de pasarle el nombre del archivo a levantar.
+Eso va a definir la forma en que voy a guardar los datos.
+
+------------------------------------------------------------------------------------------
+
+06/05/2021
+
+Continuando lo de ayer, ahí rápidamente probé cómo armar un string adecuado de manera
+que sea los nombres que yo necesito que sean. Entonces puedo armar los nombres de 
+mis redes armadas con la librería networkx de una manera específica, se me ocurre
+"TIPORED_N=$_Gm=$_ID=$.txt". Luego, usando sprintf puedo poner el nombre del archivo
+en un array de char. (¿No podría hacer lo mismo con un puntero? Mejor preocuparme
+de eso en el futuro). Cuestión que con eso puedo levantar los nombres de mis
+redes siendo que el TIPORED lo paso como input al sistema, como un for extra
+en el Bash, el N viene en el for del Bash, Gm lo agrego e ID lo saco dentro
+del mismo archivo C a partir de un Random, habiendo definido de antemano cuántas 
+redes totales fueron creadas con Python. Bien, me gusta la idea.
+
+Ahora debería ver si puedo hacer que se levante el archivo si el archivo está fuera
+de la carpeta donde está el Main original. Probemos eso. Eso funciona genial, es simplemente
+escribir el path relativo y listo. Ahora la pregunta es, 
+¿Pongo todas las redes en una única carpeta? ¿O las pongo en carpetas diferenciadas?
+Cuestión, ya tengo todo lo necesario para automatizar esto. Ahora tengo que hacer
+el trabajo de la burocracia. Esto es una paja. Pero dale, ya tenemos lo importante
+hecho.
+
+El trabajo de Burocracia es el siguiente:
+5) Ampliar la función que arma redes para que arme redes de Barabassi,
+redes random con grado fijo y redes simplemente random.
+6) Definir cuántas redes armar y guardarlas todas en una carpeta. (O varias).
+7) Preparar las carpetas en las que voy a guardar los archivos de análisis
+de las redes.
+8) Cargar los archivos a Github.
+9) Revisar los archivos de Documentación que se encuentran en ER2, para
+ver si falta agregar info al respecto de los gráficos armados.
+10) Anotar todo esto acá. (¿De verdad llego con todo esto para el
+martes que viene? Lo dudo, pero si hago hasta el 8, ya tendré
+bastante que charlar con Pablo, aunque no tenga resultados
+para mostrar.)
+11) Armar ese gráfico sobre el elemento del ensamble raro, el gráfico
+de la opinión en función de la iteración. La idea es ver que la mayoría
+de los sujetos se ubican rápido en su valor final y que hay uno o algunos
+sujetos que tardan en llegar.
+
+------------------------------------------------------------------------------------------
+
+07/05/2021
+
+Mientras fui resolviendo puntos del trabajo de Burocracia, tuve la brillante
+idea de ir borrándolos. Ahora me arrepiento un poco. Cuestión que ya hice
+los primeros cuatro puntos, que básicamente eran separar el antiguo programa
+principal en una carpeta en programas y documentarlo, guardar el código usado
+en Prosem en Archivo para cuando lo pueda necesitar, "Armé" una función que
+devuelva números entre 0 y N, lo cual es hacer rand()%N y lo último fue
+pasar la función de Lectura_Adyacencia al nuevo programa principal.
+
+Voy a tener que investigar un poco sobre redes de Barabassi de nuevo
+para poder ver bien cómo usar la función que crea redes de Barabassi
+de manera de que mis redes tengan el grado medio deseado.
+
+----------------------------------------------------------------------------------------
+
+08/05/2021
+
+Estuve revisando esa función de generar gráficos de Barabasi. Si bien
+me genera muchas dudas el hecho de que el grado medio sea constante para
+cada valor de m y n, la función parece claramente armar una red de Barabasi,
+o eso es lo que me muestra el gráfico de distribución de grados que armé
+al respecto.
+
+Dicho esto, el programa que armé ya me guarda redes de Erdos-Renyi, Barabasi
+y Regular Random en las carpetas que armé, así que con eso ya tengo el punto
+5 de los 11 que me propuse hacer hechos, ahora debería ver de definir
+cuantas redes tengo que crear. Mejor me hago unas notas sobre eso y lo charlo
+con Pablo y Sebas mañana.
+
+Ahí probé guardar mis archivos, va barbaro. Cada archivo de 1000 agentes pesa
+2 MB aprox. Supongamos que cada par de valores alfa y delta va a generar ensambles
+de 20 simulaciones. Además supongamos que tengo 25 valores de alfa por 10
+valores de delta. Eso me da para un único tipo de red un total de 5000 simulaciones
+totales. Supongamos que en total voy a tomar una cantidad de redes igual a la
+mitad de simulaciones totales, entonces tendré 2500 redes por cada tipo de 
+red. Luego, el total de redes que tendré serán 2500 y eso multiplicado por
+2 MB me da un total de 15000 MB. Que dividido por 1024 no superan los 15 GB.
+¿Cómo hice la cuenta antes, no entiendo?
+
+Bueno, igualmente queda la pregunta de cuántas redes deberé armar. Charlarlo mejor
+con Pablo y Sebas mañana.
+
+---------------------------------------------------------------------------------------
+
+09/05/2021
+
+Ya actualicé los archivos de Documentación.txt de ER2. Puse todo lo que habíamos visto
+hasta ahora al respecto. Así que ahora sigue el subir todo esto al Github. Eso quedará
+para después de la charla con Pablo y Sebas. Ahora mejor intentar pulir lo que tengo.

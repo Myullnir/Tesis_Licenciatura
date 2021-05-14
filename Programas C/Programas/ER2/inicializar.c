@@ -54,28 +54,3 @@ int GenerarAdy(ps_Red ps_var, ps_Param ps_par){
 	return 0;
 }
 
-// Esta función es la que lee un archivo y me arma la matriz de Adyacencia
-int Lectura_Adyacencia(int *pi_vec, FILE *pa_archivo){
-	// Deefino los enteros que voy a usar para leer el archivo y escribir sobre el vector.	
-	int i_indice = 2;
-	int i_salida = 0;
-	
-	// Leo la matriz de Adyacencia del archivo y la guardo en el vector de Adyacencia.
-	while(fscanf(pa_archivo,"%d",&i_salida) != EOF && i_indice < *pi_vec * *(pi_vec+1)+2){
-		*(pi_vec+i_indice) = i_salida;
-		i_indice++;
-	}
-	
-	// Aviso si hubo algún problema.
-	if(fscanf(pa_archivo,"%d",&i_salida) != EOF){
-		printf("La matriz del archivo es mas grande que tu vector\n");
-		return 1;
-	}
-	if(fscanf(pa_archivo,"%d",&i_salida) == EOF && i_indice < *pi_vec * *(pi_vec+1)+2){
-		printf("La matriz del archivo es mas chica que el vector\n");
-		return 1;
-	}
-	
-	return 0;
-}
-

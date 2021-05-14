@@ -1,7 +1,7 @@
 En esta carpeta voy a estar guardando los archivos donde se observa la trayectoria de las opiniones
-a partir de ensambles de simulaciones. Estos gráficos van a estar hechos para 100 y 1000 agentes,
-con pasos temporales dt = 0,1, Criterios de Corte 10^(-8) para todos los N=100 y Alfa = 0
-de los N=1000, mientras que para el resto de los N=1000 uso un Criterio de Corte 10^(-6).
+a partir de ensambles de simulaciones. Estos gráficos van a estar hechos para 1000 agentes,
+con pasos temporales dt = 0,1, Criterios de Corte 10^(-8) para Alfa = 0
+mientras que para el resto uso un Criterio de Corte 10^(-6).
 
 Como siempre son 2 tópicos, estoy usando redes estáticas Erdós Renyi con grado medio 8.
 Este es el primero de los gráficos de Baumann que debería replicar.
@@ -29,8 +29,8 @@ están graficadas en función del tiempo simulado.
 
 .) Distribución opiniones_N=$_alfa=$: Este es un gráfico de distribución de las opiniones.
 Cada curva representa la distribución para un dado valor de Cos(Delta) de las opiniones de todos
-los agentes. Considerando que se tienen 100 agentes y 40 simulaciones, esto me determina un total
-de 8000 opiniones para graficar. Para los gráficos con N=100 terminé usando 30 bins uniformemente 
+los agentes. Considerando que se tienen 1000 agentes y 40 simulaciones, esto me determina un total
+de 80000 opiniones para graficar. Para los gráficos con N=1000 terminé usando 30 bins uniformemente 
 distribuidos para armar las curvas. Cada gráfico está hecho para cada valor de Alfa
 
 .) Tabla Graficos TdO: Esto es una tabla que tiene 42 gráficos organizados de TdO con el fin
@@ -55,12 +55,39 @@ en la región de transición, donde suponíamos que se daba un equilibrio en la 
 entre el término que hacía caer el sistema a cero y el término que movía las opiniones a un valor
 igual a K*(grado medio). El mapa de colores está armado sobre el espacio de parámetros Alfa-Delta.
 
-.) Varianza del tiempo de simulación EP: En este gráfico la idea era medir la varianza que el sistema
-tenía en el tiempo de simulación, es decir, cuanto es la varianza en su tiempo de convergencia. Esto
-resultaba de interés porque se sabe que en la región de transición entre dos fases el sistema
-suele tardar más que lo usual en converger y además los tiempos de convergencia son muy dispares.
-Por este motivo se consideró esto como una buena forma de medir la región de transición, determinándose
-la región de transición como esa región en la cual la Varianza crece mucho con respecto al resto.
+.) Promedios EP: Este gráfico es un mapa de colores prácticamente igual al de Máximos EP, sólo que
+la idea es mirar los promedios de los valores absolutos de opiniones, ya que sabemos que en promedio
+las opiniones de los sujetos se distribuyen en una campana alrededor del valor K*(grado medio). Entonces
+la idea es que esto me permite ver que el sistema se comporta de una manera que yo espero, cosa que si
+miro los máximos, eso no lo veo.
+
+.) Varianza EP: Es un mapa de colores en el Espacio de parámetros Alfa y cos(delta) en el cual
+lo que se grafica es la varianza en los tiempos de simulación, también entendido como el tiempo
+de convergencia del sistema, de todos los elementos del ensamble que corresponden a ese par de
+valores Alfa y cos(delta). A esos valores de Varianza les tomo logaritmo y eso es lo que grafico.
+La idea de esto es que en la región de transición esperamos que la varianza aumente mucho ya que
+en esa zona entran en competencia los dos términos que determinan el comportamiento del sistema
+y esto es lo que hace que cada iteración tarde tiempos muy diversos para converger.
+
+.) Entropía EP: Este mapa de colores se inspiró a partir de lo que observamos en los gráficos de
+Distribución Cuadrantes. La Entropía es un valor que se hace más grande en la medida que la probabilidad
+de los estados finales del sistema se vuelve equiprobable, mientras que si uno o pocos estados empiezan
+a tener una probabilidad muy grande por encima de los demás, la entropía baja. Es decir, la entropía
+me sirve para medir cuanta información respecto del estado final del sistema tengo a partir del estado
+inicial. Por tanto, alta entropía indica que no sé cómo va a terminar el sistema y por eso todos los
+estados son equiprobables, mientras que baja entropía signifca que el estado final del sistema está
+más determinado porque hay estados cuya probabilidad es mayor que la de otros estados. La idea es que
+esto nos puede servir para diferenciar los estados de Polarización descorrelacionada con respecto a 
+los estados de Estado ideológico.
+
+.) Estados Finales EP: Este es el gráfico que tiene Baumann en la figura 3, es básicamente un
+mapa de colores que indica cuáles son los estados finales del sistema para cada par de valores
+Alfa y cos(delta). Podemos ver que para bajos alfas el sistema se encuentra en Consenso, para
+Cos(delta) bajo y Alfa alto el sistema tiene Polarización descorrelacionada y para Alfas altos
+a medida que aumento el cos(delta) paso de Polarización Descorrelacionada a Estado Ideológico.
+Todo esto coincide con lo propuesto por Baumann y lo que uno puede analizar de la ecuación
+diferencial.
+
 
 
 ----------------------------------------------------------------------------------------------------
@@ -115,18 +142,33 @@ muy fuertemente sobre una única diagonal, y eso lo hacen ya para bajos valores 
 Esto es lo que me hace sospechar de que Baumann toma valores de Alfa que llegan hasta 4 porque
 la influencia del cos(delta) es muy grande y Alfa necesita crecer mucho para poder contrarrestarlo
 para cos(delta) bajo incluso. Es decir, fijate que apenas subís un poquito el cos(delta) y ya ni
-tenés opiniones fuera de la diagonal del cuadrante 1 y 3.
+tenés opiniones fuera de la diagonal del cuadrante 1 y 3. Se puede señalar que a diferencia del
+caso de N=100, acá se observa un poco mejor los sujetos que para cos(delta)=0,1 quedan fuera
+de la diagonal 1-3.
 
-El gráfico de Máximos EP si bien ayuda a ver una diferencia entre la región de consenso,
-la de polarización y la de transición, al estar mirando sólo los máximos absolutos de opiniones
-no queda tan claro que lo que se esté midiendo sea lo correcto. Por eso para el caso de N=1000
-cambiamos el gráfico para medir los valores promedios de opiniones, sabiendo que justamente
-las opiniones de los agentes tienen distribuciones que arman campanas en torno de los 
-valores K*(grado medio). O al menos eso hacen en polarización, en Consenso simplemente caen a
-cero y en la transición van a valores intermedios.
+El gráfico de Varianza permite observar cláramente la región de transición, aunque hay algunas
+dudas respecto a algunos elementos del ensamble que por alguna razón tienen tiempo de convergencia
+anormalmente altos. No se logra determinar exáctamente el motivo de porque surgen estos sujetos, 
+estamos investigando un poco a ver si encontramos algo que sea lo que los esté generando.
 
-El gráfico de Varianza de Tiempo de Simulación EP está bastante bien y permite ver correctamente
-la región de transición diferenciada del resto del sistema. Una corrección que hice
-a esto que me había propuesto Seba es que los números que definen el mapa de colores les haya
-tomado un logaritmo, como para que los colores no tomen valores tan grandes que son más difíciles
-de interpretar.
+El gráfico de Promedios da muy bien y se observa claramente que el sistema tiende en la polarización
+a K*(grado medio), mientras que en la región de transición tiende a algún valor intermedio entre eso
+y cero. No diría que es el gráfico primario para diferenciar la región de transición, pero me
+parece que está bueno para entender la diferencia entre Consenso, transición y Polarización,
+todo en uno.
+
+El gráfico de Entropía es un éxito que diferencia cláramente estado ideológico del resto.
+Hay algo que estábamos considerando sobre este gráfico que es modificar los estados finales
+considerados al calcular la entropía, y en vez de contar sólo 4 estados finales, uno por cada
+cuadrante, agregar un quinto estado que sea cuando las opiniones caen a cero, porque ocurre
+justamente que las opiniones puede ser que se encuentren muy cerca de cero, pero si su valor
+no es exactamente cero, el sistema las asigna a algún cuadrante. Una idea que tenemos
+para mejorar esto es agregar un quinto estado que sea cuando las opiniones caen a cero,
+El objetivo es ver si esto permite que la Entropía diferencie las tres regiones, es decir,
+Consenso, Polarización Descorrelacionada y Estado Ideológico.
+
+Por último, el gráfico de Estados Finales EP está muy bien, se parece mucho al de Baumann.
+Para ver que tan bien se reproducen las distintas regiones lo siguiente es poder hacer un
+barrido más fino y empezar a ver que tal se ve el sistema. Aunque para eso debemos
+ya pasarnos a las pcs de la facultad. Es de destacar que pudimos conseguir estos resultados
+SIN usar redes de Actividad y SIN el mecanismo de homofilia de Baumann, lo cual es muy interesante.

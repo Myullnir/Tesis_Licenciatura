@@ -1,6 +1,9 @@
 
 *.000
 *.png
+Barabasi_*.txt
+ErdosRenyi_*.txt
+RandomR_*.txt
 Datos_*
 Programas C/Tabla_Valores_TANH
 Programas Python/Histograma_Ciclos
@@ -9,3 +12,4 @@ Resumen_Semanal.pdf
 Programas C/Clave Pública
 Programas C/Clave SSH.txt
 Programas C/Clave Privada.ppk
+Programas Python/Prueba.txt

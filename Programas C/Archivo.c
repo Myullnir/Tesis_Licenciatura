@@ -3121,3 +3121,163 @@ modificar esta función para que me de el puntero de la comunidad y no sólo el 
 
 
 NUEVO_PROGRAMA
+
+Este programa lo terminé el 06/05/2021. La idea era para armar una función que levante
+un archivo de texto y de ahí pase el contenido que sería la matriz de Adyacencia. Además
+estuve revisando cómo manipular los strings de manera de armar los nombres de mis archivos
+desde adentro del programa en C, cosa de que los archivos no tengan que entrar como input
+desde el Bash. En conclusión, usé el fscanf para leer el archivo, simplemente leo hasta final
+de archivo o hasta el tamaño total del vector. Y tiene implementado un recurso para detectar si
+la matriz de Adyacencia del archivo es más grande o más chica que el vector del programa.
+Por otra parte, usé el sprintf para armar el nombre del archivo, entendiendo que simplemente
+uso el nombre de tipo de red como input desde Bash, la cantidad de agentes y el Grado
+medio también salen de Input y el número de identidad de red lo saco en el programa de C.
+
+
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+
+
+// // Acá vienen los structs.
+// // El struct Red tiene los datos que definen mi red, y la info de la red
+// typedef struct Red{
+	// int *pi_Ady; // Matriz de adyacencia que define mis conexiones. Tiene tamaño N*N
+// }s_Red;
+
+// typedef s_Red *ps_Red;
+
+// typedef struct Parametros{
+	// int i_N; // Número de agentes en la red
+// }s_Param;
+
+// typedef s_Param *ps_Param;
+
+
+// int Lectura_Adyacencia(int *pi_vec, FILE *pa_archivo);
+// int Visualizar_i(int *pi_vec);
+// double Random();
+
+
+// int main(int argc, char *argv[]){
+	
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Defino los punteros a Structs
+	// ps_Red ps_red1;
+	// ps_red1 = malloc(sizeof(s_Red));
+	
+	// ps_Param ps_datos;
+	// ps_datos = malloc(sizeof(s_Param));
+	
+	// // Defino los parámetros de la red
+	// ps_datos->i_N = 1000;
+	
+	// // Defino el string que recibo del título. Lo puedo armar usando sprintf sobre el s_archivo. La idea es que en
+	// // formato escribo el formato de mis archivos y listo. Después le agrego los valores de N, Grado Medio e Identidad
+	// // de la red y con eso puedo leerla
+	// // char s_archivo[255];
+	// // sprintf(s_archivo,"%s_N=%d_Gm=%d.txt",argv[1],ps_datos->i_N,8);
+	// // printf("%s\n", s_archivo);
+	
+	// // Defino el puntero a mi matriz, lo malloqueo y lo inicializo
+	// ps_red1->pi_Ady = (int*) malloc((2+ps_datos->i_N*ps_datos->i_N)*sizeof(int));
+	// ps_red1->pi_Ady[0] = ps_datos->i_N;
+	// ps_red1->pi_Ady[1] = ps_datos->i_N;
+	// for(register int i_i=0; i_i<ps_datos->i_N*ps_datos->i_N; i_i++) ps_red1->pi_Ady[i_i+2] = 3;
+	
+	// // Ahora voy a querer leer un archivo. Para eso armo un puntero a file y lo dirijo al archivo.
+	// // Luego con scanf leo mi archivo. También defino un entero para recorrer mi vector y uno para guardar mis
+	// // datos leídos
+	// char s_archivo[255];
+	// sprintf(s_archivo,"./../Programas Python/Prueba.txt");
+	// FILE *pa_archivo=fopen(s_archivo,"r"); // Con esto abro mi archivo y dirijo el puntero a él
+
+	// Lectura_Adyacencia(ps_red1->pi_Ady,pa_archivo);
+	
+	// // Visualizar_i(ps_red1->pi_Ady);
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// free(ps_red1->pi_Ady);
+	// free(ps_red1);
+	// free(ps_datos);
+	// // fclose(pa_archivo);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+
+	// return 0;
+// }
+
+// // ###########################################################
+// // ###########################################################
+// // ###########################################################
+
+
+// // Funciones
+
+// // Esta función es para observar los vectores int
+// int Visualizar_i(int *pi_vec){
+	// // Defino las variables que voy a necesitar.
+	// int i_F,i_C;
+	// i_F = *pi_vec;
+	// i_C = *(pi_vec+1);
+	
+	// // Printeo mi vector
+	// for(register int i_i=0; i_i<i_F; i_i++){
+		// for(register int i_j=0; i_j<i_C; i_j++) printf("%d\t",*(pi_vec+i_i*i_C+i_j+2));
+		// printf("\n");
+	// }
+	// printf("\n");
+	
+	// return 0;
+// }
+
+// // Esta función me genera un número random entre 0 y 1
+// double Random(){
+	// return ((double) rand()/(double) RAND_MAX);
+// }
+
+// // Esta función es la que lee un archivo y me arma la matriz de Adyacencia
+// int Lectura_Adyacencia(int *pi_vec, FILE *pa_archivo){
+	// // Deefino los enteros que voy a usar para leer el archivo y escribir sobre el vector.	
+	// int i_indice = 2;
+	// int i_salida = 0;
+	
+	// // Leo la matriz de Adyacencia del archivo y la guardo en el vector de Adyacencia.
+	// while(fscanf(pa_archivo,"%d",&i_salida) != EOF && i_indice < *pi_vec * *(pi_vec+1)+2){
+		// *(pi_vec+i_indice) = i_salida;
+		// i_indice++;
+	// }
+	
+	// // Aviso si hubo algún problema.
+	// if(fscanf(pa_archivo,"%d",&i_salida) != EOF){
+		// printf("La matriz del archivo es mas grande que tu vector\n");
+		// return 1;
+	// }
+	// if(fscanf(pa_archivo,"%d",&i_salida) == EOF && i_indice < *pi_vec * *(pi_vec+1)+2){
+		// printf("La matriz del archivo es mas chica que el vector\n");
+		// return 1;
+	// }
+	
+	// return 0;
+// }
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA
+
+
+

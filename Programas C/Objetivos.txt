@@ -20,6 +20,20 @@ un cierto grado medio que sean conexas.
 que tardan en converger
 .) Erdos Renyi, Random Regular y Barabassi con redes de 4,8,12,16. Armar las redes y alimentar
 el programa para que corra con eso. A ver que ocurre.
+.) Leer los papers que Pablo pasó. En los 2 que pasó, hay uno que es resumen de muchos trabajos
+del tema. Entre ellos, hay uno hecho por Pablo y Fernando Barreda, que tiene muchas bibliografías interesantes
+
+Cosas importantes para la semana que viene:
+1) Avanzar en la programación de cosas en las máquinas de a facultad. Para eso pasar los
+archivos a la pc y ver de correrlos.
+2) Lograr trabajar sobre otros tipos de redes estáticas, para poder pasar pronto a las 
+redes de actividad
+3) Empezar a ver cómo implementaríamos el modelo de redes de actividad.
+4) Ir eligiendo un paper interesante para contar.
+5) Mandar a correr algo a las pcs de la facultada que sea exactamente lo mismo que ves
+en casa para ver diferencia de tiempos.
+
+
 
 -----------------------------------------------------------------------------------------------
 
@@ -29,3 +43,9 @@ Usuario interno: faviodic@setubal.df.uba.ar
 
 PARA ENTRAR:
 ssh faviodiciocco2@login.df.uba.ar -t ssh faviodic@setubal.df.uba.ar
+
+PARA CORRER ARCHIVOS .PY:
+./Proceso.py (Corre, pero si cerrás la terminal se cierra el programa)
+./script.py > salida.out & (Corre el programa en el Background. Salida .out guarda lo que hubiera
+ido a la terminal como salida. El Ampersand es lo que hace que funcione en el background.
+Al correr te da un número de proceso ID que tenés que guardar por si necesitás matar el proceso más tarde)

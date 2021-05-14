@@ -179,7 +179,7 @@ color=cm.rainbow(np.linspace(0,1,Divisiones))
 
 #--------------------------------------------------------------------------------------
 
-CarpCheck=[[root,files] for root,dirs,files in os.walk("./ER2 Rev")]
+CarpCheck=[[root,files] for root,dirs,files in os.walk("./ER2")]
 
 # El comentario anterior era considerando que no le daba la dirección correcta
 # de la carpeta con mi información al os.walk. Esta vez le estoy pasando la 
@@ -339,11 +339,11 @@ for AGENTES in [1000]:
             plt.figure("Variaciones Promedio",figsize=(20,12))
             plt.rcParams.update({'font.size': 18})
 #            OpinionesFinales = np.array([])
-            PuntosFinales = np.array([])
-            Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[AGENTES][ALFA][CDELTA])))
+#            PuntosFinales = np.array([])
+#            Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[AGENTES][ALFA][CDELTA])))
             
             #-------------------------------------------------------------------------------------
-            for nombre,numero in zip (SuperDiccionario[AGENTES][ALFA][CDELTA],np.arange(len(SuperDiccionario[AGENTES][ALFA][CDELTA]))):
+            for nombre in ["Datos_Opiniones_alfa=0.900_Cdelta=0.600_N=1000_Iter=2"]:   # (SuperDiccionario[AGENTES][ALFA][CDELTA],np.arange(len(SuperDiccionario[AGENTES][ALFA][CDELTA]))):
 
                 #--------------------------------------------------------------------------------------------
 
@@ -352,11 +352,11 @@ for AGENTES in [1000]:
 
                 Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
 
-#                Ady = Datos[1][1:len(Datos[1])] # Lista con elementos de la matriz de Adyacencia
-#                Ady = [int(x) for x in Ady]
-#
-#                Sup = Datos[3][1:len(Datos[3])] # Lista con elementos de la matriz de Superposición
-#                Sup = [float(x) for x in Sup]
+                Ady = Datos[1][1:len(Datos[1])] # Lista con elementos de la matriz de Adyacencia
+                Ady = np.array([int(x) for x in Ady])
+
+                Sup = Datos[3][1:len(Datos[3])] # Lista con elementos de la matriz de Superposición
+                Sup = np.array([float(x) for x in Sup])
 
                 # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
                 # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
@@ -389,7 +389,7 @@ for AGENTES in [1000]:
                 X = np.arange(0,len(Var))*0.1 # El dt usado en todos los archivos es 0.1
 
                 plt.figure("Variaciones Promedio")
-                plt.semilogy(X,Var, "--",c = Colores2[numero],linewidth = 2)
+                plt.semilogy(X,Var, "--", linewidth = 5) #,c = Colores2[numero],linewidth = 2)
 
                 # El programa sigue funcionando bárbaro, lo cual es buenísimo. Corta en el momento
                 # adecuado y el comportamiento es razonbale. El guardado y el cerrado de la figura
@@ -497,10 +497,10 @@ for AGENTES in [1000]:
             plt.xlabel("Tiempo Simulado")
             plt.ylabel("Variación promedio de las opiniones")
             plt.axis("tight")
-#            plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
-            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
+#            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
             plt.grid()
-            plt.savefig("../Imagenes/ER2/N={}/Variaciones Promedio Rev_alfa={:.2f}_Cdelta={}_N={}.png".format(AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.savefig("../Imagenes/ER2/N={}/Variaciones Promedio Rev2_alfa={:.2f}_Cdelta={}_N={}.png".format(AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
             plt.close("Variaciones Promedio")
             
             #-------------------------------------------------------------------------------------------------
