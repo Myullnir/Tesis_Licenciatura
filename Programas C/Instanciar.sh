@@ -9,23 +9,33 @@ make all
 echo Apreta enter para correr, sino primero apreta alguna letra y despues enter
 read decision
 
+Redes='RandomR'
+
 if [ -z $decision ]
 then
 	for N in 1000
+	do
+		for Red in $Redes
 		do
-		for Alfa in 90
-		do
-			for Cdelta in 6
+			for Alfa in {0..20}
 			do
-				echo Estoy trabajando el alfa $Alfa y el Cdelta $Cdelta
-				for iteracion in {101..200}
+				for Cdelta in {0..10}
 				do
-					./$1.e $N $Alfa $Cdelta $iteracion
+					for Gm in {4..16..4}
+					do
+						echo Alfa = $Alfa, Cdelta = $Cdelta, Red = $Red, Gm = $Gm
+						for iteracion in {0..10}
+						do 
+							./$1.e $N $Red $Alfa $Cdelta $Gm $iteracion
+						done
+					done
 				done
 			done
 		done
 	done
 	
-	./Mover.sh
+	# ./Mover.sh
 
 fi
+
+

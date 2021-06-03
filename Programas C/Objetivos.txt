@@ -1,8 +1,10 @@
-Acá voy anotando las cosas que me surgen como tareas por hacer, cosa de no tener que hacer
+killAcá voy anotando las cosas que me surgen como tareas por hacer, cosa de no tener que hacer
 scroll hacia arriba en el archivo de progreso cada vez que quiero recordar qué tengo que hacer.
 
 -----------------------------------------------------------------------------------------------
 
+Cosas Super generales:
+----------------------
 .) Optimizar más el código. Todo eso está anotado en el
 archivo de Optimización.txt.
 .) Vamos a hacer el modelo de agentes e integrando el RK4
@@ -13,26 +15,29 @@ archivo de Optimización.txt.
 .) Comparar con el paper original de la red y ver que funcione bien el algortimo que crea la red
 
 
-
-.) Usar el Random Regular Networks de Python para armar redes de 10000 agentes con 
-un cierto grado medio que sean conexas.
-.) Estudiar el sujeto de la iteración que resultó muy raro. Fijate si es un agente o varios
-que tardan en converger
-.) Erdos Renyi, Random Regular y Barabassi con redes de 4,8,12,16. Armar las redes y alimentar
-el programa para que corra con eso. A ver que ocurre.
+Pendientes:
+-----------
 .) Leer los papers que Pablo pasó. En los 2 que pasó, hay uno que es resumen de muchos trabajos
 del tema. Entre ellos, hay uno hecho por Pablo y Fernando Barreda, que tiene muchas bibliografías interesantes
 
+
 Cosas importantes para la semana que viene:
-1) Avanzar en la programación de cosas en las máquinas de a facultad. Para eso pasar los
-archivos a la pc y ver de correrlos.
-2) Lograr trabajar sobre otros tipos de redes estáticas, para poder pasar pronto a las 
-redes de actividad
+-------------------------------------------
 3) Empezar a ver cómo implementaríamos el modelo de redes de actividad.
 4) Ir eligiendo un paper interesante para contar.
-5) Mandar a correr algo a las pcs de la facultada que sea exactamente lo mismo que ves
-en casa para ver diferencia de tiempos.
 
+
+Transcripción de Progreso:
+--------------------------
+Organicémonos:
+5) Armemos un archivo de Python que levante estos datos y me arme los
+gráficos.
+6) Trabajemos los datos y armemos todos los gráficos.
+8) Preparemos el inicio de la charla sobre redes de Actividad.
+
+
+Bajar los 4 papers que cita Baumann y leerlos
+¿Cómo cambiarían las ecuaciones del modelo si intentara introducir efecto Backfire?
 
 
 -----------------------------------------------------------------------------------------------
@@ -42,10 +47,41 @@ Usuario externo: faviodiciocco2@login.df.uba.ar
 Usuario interno: faviodic@setubal.df.uba.ar
 
 PARA ENTRAR:
-ssh faviodiciocco2@login.df.uba.ar -t ssh faviodic@setubal.df.uba.ar
+ssh -J faviodiciocco2@login.df.uba.ar faviodic@setubal.df.uba.ar
 
 PARA CORRER ARCHIVOS .PY:
 ./Proceso.py (Corre, pero si cerrás la terminal se cierra el programa)
 ./script.py > salida.out & (Corre el programa en el Background. Salida .out guarda lo que hubiera
 ido a la terminal como salida. El Ampersand es lo que hace que funcione en el background.
 Al correr te da un número de proceso ID que tenés que guardar por si necesitás matar el proceso más tarde)
+
+PARA COPIAR ARCHIVOS DESDE MI PC A LA DE SETUBAL:
+scp (-ro) (ProxyJump faviodiciocco2@login.df.uba.ar) "PATH LOCAL" "faviodic@setubal.df.uba.ar:PATH REMOTO"
+
+PARA VER LOS PROGRAMAS QUE ESTÁN CORRIENDO DE FONDO:
+htop
+
+PARA MANDAR A CORRER UN PROGRAMA EN EL BACKGROUND:
+nohup COMANDO &
+
+ID procesos: 
+1) 67479
+2) 67528
+3) 67559
+4) 67597
+5) 67630
+6) 67669
+7) 67706
+8) 67744
+
+------------------------------------------------------------------------------------------------------------
+Cuenta nueva en Oporto: ()
+
+faviodic@oporto.df.uba.ar
+contraseña:faviodic
+
+-------------------------------------------------------------------------------------------------------------
+Cuenta nueva en Algarve: (20 hilos)
+
+faviodic@algarve.df.uba.ar
+contraseña:faviodic

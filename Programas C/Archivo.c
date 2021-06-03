@@ -2483,7 +2483,7 @@ NUEVO_PROGRAMA
 
 
 Este archivo lo armé el 09/02/2021. La idea era armar un archivo de prueba para guardar
-dobules y ver hasta cuantos decimales puedo guardar sin problemas. Interesantemente
+doubles y ver hasta cuantos decimales puedo guardar sin problemas. Interesantemente
 me guardó hasta 32 decimales y no tuvo errores que yo haya notado. Le hice tomar un 
 número y dividirlo por 2 iterativamente y guardar ese resultado. Por lo visto, funcionó bien
 guardó los 32 decimales correctamente.
@@ -3278,6 +3278,273 @@ medio también salen de Input y el número de identidad de red lo saco en el pro
 
 
 NUEVO_PROGRAMA
+
+Este programa lo armé el 14/05/2021. Es un programa sencillo cuya función es simplemente 
+ver cómo comparar strings para algo que necesitaba hacer en el main de la función principal.
+Cuestión que terminé teniendo que usar la función de C strcmp, que compara dos strings
+y si son iguales devuelve un cero. A todo esto entonces, agregué la biblioteca
+string.h que tiene la función strcmp.
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+// #include<string.h>
+
+
+// int main(int argc, char *argv[]){
+	
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+
+	// // Probemos que puede comparar correctamente el argv con un string.
+	// char s_input[30];
+	// sprintf(s_input,"%s",argv[1]);
+	// if(strcmp("Exito",argv[1])==0) printf("Esto funciona correctamente\n");
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+
+	// return 0;
+// }
+
+//###########################################################
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA
+
+Esta función la terminé el 22/05/2021. Acá el objetivo era armar una función que sirva
+para interpolar el cálculo de la TANH, de manera de que el programa no tenga que realmente
+calcular una TANH, sino que obtenga el valor a partir de una tabla de valores calculada previamente.
+Para esto tuve que armar varias funciones, no fue sólo una. Y además mi idea es que para implementar
+esto en el programa principal debería agregar nuevos archivos y cosas de manera de que esté bien organizado.
+
+Las cosas que se introducen en este código son:
+.) Un struct específico para la tabla de valores de la Tanh.
+.) La función: Interpolación. La idea es que es un poco general, por lo que en el futuro
+debería poder usarse para otras interpolaciones en caso de ser necesario. Esta va a ir en 
+el archivo de general.c.
+.) La función Largo_Tabla_TANH. Esta lo que hace es medir la cantidad de números que tengo
+guardados en mi tabla, de manera de que si cambio el paso del cálculo de valores de la tabla,
+el programa ajuste el tamaño del vector donde se van a guardar de manera automática. La forma en que está
+armada es un poco específica según la tabla que tengo, pero podría usarse para otras cosas con algunos ajustes.
+La voy a colocar en el archivo TTanh.c (Tabla Tanh).
+.) La función Indices_Tabla. Esta lo que hace es tomar el valor del argumento que yo quisiera evaluar en la
+tanh y sobreescribir sobre dos ints que yo le pase los valores de los índices del vector del struct en los
+cuales se encuentran los valores calculados entre los cuales ese argumento se encuentra encerrado. Esta función
+depende de cómo fue armada la tabla, así que tiene que ajustarse a cada tabla nueva que se arme. Va a ir a TTanh.c
+.) La función Lectura_Tabla_TANH se encarga de pasar los valores que están en la tabla al vector de doubles del struct.
+Esta función también está armada tomando en consideración la tabla de valores de tanh, así que la voy a poner
+en TTanh.c, pero podría usarse en un futuro para levantar datos de otras tablas con un pequeño cambio.
+.) La función IntrpTANH empaqueta el uso de las funciones Indices_Tabla e Interpolacion de manera de
+poder usarla en la función Din1 reemplazando directamente a la función tanh. Esta función por supuesto que
+va también en TTanh.c
+.) De yapa, me terminé armando dos funciones que calculan máximo y mínimo entre dos valores doubles y devuelve
+un double. Creo que se le puede igualmente pasar valores int y la función los auto casteara. Sino se pueden
+castear en la entrada a double, y luego castear la salida a int en caso de ser necesario. Estas van a ir
+a general.c
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+// #include<string.h>
+
+// typedef struct Tabla{
+	// double* pd_valores; // Este es el vector donde guardo los valores de la tabla
+	// int i_largo; // Este es el largo de la tabla.
+// } s_Tabla;
+
+// typedef s_Tabla * ps_Tab;
+
+// double Interpolacion(double d_y1, double d_y2, double d_x1,double d_x);
+// int Indices_Tabla(int* i_indice1, int* i_indice2, double d_argumento);
+// int Largo_Tabla_TANH(FILE *pa_file);
+// double IntrpTANH(double d_Arg, ps_Tab ps_val, FILE* pa_file);
+// int Lectura_Tabla_TANH(double* pd_vec, FILE* pa_file);
+// double Max(double d_a, double d_b);
+// double Min(double d_a, double d_b);
+
+
+
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Defino el puntero a mi archivo y lo abro
+	// char s_archivo[255];
+	// sprintf(s_archivo,"Tabla_Valores_TANH");
+	// FILE *pa_archivo=fopen(s_archivo,"r"); // Con esto abro mi archivo y dirijo el puntero a él. Con el +x lo que hago es que no me reescriba el archivo ya creado
+	
+	// // Armo mi puntero a struct
+	// ps_Tab ps_tabla;
+	// ps_tabla = malloc(sizeof(s_Tabla));
+	
+	// // Defino el tamaño de mi vector de índices, lo malloqueo y lo inicializo
+	// ps_tabla->i_largo = Largo_Tabla_TANH(pa_archivo);
+	// ps_tabla->pd_valores = (double*) malloc((ps_tabla->i_largo+2)*sizeof(double));
+	// for(int i_i=0; i_i<ps_tabla->i_largo+2;i_i++) ps_tabla->pd_valores[i_i] = 0;
+	// ps_tabla->pd_valores[0] = 1; // Cantidad de filas
+	// ps_tabla->pd_valores[1] = ps_tabla->i_largo; // Cantidad de columnas
+	
+	// // Levanto los valores de la Tabla_Valores_TANH y los pongo en mi vector
+	// Lectura_Tabla_TANH(ps_tabla->pd_valores,pa_archivo);
+	
+	// // Comparemos algunos cálculos de tanh con cálculos de Interpolación
+	// double da_array[8] = {-5,-4.213485,-3.457286,-2.123457,1.244567,2.124518,3.555555,5};
+	
+	// for(int i_i=0; i_i<8; i_i++){
+		// printf("El resultado de la interpolacion para %lf es %.5lf\n",da_array[i_i],IntrpTANH(da_array[i_i],ps_tabla,pa_archivo));
+		// printf("El resultado de la tanh para %lf es %.5lf\n",da_array[i_i],tanh(da_array[i_i]));
+	// }
+	
+	// // Ahora con esto me armo los datos para la interpolación. Voy a guardar 12 decimales.
+	// // fprintf(pa_archivo,"%lf\t",-1.0);
+	// // for(register int i_i=0; i_i<1000001; i_i++) fprintf(pa_archivo,"%lf\t",tanh(-5+0.00001*i_i));
+	// // fprintf(pa_archivo,"%lf\t",1.0);
+		
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// free(ps_tabla->pd_valores);
+	// free(ps_tabla);
+	// fclose(pa_archivo);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+		
+	// return 0;
+// }
+
+// //###########################################################
+
+// // Me defino funciones de máximo y mínimo
+// double Max(double d_a, double d_b){
+	// // Defino la variable a usar
+	// double d_max = 0;
+	
+	// d_max = (d_a > d_b)? d_a : d_b; // Uso un operador ternario. La idea es que se evalúa la función antes del
+	// // signo de pregunta. Si es verdadera, se devuelve lo que está a la izquierda de los dos puntos.
+	// // Sino se devuelve lo que está a la derecha
+	
+	// return d_max;
+// }
+
+// double Min(double d_a, double d_b){
+	// // Defino la variable a usar
+	// double d_min = 0;
+	
+	// d_min = (d_a < d_b)? d_a : d_b; // Uso un operador ternario. La idea es que se evalúa la función antes del
+	// // signo de pregunta. Si es verdadera, se devuelve lo que está a la izquierda de los dos puntos.
+	// // Sino se devuelve lo que está a la derecha
+	
+	// return d_min;
+// }
+
+
+// // Voy a armar las funciones que voy a necesitar para poder realizar las interpolaciones.
+// // Eso sería la función de Interpolación y la función que calcula la posición
+
+// double Interpolacion(double d_y1, double d_y2,double d_x1,double d_x){
+	// // Defino las variables que voy a necesitar
+	// double d_resultado = 0;
+	// double d_deltax = 0.00001;
+	// double d_deltay = d_y2-d_y1;
+	
+	// d_resultado = (d_deltay/d_deltax)*d_x+d_y1+(-d_deltay/d_deltax)*d_x1; // Esta es la cuenta de la interpolación
+	
+	// return d_resultado;
+// }
+
+
+// // La siguiente función es la que me dice la cantidad de números que hay guardados en el
+// // archivo. La idea es que use este número para armar un vector que es el que guarda
+// // la posición de cada uno de los números de la tabla
+
+// int Largo_Tabla_TANH(FILE *pa_file){
+	// // Defino la variable que voy a returnear
+	// int i_largo = 0;
+	// double d_salida = 0;
+	
+	// fseek(pa_file,0,SEEK_SET);
+	// while(fscanf(pa_file,"%lf\t",&d_salida)!=EOF) i_largo++;
+	// fseek(pa_file,0,SEEK_SET);
+	
+	// return i_largo;
+// }
+
+// // Con esta función ubico el índice que le corresponde a cada número que va entre -5 y 5
+// // en el vector de valores de la tabla.
+
+// int Indices_Tabla(int* i_indice1, int* i_indice2, double d_argumento){
+	// // Defino las variables que voy a necesitar.
+	// double d_indice = 0; // Este es el valor "exacto" del índice que le correspondería al argumento
+	
+	// d_indice = (d_argumento+5)/0.00001; // Esto sale de despejar la fórmula para calcular los valores de la tabla.
+	// // El 0,00001 es el paso con el que armé los valores de la tabla
+	
+	// d_indice = Max(d_indice,0);
+	// d_indice = Min(d_indice,1000003-1);
+	
+	// *i_indice1 = floor(d_indice);
+	// *i_indice2 = ceil(d_indice);
+	
+	// return 0;
+// }
+
+
+// // Esta función empaqueta el resto para que sólo reciba los elementos básicos, y
+// // ya poder pasarlo al main
+// double IntrpTANH(double d_Arg, ps_Tab ps_val, FILE* pa_file){
+	// // Defino las variables que necesito
+	// double d_Y1,d_Y2,d_X1,d_resultado;
+	// int i_i1, i_i2;
+	// i_i1 = 0;
+	// i_i2 = 0;
+	
+	// Indices_Tabla(&i_i1, &i_i2,d_Arg);
+	// d_Y1 = ps_val->pd_valores[i_i1+2];
+	// d_Y2 = ps_val->pd_valores[i_i2+2];
+	// d_X1 = -5+0.00001*i_i1;
+	
+	// d_resultado = Interpolacion(d_Y1,d_Y2,d_X1,d_Arg);
+	
+	
+	// return d_resultado;
+// }
+
+
+// // Esta función se encarga de leer la tabla de valores y colocarla en
+// // el vector de valores del struct
+// int Lectura_Tabla_TANH(double* pd_vec, FILE* pa_file){
+	// // Defino mi variable de salida y el entero que recorra los índices
+	// double d_salida = 0;
+	// int i_indice = 0;
+	
+	// // Leo los datos de la tabla y los guardo en el vector.
+	// while(fscanf(pa_file,"%lf\t",&d_salida)!=EOF){
+		// *(pd_vec+i_indice+2)= d_salida;
+		// i_indice++;
+	// }
+	
+	// return 0;
+// }
+
 
 
 

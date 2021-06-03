@@ -4,7 +4,9 @@
 #include<stdlib.h>
 #include<math.h>
 #include<time.h>
+#include<string.h>
 #include"general.h"
+#include"TTanh.h"
 #include"inicializar.h"
 #include"avanzar.h"
 
@@ -12,9 +14,10 @@
 
 int main(int argc, char *argv[]){
 	// Empecemos con la base. Defino variables de tiempo para medir cuanto tardo y cosas básicas
-	time_t tt_prin,tt_fin;
+	time_t tt_prin,tt_fin,semilla;
 	time(&tt_prin);
-	srand(time(NULL)); // Voy a definir la semilla a partir de un número entero que es el número de iteración  srand(time(NULL));
+	semilla = time(NULL);
+	srand(semilla); // Voy a definir la semilla a partir de un número entero que es el número de iteración  srand(time(NULL));
 	float f_tardanza; // Este es el float que le paso al printf para saber cuanto tardé
 	
 	// Creo mis punteros a structs y los malloqueo.
@@ -24,26 +27,30 @@ int main(int argc, char *argv[]){
 		ps_Red ps_red; // No te vayas a confundir, que ps_Red es el tipo de dato definido por usuario como un puntero al struct Red. En cambio, ps_red es un puntero
 		ps_red = malloc(sizeof(s_Red)); 
 		
-		// double d_AngtRad = (double) (2*M_PI)/360; // La idea es que con el instanciar le paso el ángulo en grados al archivo y esta es la constante para pasarlo a radianes.
+		ps_Tab ps_tab; // Al igual que en los otros, ps_Tab es el tipo de dato definidio por usuario como el puntero al struct Tabla, en cambio ps_tab es un puntero.
+		ps_tab = malloc(sizeof(s_Tabla));
+		
+		
+		// ps_red->s_Tred = NULL;
+		sprintf(ps_red->s_Tred,"%s",argv[2]);
 		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
 		ps_datos->i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		ps_datos->i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
-		ps_datos->f_Gradomedio = 8; // Valor de grado medio de los agentes de la red
-		ps_datos->f_Pint = ps_datos->f_Gradomedio/(ps_datos->i_N-1); // Probabilidad de que se forme un enlace entre dos agentes aleatorios.
+		ps_datos->i_Gradomedio = strtol(argv[5],NULL,10); // Valor de grado medio de los agentes de la red. Esto lo obtengo del input porque ahora armo redes de diferentes grados medios
 		ps_datos->f_K = 1; // Influencia social
 		ps_datos->f_dt = 0.1; // Paso temporal de iteración del sistema
-		ps_datos->f_alfa = strtof(argv[2],NULL)/100; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
+		ps_datos->i_ID = strtol(argv[6],NULL,10)%10; // La ID simplemente diferencia a las 10 redes que armé que son del mismo tipo, con el mismo N y el mismo Gm.
+		ps_datos->f_alfa = strtof(argv[3],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		ps_datos->i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la variación promedio de las opiniones.
-		ps_datos->d_CritCorte = pow(10,-6); // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
-		ps_datos->i_Itextra = 100; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		ps_datos->f_Cosangulo =  strtof(argv[3],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
+		ps_datos->d_CritCorte = 0.0005; // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
+		ps_datos->i_Itextra = 15; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		ps_datos->f_Cosangulo = strtof(argv[4],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
 		
 		// Estos son unas variables que si bien podrían ir en el puntero red, son un poco ambiguas y no vale la pena pasarlas a un struct.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
-		int i_tamaño = 0; // Esta variable mide el tamaño de la componente gigante de mi red.
-		int i_iteracion = strtol(argv[4],NULL,10); // Número de instancia de la simulación.
+		int i_iteracion = strtol(argv[6],NULL,10); // Número de instancia de la simulación.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes.
 		// También hay una matriz de paso previo del sistema y un vector para guardar la diferencia entre el paso previo y el actual.
@@ -53,10 +60,48 @@ int main(int argc, char *argv[]){
 		ps_red->pd_PreOpi = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		ps_red->pd_Diferencia = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		
-		// Voy a abrir un archivo ahora para la evolución de opiniones
-		char s_archivo1[255];
-		sprintf(s_archivo1,"Datos_Opiniones_alfa=%.3f_Cdelta=%.3f_N=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,i_iteracion);
+		// Voy a abrir tres archivos. Uno para anotar la evolución de opiniones.
+		// El otro es del que voy a levantar mi matriz de Adyacencia
+		// El tercero es para levantar los datos de la Tabla_Valores_TANH
+		char s_archivo1[355];
+		// Estas líneas son gigantescamente largas porque tienen anotado todo el path para el lugar donde se van a guardar los archivos,
+		// y además lo archivos tienen que tener registro de bastantes datos importantes de la red. Ese registro por ahora lo vengo
+		// llevando en el nombre de los archivos, pero supongo que podría pensar en el futuro para pasar eso a un archivo separado
+		// que guarde junto a los archivos. Cuestión que esto hace que no sea necesario el usar el archivo de Bash Mover.sh
+		// Hay tres if porque cada uno corresponde a cada tipo de red en particular.
+		if(strcmp("Barabasi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/Barabasi/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("ErdosRenyi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/Erdos-Renyi/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("RandomR",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/Random Regulars/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+		
+		// Esto me va a levantar mi matriz de Adyacencia. Armé tres ifs para los casos dependiendo del tipo de red que vaya a usar.
+		char s_Mady[255];
+		if(strcmp("Barabasi",argv[2])==0) sprintf(s_Mady,"../Programas Python/MARE/Barabasi/%s_N=%d_Gm=%d_ID=%d.txt",argv[2],ps_datos->i_N, ps_datos->i_Gradomedio,ps_datos->i_ID);
+		if(strcmp("ErdosRenyi",argv[2])==0) sprintf(s_Mady,"../Programas Python/MARE/Erdos-Renyi/%s_N=%d_Gm=%d_ID=%d.txt",argv[2],ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID);
+		if(strcmp("RandomR",argv[2])==0) sprintf(s_Mady,"../Programas Python/MARE/Random Regulars/%s_N=%d_Gm=%d_ID=%d.txt",argv[2],ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID);
+		FILE *pa_Mady=fopen(s_Mady,"r"); // Con esto abro mi archivo y dirijo el puntero a él.
+		
+		
+		
+		// Este archivo levanta los datos de la tabla de valores de tanh calculados previamente.
+		char s_Tanh[100];
+		sprintf(s_Tanh,"Tabla_Valores_TANH");
+		FILE *pa_tabtanh=fopen(s_Tanh,"r");
+		
+		// Ahora que tengo el stream a la tabla de valores de tanh, malloqueo e inicializo mi vector donde guardo los valores.
+		ps_tab->i_largo = Largo_Tabla_TANH(pa_tabtanh);
+		
+		// Inicializo mi vector donde guardo los valores
+		ps_tab->pd_valores = (double*) malloc((ps_tab->i_largo+2)*sizeof(double));
+		for(register int i_i=0; i_i<ps_tab->i_largo+2; i_i++) ps_tab->pd_valores[i_i] = 0;
+		ps_tab->pd_valores[0] = 1;
+		ps_tab->pd_valores[1] = ps_tab->i_largo;
+		
+		//Guardo los valores y cierro el archivo.
+		Lectura_Tabla_TANH(ps_tab->pd_valores, pa_tabtanh);
+		fclose(pa_tabtanh);
+		
+		
 		
 		// Inicializo mis cinco "matrices".
 		// Matriz de Adyacencia. Es de tamaño N*N
@@ -90,27 +135,36 @@ int main(int argc, char *argv[]){
 		ps_red->i_agente2 = 0;
 		
 		// Puntero a la función que define mi ecuación diferencial
-		double (*pf_EcDin)(ps_Red var, ps_Param par) = &Din2;
+		double (*pf_EcDin)(ps_Red var, ps_Param par, ps_Tab tab) = &Din2;
 		
 	
 	// Genero las redes de mi sistema
 	GenerarOpi(ps_red,ps_datos); // Esto me inicializa mis vectores de opinión, asignándole a cada agente una opinión en cada tópico
 	GenerarAng(ps_red,ps_datos); // Esto me inicializa mi matriz de superposición, definiendo el solapamiento entre tópicos.
-	
-	// Me armo una red conexa, por eso voy a repetir el proceso de creación hasta que el tamaño de la componente gigante sea toda la red.
-	do{
-		GenerarAdy(ps_red,ps_datos); // Esto me inicializa mi matriz de adyacencia, creando las conexiones de mi red
-		i_tamaño = Tamaño_Comunidad(ps_red->pi_Ady,0);
+
+	// Levanto mi red conexa a partir de mi un archivo txt donde estaba armada previamente. Si hubo un error en 
+	// el levantar la red, hago que corte todo ahora y además ya habrá mandado un mensaje. Luego cierro mi archivo.
+	// Tengo un poco de duda sobre usar el goto, pero confío que todo está bien.
+	if(Lectura_Adyacencia(ps_red->pi_Ady,pa_Mady) == 1){
+		fclose(pa_Mady);
+		goto Final;
 	}
-	while(i_tamaño != ps_datos->i_N);
+	fclose(pa_Mady);
+	
+	//############################################################################################################
+	
+	// Hablando con Seba y Pablo, charlamos sobre que no era necesario guardar TODOS los datos, porque eso ocupa mucho espacios
+	// y tarda mucho tiempo. Por eso vamos a guardar sólo el estado final del sistema y la semilla. Por eso todo esto lo comento.
 	
 	// Anoto los valores de mis tres matrices en mi archivo de evolución de opiniones
-	fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
-	Escribir_i(ps_red->pi_Ady,pa_archivo1); // Matriz de Adyacencia
-	fprintf(pa_archivo1, "\tMatriz de Superposicion\n");
-	Escribir_d(ps_red->pd_Ang,pa_archivo1); // Matriz de Superposición
-	fprintf(pa_archivo1, "\tMatriz de Opiniones\n");
-	Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+	// fprintf(pa_archivo1, "\tMatriz de Adyacencia\n");
+	// Escribir_i(ps_red->pi_Ady,pa_archivo1); // Matriz de Adyacencia
+	// fprintf(pa_archivo1, "\tMatriz de Superposicion\n");
+	// Escribir_d(ps_red->pd_Ang,pa_archivo1); // Matriz de Superposición
+	// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+	fprintf(pa_archivo1, "\tVariacion Promedio\n");
+	
+	//############################################################################################################
 	
 	// Evolucionemos el sistema utilizando un mecanismo de corte
 	// Queda para el futuro ver si vale la pena meter esto en una sola función.
@@ -121,20 +175,22 @@ int main(int argc, char *argv[]){
 		// Evoluciono el sistema hasta que se cumpla el criterio de corte
 		do{
 			for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
-			Iteracion(ps_red,ps_datos,pf_EcDin);
-			Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
 		}
 		while(ps_red->d_Varprom > ps_datos->d_CritCorte);
 		
 		// Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
 		while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
 			for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
-			Iteracion(ps_red,ps_datos,pf_EcDin);
-			Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
 			i_contador +=1;
 		}
 		// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
@@ -142,12 +198,25 @@ int main(int argc, char *argv[]){
 		// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
 	}
 	
+	// Guardo los datos finales del sistema y la semilla
+	
+	fprintf(pa_archivo1, "\n");
+	fprintf(pa_archivo1, "\tEstado Final Matriz de Opiniones\n");
+	Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+	fprintf(pa_archivo1, "\tSemilla\n");
+	fprintf(pa_archivo1,"\t%ld\n",semilla);
+	
+	
+	Final:
+	
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
 	free(ps_red->pd_Ang);
 	free(ps_red->pi_Ady);
 	free(ps_red->pd_Opi);
 	free(ps_red->pd_PreOpi);
 	free(ps_red->pd_Diferencia);
+	free(ps_tab->pd_valores);
+	free(ps_tab);
 	free(ps_red);
 	free(ps_datos);
 	fclose(pa_archivo1);

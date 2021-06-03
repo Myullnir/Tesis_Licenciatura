@@ -15,20 +15,10 @@ una tabla bien grande y desde entonces simplemente la levante.
 Estas dos ideas sirven para reemplazar en la función Din1 el cálculo de la 
 tanh.
 
-.) En la función Din1 voy a poner un if para poder elegir el segundo agente
-de manera aleatoria, pero para que ese agente no sea el mismo que estoy
-iterando. Se me ocurrió armar una función que tome como input el número
-principal y el rango de valores en el cual se tiene que mover el número
-aleatorio. La idea es que la función arma una tira de números, que son
-todos los números en el rango menos el número principal, luego genera un
-número al azar que está dentro del rango menos uno, y lo que hace es ir a
-buscar al número que se encuentra en esa casilla aleatoria de la tira de
-números. De esta manera, sin usar un if, me aseguro que en una sola tirada
-aleatoria estoy eligiendo un número que es distinto al número principal.
-Implementando esto en la función Din1, lo que lograría es que el sistema
-no tenga que usar el if y que en un sólo intento genere el número que
-quiero, de manera que el agente principal interactúe con alguien que
-no es él mismo.
+.) En la función Din1 tengo un if metido que se encarga de reducir
+las cuentas al returnear un 0 si el elemento de la matriz de adyacencia
+es cero. Debería ver la forma de hacer que esto no sea un if, sino que
+resuelva el problema de una.
 
 .) En el archivo de Análisis Datos.ipynb fijate que en el módulo que
 usé para calcular Kmin y Kmax, estoy considerando a K entero. K por
@@ -48,9 +38,3 @@ de K que me encuentre en una lista. Convierto la lista a Set para
 eliminar las repeticiones. Después la vuelvo lista de nuevo.
 La ordeno. El primer elemento es el Kmin. El último elemento
 es el Kmax. La diferencia del primero con el segundo es el deltaK.
-
-.) Una forma de reduir el espacio ocupado con los datos es que no me guarde
-los valores de opiniones con precisión a 12 cifras, sino que sólo lo
-haga con precisión seis. Eso reduciría a la mitad el peso de los archivos.
-Me parece razonable, considerando que mi criterio de corte está dado para
-una variación promedio menor a 10^(-6)

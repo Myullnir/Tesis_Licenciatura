@@ -4,6 +4,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
+#include<string.h>
 #include "general.h"
 
 
@@ -27,7 +28,7 @@ double Gaussiana(float f_mu, float f_sigma){
 
 // Esta función me calcula la norma de un vector
 double Norma_d(double *pd_x){
-	// Defino mis variables iniciales que son el resultado final, la suma de los cuadrados y el tamaño de mi vector
+	// Defino mis variables iniciales que son el resultado final, la suma de los cuadrados y el tamao de mi vector
 	double d_norm,d_sum = 0;
 	int i_C,i_F;
 	i_F = *pd_x;
@@ -103,7 +104,7 @@ int Visualizar_i(int *pi_vec){
 // y uno del paso temporal siguiente me alcance para poder hacer una evolución sincrónica del sistema.
 // Fijate que la foto se ve intacta, porque en la línea antes de calcular el resultado final, vuelvo a reescribir
 // mi foto con el valor inicial que tenía, de manera de que esta foto entra y sale igual.
-double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par)){
+double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, ps_Tab ps_tab, double (*pf_funcion)(ps_Red ps_var, ps_Param ps_par, ps_Tab ps_tab)){
 	// Defino las variables y vectores que voy a necesitar
 	int i_F = (int) *pd_sistema; // Este es el número de filas del vector principal
 	int i_C = (int) *(pd_sistema+1); // Este es el número de columnas del vector principal
@@ -133,7 +134,7 @@ double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funci
 	for(register int i_j=0; i_j<4; i_j++){ // Esto itera para mis 4 k
 		// Calculo el elemento de la pendiente k(i_j+1)
 		for(register int i_i=0; i_i<i_F*i_C; i_i++) *(pd_sistema+i_i+2) = *(pd_inicial+i_i+2)+*(pd_pendientes+i_j+2)*DT[i_j];
-		*(pd_pendientes+i_j+1+2) = (*pf_funcion)(ps_var,ps_par);
+		*(pd_pendientes+i_j+1+2) = (*pf_funcion)(ps_var,ps_par,ps_tab);
 	}
 	
 	// Copio al sistema igual que el inicial para deshacer los cambios que hice en el vector principal al calcular los k
@@ -170,13 +171,13 @@ double RK4(double *pd_sistema ,ps_Red ps_var, ps_Param ps_par, double (*pf_funci
 
 // Esta función va a recibir un vector double y va a escribir ese vector en mi archivo.
 int Escribir_d(double *pd_vec, FILE *pa_archivo){
-	// Defino las variables del tamaño de mi vector
+	// Defino las variables del tamao de mi vector
 	int i_C,i_F;
 	i_F = *pd_vec;
 	i_C = *(pd_vec+1);
 	
 	// Ahora printeo todo el vector en mi archivo
-	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%.12lf",*(pd_vec+i_i+2));
+	for(register int i_i=0; i_i<i_C*i_F; i_i++) fprintf(pa_archivo,"\t%.6lf",*(pd_vec+i_i+2));
 	fprintf(pa_archivo,"\n");
 	
 	return 0;
@@ -184,7 +185,7 @@ int Escribir_d(double *pd_vec, FILE *pa_archivo){
 
 // Esta función va a recibir un vector int y va a escribir ese vector en mi archivo.
 int Escribir_i(int *pi_vec, FILE *pa_archivo){
-	// Defino las variables del tamaño de mi vector
+	// Defino las variables del tamao de mi vector
 	int i_C,i_F;
 	i_F = *pi_vec;
 	i_C = *(pi_vec+1);
@@ -196,12 +197,12 @@ int Escribir_i(int *pi_vec, FILE *pa_archivo){
 	return 0;
 }
 
-// Esta función me mide el tamaño del grupo al cual pertenece el nodo inicial: i_inicial
-int Tamaño_Comunidad(int *pi_adyacencia, int i_inicial){
-	// Defino la variable del tamaño del grupo, el número de filas de la matriz de Adyacencia, el número de agentes
+// Esta función me mide el tamao del grupo al cual pertenece el nodo inicial: i_inicial
+int Tamao_Comunidad(int *pi_adyacencia, int i_inicial){
+	// Defino la variable del tamao del grupo, el número de filas de la matriz de Adyacencia, el número de agentes
 	// restantes por visitar; y los inicializo
-	int i_tamaño, i_F, i_restantes;
-	i_tamaño = 0;
+	int i_tamao, i_F, i_restantes;
+	i_tamao = 0;
 	i_F = *pi_adyacencia;
 	i_restantes = 0;
 	
@@ -213,7 +214,7 @@ int Tamaño_Comunidad(int *pi_adyacencia, int i_inicial){
 	*(pi_Grupo+1) = i_F;
 	for(register int i_i=0; i_i<i_F; i_i++) *(pi_Grupo+i_i+2) = 0;
 	
-	// Defino un puntero que me marque los nuevos sujetos que visitar. Lo hago de tamaño i_F para poder asignar un 1 al visitar el agente en cada posición correcta.
+	// Defino un puntero que me marque los nuevos sujetos que visitar. Lo hago de tamao i_F para poder asignar un 1 al visitar el agente en cada posición correcta.
 	int *pi_Visitar;
 	pi_Visitar = (int*) malloc((2+i_F)*sizeof(int));
 	
@@ -250,25 +251,25 @@ int Tamaño_Comunidad(int *pi_adyacencia, int i_inicial){
 	}
 	while(i_restantes > 0);
 	
-	// Finalmente mido el tamaño de mi grupo
-	for(register int i_i=0; i_i<i_F; i_i++) i_tamaño += *(pi_Grupo+i_i+2);
+	// Finalmente mido el tamao de mi grupo
+	for(register int i_i=0; i_i<i_F; i_i++) i_tamao += *(pi_Grupo+i_i+2);
 	
 	// Libero las memorias malloqueadas
 	free(pi_Grupo);
 	free(pi_Visitar);
 	
-	return i_tamaño;
+	return i_tamao;
 }
 
 // Esta función me calcula la diferencia entre dos vectores
 int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
-	// Compruebo primero que mis dos vectores sean iguales en tamaño
+	// Compruebo primero que mis dos vectores sean iguales en tamao
 	if(*pd_x1!=*pd_x2 || *(pd_x1+1)!=*(pd_x2+1) || *pd_x1!=*pd_Dx || *(pd_x1+1)!=*(pd_Dx+1)){
-		printf("Los vectores son de tamaños distintos, no puedo restarlos\n");
+		printf("Los vectores son de tamaos distintos, no puedo restarlos\n");
 		return 0;
 	}
 	
-	// Defino las variables de tamaño de mis vectores
+	// Defino las variables de tamao de mis vectores
 	int i_C,i_F;
 	i_F = *pd_x1;
 	i_C = *(pd_x1+1);
@@ -280,3 +281,51 @@ int Delta_Vec_d(double *pd_x1, double *pd_x2, double *pd_Dx){
 	return 0;
 }
 
+
+// // Me defino funciones de máximo y mínimo
+double Max(double d_a, double d_b){
+	// Defino la variable a usar
+	double d_max = 0;
+	
+	d_max = (d_a > d_b)? d_a : d_b; // Uso un operador ternario. La idea es que se evalúa la función antes del
+	// signo de pregunta. Si es verdadera, se devuelve lo que está a la izquierda de los dos puntos.
+	// Sino se devuelve lo que está a la derecha
+	
+	return d_max;
+}
+
+double Min(double d_a, double d_b){
+	// Defino la variable a usar
+	double d_min = 0;
+	
+	d_min = (d_a < d_b)? d_a : d_b; // Uso un operador ternario. La idea es que se evalúa la función antes del
+	// signo de pregunta. Si es verdadera, se devuelve lo que está a la izquierda de los dos puntos.
+	// Sino se devuelve lo que está a la derecha
+	
+	return d_min;
+}
+
+
+// Esta función toma dos valores de "y" y uno de "x" y los usa para interpolar
+// el valor y que le corresponde al argumento x que es el elemento final que se le
+// pasa a esta función. En principio esta función sirve para interpolar funciones en
+// general y no únicamente a la TANH, pero para usarla con otras funciones se necesitar
+// modificar el valor de d_deltax según el paso con el que fue armada la tabla de datos
+// de la cual se extraen las "y" usadas para interpolar. El motivo de no usar dos valores
+// de "x" para definir el d_deltax es porque podría ocurrir que los "x" sean iguales ya que
+// el argumento d_x es un valor sobre el cual se calculo un dato de la tabla. Eso llevaría abort
+// que el programa haga una división por cero y eso sería un grave problema. En el futuro se
+// pueden intentar buscar soluciones, del tipo de modificar el valor de d_x2 de manera artificial
+// desde afuera, de forma de que el d_deltax no sea nunca cero. Total, una vez obtenido
+// d_y2, no necesito respetar el valor de índice i_i2 obtenido antes. Al final, el d_x2
+// sólamente tendría el propósito de definir correctametne el d_deltax
+double Interpolacion(double d_y1, double d_y2,double d_x1,double d_x){
+	// Defino las variables que voy a necesitar
+	double d_resultado = 0;
+	double d_deltax = 0.00001;
+	double d_deltay = d_y2-d_y1;
+	
+	d_resultado = (d_deltay/d_deltax)*d_x+d_y1+(-d_deltay/d_deltax)*d_x1; // Esta es la cuenta de la interpolación
+	
+	return d_resultado;
+}

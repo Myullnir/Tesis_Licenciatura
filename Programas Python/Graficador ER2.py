@@ -231,7 +231,7 @@ Conjunto_N.sort()
 
 #--------------------------------------------------------------------------------------------
 
-# Voy a armar un diccionar que contenga las listas de los nombres de los archivos asociados
+# Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
 # a un cierto N, Alfa y Cdelta. Me armo primero el superdiccionario, que es el diccionario,
 # que contiene diccionarios, que llevan a diccionario que llevan a las listas de los nombres
 # de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa
