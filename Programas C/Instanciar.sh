@@ -9,29 +9,21 @@ make all
 echo Apreta enter para correr, sino primero apreta alguna letra y despues enter
 read decision
 
-Redes='RandomR'
-
 if [ -z $decision ]
 then
 	for N in 1000
 	do
-		for Red in $Redes
+		for Alfa in 9
 		do
-			for Alfa in {0..20}
+			for Cdelta in 2
 			do
-				for Cdelta in {0..10}
-				do
-					for Gm in {4..16..4}
-					do
-						echo Alfa = $Alfa, Cdelta = $Cdelta, Red = $Red, Gm = $Gm
-						for iteracion in {0..10}
-						do 
-							./$1.e $N $Red $Alfa $Cdelta $Gm $iteracion
-						done
-					done
+				echo Alfa = $Alfa, Cdelta = $Cdelta
+				for iteracion in {0..10}
+				do 
+					./$1.e $N $Red $Alfa $Cdelta $iteracion
 				done
 			done
-		done
+			done
 	done
 	
 	# ./Mover.sh

@@ -3227,4 +3227,59 @@ tantas satisfacciones.
 
 03/06/2021
 
-Hago la suba de archivos a Github.
+Hago la suba de archivos a Github. Probé usar el scipy.stats que me dijo Sebas,
+pero no lo pude ahcer funcar. Voy a probar la función que propuse yo por ahora y 
+veré si con eso lo puedo hacer correr.
+
+Al final la función que yo propuse no funcionó y no supimos como adaptar el código
+de scipy.stats para que funque, así que Sebas me dió una mano para armar una función
+que asigne la actividad de forma correcta.
+
+----------------------------------------------------------------------------------------------
+
+06/06/2021
+
+Voy a armar la función que crea la matriz de Adyacencia en cada paso temporal.
+La idea de esta función es que reciba la matriz de Adyacencia, la limpie totalmente,
+luego active uno por uno a los agentes y a los que active conectarlos mediante
+una segunda función. La función está casi terminada, aunque igual queda probarla.
+Si funciona ya puedo mandar a correr algunos estados para ver qué ocurre, cuanto
+tardan y cómo quedan.
+
+---------------------------------------------------------------------------------------------
+
+07/06/2021
+
+Terminé la función que arma las redes según valores de actividad. La realice con
+el criterio de que cada nodo que se activa forme m nuevos enlaces, siendo que 
+no se puedan repetir enlaces con nodos previos. Había un error en un punto
+en el que no estaba reduciendo correctamente el vector con agentes disponibles,
+pero eso ya se arregló y parece funcionar perfecto.
+
+Ahora tengo que hacer lo siguiente:
+1) Armar la carpeta donde voy a guardar los nuevos resultados.
+2) Pasar el código de Prosem a Archivo.c
+3) Guardar el código de src en Programas.
+4) Actualizar el archivo de Documentos.
+5) Implementar esto en el programa main
+6) Mandar a correr el programa como para ver cuánto tarda
+7) Subir todo a GitHub
+8) Preparar el archivo py que debería armar los gráficos
+
+Realizados: 1); 2); 3); 4); 
+
+-----------------------------------------------------------------------------------------------
+
+08/06/2021
+
+Continúo con lo de ayer, ya realicé el 5) y el 6)
+Hagamos el 7 y salteemos el 8 por ahora así preparamos cosas de la 
+presentación.
+
+Entre cosas, cabe mencionar que el programa parece estar teniendo
+problemas para llegar a la solución del sistema en el caso de alfa = 0,9
+y Cdelta = 0,2. Según mis cuentas se encuentra cerca del alfa crítico.
+Me parece que la aleatoriedad con la que se arman las redes hace
+que la competencia entre caer al cero y polarizar se vuelva mucho
+más extensa.
+

@@ -178,3 +178,28 @@ escribía los datos iniciales importantes y desde ahí empezaba a evolucionar
 el sistema usando un correspondiente método de RK4. Cuando veía que el sistema
 variaba las opiniones de los sujetos en promedio una cantidad menor a 
 10^(-6), entonces cortaba, cerraba todo y listo.
+
+-----------------------------------------------------------------------------------
+
+07/06/2021
+
+En la carpeta Redes Estáticas está el código que usé para armar los datos
+que tomaban las matrices de Adyacencia a partir de archivos externos.
+Estos archivos externos habían sido armados usando el networkx de Python.
+Los tipos de redes creados eran: Erdos-Renyi, Random Regulars y Barabasi.
+En total eran 20 redes distintas para cada tipo, las cuales se encuentran
+en la carpeta MARE (Matrices Adyacencia Redes Estáticas). El programa
+realiza las cuentas iterando el sistema tal cual el anterior y guarda
+la semilla inicial, las Variaciones Promedio calculadas en cada paso y
+el estado final de las opiniones del sistema.
+
+Lo usé para trabajar redes con N=1000, grado medio que variaba entre
+4,8,12 y 16, dt=0,01, Criterio de Corte igual a 10^(-4), Influencia Social
+igual a 1 y Máximo de opiniones iniciales igual a 3. El Alfa varió
+entre 0 y 4 de a 0,1, mientras que el coseno(delta) varió entre -0,5 y 1
+de a 0,1. Todo esto lo hice con 100 iteraciones para cada punto del ensamble
+calculándolo en las computadoras de Oporto. Todavía tengo que ponerme a hacer
+un barrido fino. En la pc tengo también algunos archivos obtenidos con este
+programa que planeo usar para probar simplemente el armado de los gráficos.
+Después tengo que armar los gráficos desde Oporto y traerlos. O traer
+los archivos y graficar acá, lo que sea más rápido.

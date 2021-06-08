@@ -15,7 +15,6 @@ typedef struct Red{
 	double *pd_Diferencia; // Vector que guarda las diferencias entre PreOpi y Opi.
 	double *pd_Opi; // Vector de opinión de cada individuo
 	double *pd_Ang; // Matriz de superposición entre tópicos. Tiene tamaño T*T
-	double *pd_Act; // Vector de Actividad de cada agente.
 	int *pi_Ady; // Matriz de adyacencia que define mis conexiones. Tiene tamaño N*N
 	int i_agente; // Entero que representa el agente que estoy mirando. Es un valor que va entre 0 y N-1
 	int i_agente2; // Este es el segundo agente con el cual se pone en contacto el primero.
@@ -30,15 +29,12 @@ typedef s_Red *ps_Red;
 typedef struct Parametros{
 	double d_NormDif; // Este es el factor de normalización de la Variación Promedio.
 	double d_CritCorte; // Este número es el piso que tiene que cruzar el Varprom para que se corte la iteración
-	double d_epsilon; // Actividad mínima de los agentes
-	double d_gamma; // Potencia de la distribución de probabilidades de la actividad. Es el valor positivo.
 	// float f_Beta; // Exponente que regula el grado de homofilia
 	float f_K; // Influencia social
 	float f_alfa; // Controversialidad de los temas
 	float f_dt; // Paso temporal de iteración del sistema
 	float f_Cosangulo; // Este es el coseno del ángulo entre los tópicos.
 	int i_Gradomedio; // Este es el grado medio de los agentes de la red.
-	int i_m; // Esto sería el número de conexiones que haría para cada agente que se activa.
 	int i_N; // Número de agentes en la red
 	int i_T; // Cantidad de tópicos
 	int i_Mopi; // Máximo inicial de opiniones
