@@ -34,19 +34,22 @@ int main(int argc, char *argv[]){
 		ps_datos->i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		ps_datos->i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		ps_datos->i_m = 10; // Cantidad de conexiones que hace el agente al activarse
-		ps_datos->f_K = 1; // Influencia social
-		ps_datos->f_dt = 0.1; // Paso temporal de iteración del sistema
+		ps_datos->f_K = 3; // Influencia social
+		ps_datos->f_dt = 0.01; // Paso temporal de iteración del sistema
 		ps_datos->f_alfa = strtof(argv[2],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		ps_datos->i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la variación promedio de las opiniones.
 		ps_datos->d_epsilon = 0.01; // Mínimo valor de actividad de los agentes
-		ps_datos->d_gamma = 2.1; // 
+		ps_datos->d_gamma = 2.1; // Esta es la potencia que define la distribución de actividad
+		ps_datos->d_beta = 3; // Esta es la potencia que determina el grado de homofilia.
 		ps_datos->d_CritCorte = 0.001; // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
-		ps_datos->i_Itextra = 20; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		ps_datos->i_Itextra = 50; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
 		ps_datos->f_Cosangulo = strtof(argv[3],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
 		
 		// Estos son unas variables que si bien podrían ir en el puntero red, son un poco ambiguas y no vale la pena pasarlas a un struct.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
+		int i_renovar_Adyacencia = (int) (1/ps_datos->f_dt); // Este número es la cantidad de veces que itero el sistema antes de renovar la matriz de Adyacencia
+		int i_contador_Adyacencia = 0; // Esta variable lleva el control de cantidad de veces que iteré el sistema y cada vez que alcanzo un paso temporal discreto, renueva la matriz de Adyacencia
 		int i_iteracion = strtol(argv[4],NULL,10); // Número de instancia de la simulación.
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes.
@@ -132,7 +135,6 @@ int main(int argc, char *argv[]){
 	// Acá tengo que poner la inicialización de los valores de Actividad
 	Actividad(ps_red->pd_Act,ps_datos->d_epsilon,-ps_datos->d_gamma);
 
-	
 	// Evolucionemos el sistema utilizando un mecanismo de corte
 	// Queda para el futuro ver si vale la pena meter esto en una sola función.
 	fprintf(pa_archivo1, "\tVariacion Promedio\n");
@@ -143,9 +145,13 @@ int main(int argc, char *argv[]){
 		
 		// Evoluciono el sistema hasta que se cumpla el criterio de corte
 		do{
-			Adyacencia_Actividad(ps_red, ps_datos);
+			if(i_contador_Adyacencia%i_renovar_Adyacencia==0){
+				Adyacencia_Actividad(ps_red, ps_datos);
+			}
+			if(i_contador_Adyacencia%(i_renovar_Adyacencia*100)==0) printf("El contador va %d\n", i_contador_Adyacencia);
 			for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			i_contador_Adyacencia++;
 			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
@@ -155,14 +161,19 @@ int main(int argc, char *argv[]){
 		
 		// Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
 		while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
-			Adyacencia_Actividad(ps_red, ps_datos);
+			if(i_contador_Adyacencia%(i_renovar_Adyacencia)==0){
+				Adyacencia_Actividad(ps_red, ps_datos);
+				printf("Rearme la matriz de Adyacencia\n");
+				printf("El contador va %d\n", i_contador_Adyacencia);
+			}
 			for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			i_contador_Adyacencia++;
 			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
 			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
-			i_contador +=1;
+			i_contador += 1;
 		}
 		// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
 		// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.

@@ -3283,3 +3283,186 @@ Me parece que la aleatoriedad con la que se arman las redes hace
 que la competencia entre caer al cero y polarizar se vuelva mucho
 más extensa.
 
+Ya subí todo a Github. Ahora me queda seguir con lo de la presentación.
+Hablando con Pablo y Sebas el tema de que el sistema no convergía a nada lo
+vamos a intentar resolver proponiendo que la red se actualice por cada 
+paso temporal discreto. Bueno, ahí lo mandé a correr, veamos que tal
+resulta esto.
+
+Por otra parte, ya que hoy se termina de correr lo que mandé sobre las
+Redes Estáticas en Oporto y no voy a poder esta semana ponerme
+a armar los gráficos al respecto, lo mejor va a ser que el sistema
+arme algunas listas extra, como para aprovechar el tiempo y no tener
+la máquina parada. Ya tengo valores de Cos(delta) entre -0,5 y 1 de a 0,1,
+Grados medios entre 4 y 16 de a 4, Alfas entre 0 y 4 de a 0,1 y todo con
+60 iteraciones para redes de Barabasi, Erdos-Renyi y Random Regulars. Ahora
+lo que voy a hacer es un barrido más fino entre Alfa 0 y 0,2, de a 0,01.
+Eso significa calcular para Alfa entre 0,01 y 0,09 + 0,11 y 0,19. En total
+eso son 18 alfas. Si lo separo en 6 programas, eso significan tres alfas
+para cada uno. Suena bien.
+
+--------------------------------------------------------------------------------
+
+15/06/2021
+
+Ayer hubo un corte de luz en la Facultad, así que lo que había mandado a correr
+se cortó. Por suerte sólo faltaba el tema de las redes Random. Así que ahora las
+mandé a correr esas y listo.
+
+Lo que creo que debería hacer de acá a la siguiente semana es armar el programa que 
+calcula la probabilidad de juntar agentes según homofilia y luego el programa
+de Python que realiza los gráficos necesarios.
+
+----------------------------------------------------------------------------
+
+18/16/2021
+
+Hoy estuve (muy lentamente) trabajando en una función que se encargue
+de calcular la probabilidad de interacción de dos agentes dada la homofilia entre ellos.
+La cosa trabaja, pero todavía no estoy seguro que las cuentas estén bien hechas,
+eso tengo que revisarlo mañana con más detalle. En Python armé un programa
+para poder calcular estas probabilidades más al detalle.
+Veré de ir usando más elementos de control para ver que esté todo bien.
+
+---------------------------------------------------------------------------------
+
+20/06/2021
+
+Revisé mejor la función que calcula probabilidades. Al final el problema no era cómo
+calculaba los valores, sino que cuando avisaba a cuales agentes conectaba y cosas,
+los números que decía que conectaba no eran los correctos.
+Lo revisé con el programa que hice en Python y haciendo algunas cuentas en la calculadora.
+Por lo visto, funciona perfecto ahora, la distancia entre agentes se calcula bien y la
+probabilidad también. El factor de Normalización está comprobado con Python, no lo hice
+yo a mano porque eso era un re bardo.
+En el código hice una modificación a la generación de opiniones para que los valores
+de opiniones sean enteros, así me resultaba más fácil el traspasar los datos a
+Python y hacer las cuentas. Esta modificación no está en la función principal.
+
+Ahora lo que tengo que hacer entonces es pasar el programa a Archivo.c para guardarlo
+y documentarlo correctamente. Luego implementar la función en el archivo principal y ya
+mandar a correr un barrido grueso del sistema con los datos de Baumann, haré ensambles de
+5 elementos sólo para probarlo y veremos que tal sale. Terminado eso ya sí me tengo
+que poner a armar los archivos de Python que correctamente me armen mis figuras con
+los datos de RE y después leer alguno de los papers que Pablo me pasó.
+
+El programa está funcionando. Cabe preguntarse si funciona bien, pero eso lo veremos
+más tarde. Ahora, está teniendo el problema de que tarda mucho en armar la matriz
+de Adyacencia. Al final lo que temía está ocurriendo. El sistema puede tardar mucho tiempo
+en armar las conexiones. Eso puede ser porque hay pocos agentes con probabilidad útil
+para conectarse, o directamente porque no los hay porque están todos lejos entonces
+tarda mucho en conectar. Se me ocurre que una forma de acelerar esto es que en vez
+de a lo bruto lanzar muchas veces la moneda hasta que uno logre conectarse, lo mejor es
+lanzar la moneda una sóla vez, realizar algunas cuentas extras pero necesarias y listo.
+Escribamos la idea y después pasémosla al Powerpoint.
+
+Ya tengo una idea anotada sobre qué hacer. Me dejaré para hacer eso para la otra semana.
+Ya mañana me pondré a hacer lo del archivo Python y el martes armaré en el Drive
+mi idea sobre lo que planeo hacer con la implementación de la homofilia para reducir
+tiempos.
+
+-------------------------------------------------------------------------------------
+
+21/06/2021
+
+Voy a armar los archivos de Python que me crean los gráficos para redes estáticas.
+Estos archivos tienen que levantar todos los nombres de los archivos y graficar
+8 tipos de gráficos distintos. Por tanto requiero 8 archivos distintos. Los voy
+a poner en una carpeta propia.
+
+Ya armé el código que fabrica el superdiccionario, así que ya eso es el paso clave.
+Ahora voy a usar esto en la base de todos los códigos para armar todos los gráficos.
+
+----------------------------------------------------------------------------------------
+
+23/06/2021
+
+Hablando con Pablo ayer entonces decidimos por ahora al hacer las TdO no graficar
+los valores normalizados sino graficar los valores por lo que dan. El programa
+de graficación ya está bastante bien, aunque el algoritmo de detección del estado
+final está teniendo algunas fallas. Le surgen situaciones donde por uno o dos
+puntos levemente corridos de la diagonal, el código detecta polarización cuando 
+claramente se trata de un estado ideológico. Así que habrá que ver cómo tomar
+en consideración si el resultado final es ideológico o Polarización.
+
+Se me ocurren dos ideas. La primera es darle un cierto peso a los distintos
+estados, de manera de que si solo unos pocos sujetos son de polarización entonces
+no los tome en cuenta. Eso no suena muy simple.
+
+La otra, más rápido y que creo funcionaría igual de bien, es aplicar esto según
+cada una de las iteraciones, de manera de que califique a cada iteración como Ideológico
+o Polarización y de ahí luego haga un promedio. Eso debería ser más útil.
+
+-------------------------------------------------------------------------------------
+
+25/06/2021
+
+Estuve armando el código para acelerar el proceso de selección de agentes
+en el armado de la red de actividad. Para esto la idea es meter dos
+nuevos punteros que guardan los valores de distancia^-beta y de probabilidades
+de los agentes. La idea es considerar que a cada agente le doy una cantidad
+de rifas de manera tal que esa cantidad de rifas representa la probabilidad
+de que cada uno sea seleccionado. Esa cantidad de rifas se representa
+por una región del intervalo [0,1]. De esta manera, lanzo un número
+random una única vez y luego reviso dónde cayó (Es decir, qué número
+de la lotería salió) y lo asigno al agente que le correspondía ese lugar.
+Luego, saco ese agente del puntero de distancias al poner su distancia en
+cero y lo saco del puntero de probabilidades al poner su probabilidad de
+conexión en cero. Lo segundo sirve para que no vuelva a tocar como posible
+conexión. Lo primero sirve porque voy a querer recalcular el factor de
+Normalización cada vez que saque a un agente del grupo ya que al irse
+él se lleva su probabilidad, entonces queda una franja vacía que no
+le pertenece a nadie. Eso significa que si el número Random cayera ahí,
+no podría asignar el lugar a nadie y el programa llegaría a un freno.
+
+Ahí lo probé, el programa funciona bárbaro. Probé sumar las probabilidades
+y dan 1. No probé casos de agentes cuya distancia sea cero. Hagamos eso.
+Si esto funciona bien, el programa está perfecto y ya mañana lo puedo implementar tranca.
+Ya probé eso y funciona perfecto. También estuve mirando las probabilidades
+para ver que efectivamente lo que el programa esté haciendo tenga sentido.
+Lo que vi es que justamente luego de remover a un agente de la lista de posibles
+sorteados, el nuevo cálculo de probabilidades actualiza las probabilidades de
+los agentes básicamente considerando cuál es su probabilidad dado que el rango
+cambió. Volviendo al caso de las rifas, si había 100 números y el primer agente
+en irse tenía 30 rifas, entonces ahora quedan 70 rifas. Por tanto, el que tenía
+10 números, cuando había 100 rifas tenía una probabilidad de 0,1 de ser ganador,
+pero ahora que hay 70 rifas su probabilidad es 1/7. Esa es la forma en
+que esto va cambiando. Por lo que estoy viendo, este no es un proceso
+de probabilidades independientes. Por el contrario, las probabilidades
+de que el sujeto sea seleccionado en segunda o tercera vuelta dependen
+de quiénes se vayan en primera y segunda vuelta. Consultar si esto
+puede ser un problema.
+
+También de paso mandé a correr hasta terminar el armado de imágenes para los
+casos de redes de Random Regulars. La verdad que los gráficos de estados final
+en el espacio de Parámetros se ven bastante bien en este caso.
+
+.) Mañana tendré que hacer el tema de volver un poco más robusto el reconocimiento
+de casos de Consenso y demás. Y la burocracia Infernal.
+
+Veamos si llego hoy a implementar el código que acelera el proceso
+de selección de agentes en el código principal.
+
+--------------------------------------------------------------------------------------
+
+27/06/2021
+
+La implementación del código que acelera la selección de agentes funciona bien.
+Aunque sigo con el problema de que el sistema no converge a nada para 
+los casos de Polarización. Me pasa con Alfa 0,2 y de ahí para arriba.
+La situación es que la red es muy esparsa y cambiante como para que
+el sistema pueda converger a una solución, por lo que se queda oscilando infinitamente.
+Esto es una gran cagada, porque no puedo resolver una única iteración del problema,
+ni hablemos de lograr que corra un ensamble. Probé reducir el dt como para que
+la variación promedio baje, pero eso no afectó. El resto de los parámetros los
+tengo tal cual como baumann, por lo que no entiendo cómo es que a él el sistema
+le converge y a mí no.
+
+También probé con aumentar el tiempo que la red de actividad se mantiene armada.
+Eso sólo logró reemplazar el problema al tener una red cuasi fija. No creo que sea
+el camino. Vamos a mirar los parámetros específicos que usa Baumann, después voy a
+ponerme con la Burocracia Infernal y si me queda tiempo ya miraré el archivo
+
+Ví que me faltaba poner el K=3 para que mis parámetros sean exactamente los mismos
+que Baumann. Aún así, dudo que eso alcance para que el sistema converja correctamente.
+

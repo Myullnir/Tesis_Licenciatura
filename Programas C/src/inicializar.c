@@ -117,21 +117,26 @@ int Adyacencia_Actividad(ps_Red ps_red, ps_Param ps_datos){
 	for(register int i_i=0; i_i<i_F*i_C; i_i++) ps_red->pi_Ady[i_i+2] = 0;
 	
 	// Ahora reviso todos los agentes, los intento activar y si se activa lo conecto con m agentes.
-	for(ps_red->i_agente=0; ps_red->i_agente<i_F; ps_red->i_agente++) if(Random()<ps_red->pd_Act[ps_red->i_agente+2]){
-		Conectar_agentes(ps_red, ps_datos->i_m);
-	}
+	for(ps_red->i_agente=0; ps_red->i_agente<i_F; ps_red->i_agente++) if(Random()<ps_red->pd_Act[ps_red->i_agente+2]) Conectar_agentes(ps_red,ps_datos);
 	
 	return 0;
 }
 
 
 // Esta función recibe la matriz de Adyacencia y el agente, y lo conecta con m agentes.
-int Conectar_agentes(ps_Red ps_red, int i_m){
-	// Defino las variables del tamaño de la matriz y un vector que voy a usar para samplear elementos. Inicializo el vector
-	int i_F,i_C, i_indice;
+int Conectar_agentes(ps_Red ps_red, ps_Param ps_datos){
+	// Defino las variables del tamaño de la matriz y otras que voy a usar
+	int i_F,i_C, i_indice, i_libres;
 	i_indice = 0;
+	i_libres = 0;
 	i_F = ps_red->pi_Ady[0];
 	i_C = ps_red->pi_Ady[1];
+	double d_distancia = 0; // Este es el valor escalar de distancia entre dos opiniones
+	double d_probacumulada = 0; // Esta es la probabilidad acumulada de los agentes
+	double d_proba = 0; // Esta es la probabilidad que lanzo una sola vez
+	
+	
+	// Armo un vector que voy a usar para samplear elementos y lo inicializo
 	int* pi_agentes_libres;
 	pi_agentes_libres = (int*) malloc((i_C+2)*sizeof(int));
 	*pi_agentes_libres = 1;
@@ -143,36 +148,106 @@ int Conectar_agentes(ps_Red ps_red, int i_m){
 	// de i_i = ps_red->i_agente
 	for(register int i_i=0; i_i<ps_red->i_agente; i_i++){
 		if(ps_red->pi_Ady[ps_red->i_agente*i_F+i_i+2]==0){
-			*(pi_agentes_libres+i_indice+2) = i_i;
-			i_indice++;
+			*(pi_agentes_libres+i_libres+2) = i_i;
+			i_libres++;
 		}
 	}
 	
 	for(register int i_i=ps_red->i_agente+1; i_i<i_C; i_i++){
 		if(ps_red->pi_Ady[ps_red->i_agente*i_F+i_i+2]==0){
-			*(pi_agentes_libres+i_indice+2) = i_i;
-			i_indice++;
+			*(pi_agentes_libres+i_libres+2) = i_i;
+			i_libres++;
 		}
 	}
 	
-	// Ahora sampleo m agentes de esta lista. ¿Podría pasar que un agente no tenga 10 sujetos con los
-	// cuales conectarse? Eso requeriría que tenga un grado de 990 para arrancar. Muy poco probable.
-	// Igual después armo una solución para ese caso.
-	if(i_indice>9){
-		for(register int i_i=0; i_i<i_m; i_i++){
-			ps_red->i_agente2 = rand()%i_indice;
-			ps_red->pi_Ady[ps_red->i_agente*i_F+*(pi_agentes_libres+ps_red->i_agente2+2)+2] = 1;
-			ps_red->pi_Ady[*(pi_agentes_libres+ps_red->i_agente2+2)*i_F+ps_red->i_agente+2] = 1; // Esto se encarga de marcar al sujeto simétrico
-			for(register int i_j=ps_red->i_agente2; i_j<*(pi_agentes_libres+1)-1; i_j++) *(pi_agentes_libres+i_j+2) =  *(pi_agentes_libres+i_j+1+2);
-			i_indice--;
+	
+	// Armo un vector para ver la diferencia entre opiniones. Este vector lo voy a usar primero para calcular la
+	// distancia entre agentes y con eso hallar el factor de normalización y sus probabilidades de conexión
+	double* pd_DifOpi;
+	pd_DifOpi = (double*) malloc((ps_datos->i_T+2)*sizeof(double));
+	*pd_DifOpi = 1;
+	*(pd_DifOpi+1) = ps_datos->i_T;
+	for(register int i_i=0; i_i<ps_datos->i_T; i_i++) *(pd_DifOpi+i_i+2) = 0;
+	
+	
+	// Voy a armar dos vectores más acá el primero es el de Distbeta, el cual me guarda
+	// la distancia de cada agente con el agente ps_red->i_agente elevada a la menos beta.
+	// El segundo ya toma el valor de normalización y a cada una de estas distancias las normaliza
+	// para obtener la probabilidad de interacción por homofilia.
+	double* pd_distbeta;
+	pd_distbeta = (double*) malloc((ps_datos->i_N+2)*sizeof(double));
+	*pd_distbeta = 1;
+	*(pd_distbeta+1) = ps_datos->i_N;
+	for(register int i_i=0; i_i<ps_datos->i_N; i_i++) *(pd_distbeta+i_i+2) = 0;
+	
+	double* pd_probabilidades;
+	pd_probabilidades = (double*) malloc((ps_datos->i_N+2)*sizeof(double));
+	*pd_probabilidades = 1;
+	*(pd_probabilidades+1) = ps_datos->i_N;
+	for(register int i_i=0; i_i<ps_datos->i_N; i_i++) *(pd_probabilidades+i_i+2) = 0;
+	
+	
+	// Calculo todas las distancias y el factor de normalizacion
+	double d_normalizacionP = 0;
+	for(register int i_i=0; i_i<i_libres; i_i++){
+		i_indice = *(pi_agentes_libres+i_i+2);
+		for(register int i_j=0; i_j<ps_datos->i_T; i_j++) *(pd_DifOpi+i_j+2) = ps_red->pd_Opi[ps_red->i_agente*ps_datos->i_T+i_j+2]-ps_red->pd_Opi[i_indice*ps_datos->i_T+i_j+2];
+		d_distancia = Norma_d(pd_DifOpi);
+		if(d_distancia>0) *(pd_distbeta+i_indice+2) = pow(d_distancia,-ps_datos->d_beta);
+		else *(pd_distbeta+i_indice+2) = 0;
+	}
+	for(register int i_i=0; i_i<ps_datos->i_N; i_i++) d_normalizacionP += *(pd_distbeta+i_i+2); // Esta línea me calcula el factor de normalización
+	
+	// // Ahora calculo las probabilidades
+	for(register int i_i=0; i_i<i_libres; i_i++){
+		i_indice = *(pi_agentes_libres+i_i+2);
+		for(register int i_j=0; i_j<ps_datos->i_T; i_j++) *(pd_DifOpi+i_j+2) = ps_red->pd_Opi[ps_red->i_agente*ps_datos->i_T+i_j+2]-ps_red->pd_Opi[i_indice*ps_datos->i_T+i_j+2];
+		d_distancia = Norma_d(pd_DifOpi);
+		if(d_distancia>0) *(pd_probabilidades+i_indice+2) = *(pd_distbeta+i_indice+2)/d_normalizacionP;
+		else *(pd_probabilidades+i_indice+2) = 1;
+	}
+	
+	
+	// Ahora sampleo m agentes de esta lista
+	if(i_libres>ps_datos->i_m){
+		int i_contador = 0;
+		while(i_contador<ps_datos->i_m){
+			i_indice = 0;
+			d_proba = Random();
+			d_probacumulada = *(pd_probabilidades+2);
+			// Defino cuál es el agente que se conecta
+			while(d_proba>d_probacumulada){
+				i_indice++;
+				d_probacumulada += *(pd_probabilidades+i_indice+2);
+			}
+			// Hago la conexión
+			ps_red->pi_Ady[ps_red->i_agente*i_F+i_indice+2] = 1;
+			ps_red->pi_Ady[i_indice*i_F+ps_red->i_agente+2] = 1; // Esto se encarga de marcar al sujeto simétrico
+			// Saco al agente del grupo de agentes posibles para conectarse al
+			// poner su distancia como cero y su probabilidad como cero.
+			*(pd_distbeta+i_indice+2) = 0;
+			*(pd_probabilidades+i_indice+2) = 0;
+			// Calculo el nuevo factor de normalización y las nuevas probabilidades,
+			// ignorando aquellos sujetos cuya distancia es cero. Esto ignora tanto a los
+			// ya conectados como a los que tienen distancia cero.
+			d_normalizacionP = 0;
+			for(register int i_i=0; i_i<ps_datos->i_N; i_i++) d_normalizacionP += *(pd_distbeta+i_i+2);
+			for(register int i_i=0; i_i<ps_datos->i_N; i_i++) if(*(pd_distbeta+i_i+2)!=0) *(pd_probabilidades+i_i+2) = *(pd_distbeta+i_i+2)/d_normalizacionP;
+			// Avanzo el contador para marcar que hice una conexión
+			i_contador++;
 		}
 	}
-	else for(register int i_i=0; i_i<i_indice; i_i++){
+	else for(register int i_i=0; i_i<i_libres; i_i++){
 		ps_red->pi_Ady[ps_red->i_agente*i_F+*(pi_agentes_libres+i_i+2)+2] = 1;
 		ps_red->pi_Ady[*(pi_agentes_libres+i_i+2)*i_F+ps_red->i_agente+2] = 1; // Esto se encarga de marcar al sujeto simétrico
 	}
-		
+	
 	
 	free(pi_agentes_libres);
+	free(pd_DifOpi);
+	free(pd_distbeta);
+	free(pd_probabilidades);
 	return 0;
 }
+
+

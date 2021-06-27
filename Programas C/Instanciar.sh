@@ -13,14 +13,14 @@ if [ -z $decision ]
 then
 	for N in 1000
 	do
-		for Alfa in 9
+		for Alfa in {2..10}
 		do
-			for Cdelta in 2
+			for Cdelta in {0..10}
 			do
 				echo Alfa = $Alfa, Cdelta = $Cdelta
-				for iteracion in {0..10}
+				for iteracion in {0..4}
 				do 
-					./$1.e $N $Red $Alfa $Cdelta $iteracion
+					./$1.e $N $Alfa $Cdelta $iteracion
 				done
 			done
 			done

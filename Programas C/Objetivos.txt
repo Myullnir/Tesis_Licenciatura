@@ -39,6 +39,27 @@ gráficos.
 Bajar los 4 papers que cita Baumann y leerlos
 ¿Cómo cambiarían las ecuaciones del modelo si intentara introducir efecto Backfire?
 
+Capítulos Tesis:
+Introducción
+Modelo en Redes Fijas
+Modelo en Redes de Actividad
+Modelo sin campo externo
+Modelo con campo externo
+
+
+
+----------------------------------------------------------------------------------------------
+
+###################################
+Datos que tengo de Redes Estáticas
+###################################
+
+En la computadora de Oporto tengo los datos de Redes Estáticas. Tengo datos para redes con 1000 sujetos,
+de 2 tópicos, redes de Barabasi, Erdos-Renyi y Random Regulars, con Alfa entre 0 y 4 de a 0,1;
+con cos(Delta) entre -0,5 y 1 de a 0,1; con Grado Medio entre 4 y 16 de a 4; 60 iteraciones para
+cada elemento del ensamble.
+A este conjunto de datos le voy a sumar un segundo barrido realizado entre 0 y 0,2 de a 0,01.
+
 
 -----------------------------------------------------------------------------------------------
 
@@ -65,23 +86,22 @@ PARA MANDAR A CORRER UN PROGRAMA EN EL BACKGROUND:
 nohup COMANDO &
 
 ID procesos: 
-1) 67479
-2) 67528
-3) 67559
-4) 67597
-5) 67630
-6) 67669
-7) 67706
-8) 67744
+1) 5042
+2) 5076
+3) 5109
+4) 5158
+5) 5190
+6) 5225
+
 
 ------------------------------------------------------------------------------------------------------------
-Cuenta nueva en Oporto: ()
+Cuenta nueva en Oporto: (20 hilos)
 
 faviodic@oporto.df.uba.ar
-contraseña:faviodic
+contraseña:
 
 -------------------------------------------------------------------------------------------------------------
 Cuenta nueva en Algarve: (20 hilos)
 
 faviodic@algarve.df.uba.ar
-contraseña:faviodic
+contraseña:

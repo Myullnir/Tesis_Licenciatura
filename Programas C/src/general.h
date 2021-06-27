@@ -32,7 +32,7 @@ typedef struct Parametros{
 	double d_CritCorte; // Este número es el piso que tiene que cruzar el Varprom para que se corte la iteración
 	double d_epsilon; // Actividad mínima de los agentes
 	double d_gamma; // Potencia de la distribución de probabilidades de la actividad. Es el valor positivo.
-	// float f_Beta; // Exponente que regula el grado de homofilia
+	double d_beta; // Exponente que regula el grado de homofilia
 	float f_K; // Influencia social
 	float f_alfa; // Controversialidad de los temas
 	float f_dt; // Paso temporal de iteración del sistema

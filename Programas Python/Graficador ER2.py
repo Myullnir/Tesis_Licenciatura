@@ -389,7 +389,7 @@ for AGENTES in [1000]:
                 X = np.arange(0,len(Var))*0.1 # El dt usado en todos los archivos es 0.1
 
                 plt.figure("Variaciones Promedio")
-                plt.semilogy(X,Var, "--", linewidth = 5) #,c = Colores2[numero],linewidth = 2)
+                plt.semilogy(X,Var, "--", linewidth = 5,c = Colores2[numero],linewidth = 2)
 
                 # El programa sigue funcionando bárbaro, lo cual es buenísimo. Corta en el momento
                 # adecuado y el comportamiento es razonbale. El guardado y el cerrado de la figura
