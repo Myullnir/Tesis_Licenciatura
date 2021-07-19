@@ -3315,7 +3315,7 @@ de Python que realiza los gráficos necesarios.
 
 ----------------------------------------------------------------------------
 
-18/16/2021
+18/06/2021
 
 Hoy estuve (muy lentamente) trabajando en una función que se encargue
 de calcular la probabilidad de interacción de dos agentes dada la homofilia entre ellos.
@@ -3466,3 +3466,268 @@ ponerme con la Burocracia Infernal y si me queda tiempo ya miraré el archivo
 Ví que me faltaba poner el K=3 para que mis parámetros sean exactamente los mismos
 que Baumann. Aún así, dudo que eso alcance para que el sistema converja correctamente.
 
+Ya hice la burocracia, ahora pongámonos con el tema de los gráficos de Python.
+
+-------------------------------------------------------------------------------------
+
+28/06/2021
+
+Hablando con Pablo y Sebas, me propusieron que para poder ver estados finales del
+sistema en el caso de Redes de Actividad lo que voy a tener que hacer es 
+cambiar el criterio de convergencia. Para eso voy a hacer que los sistemas
+evolucionen 1000 iteraciones, guardarme esas opiniones que hayan alcanzado
+y luego promediar los valores de opiniones obtenidos. Esto significa entonces
+que si por ejemplo hago que un punto del ensamble tenga 10 simulaciones, el resultado
+va a estar promediado con 10 iteraciones nomás. Ok, razonable.
+
+Eso significa que el código tiene que cambiar para que itere una cantidad fija de veces,
+no que haga un while. Luego simplemente me guardo las opiniones finales y la variación
+promedio.
+
+---------------------------------------------------------------------------------------
+
+29/06/2021
+
+Ahí corregí la función que define si el sistema llega a Polarización, Consenso o 
+estado Ideológico. Ahora la cosa es mucho más robusta. Ya puedo mandar esto a 
+correr en las pcs. Lo que voy a hacer es cancelar todo el tema de graficar las
+TdO y sólo armar los gráficos de Estados Finales en el espacio de Parámetros.
+Luego tendré que ver de hacer lo de los gráficos específicos, pero imagino que eso
+será sencillo.
+
+Ahora voy a corregir la función principal así ya mañana lo puedo mandar a correr y
+tengo datos para trabajar lo de Redes de Actividad. Ya corregí la función. El tema ahora
+es ver cómo pedirle que corra una cantidad de tiempo más razonable,
+porque ahora mismo está tardando eternidades.
+
+Una opción es hacer lo que decía Pablo de quizás cambiar el criterio de convergencia,
+diciendo algo como que si el sistema empieza a tener una variación promedio
+en cierto rango, o si su varianza es baja, entonces podemos cortar el programa.
+
+Charlarlo para entenderlo mejor. Igual ya mañana me conviene mandar a correr
+esto así como está. Podría ya mandarlo a correr en Oporto y después
+traer los datos a mi pc para mirarlos más rápido. A 1 minuto por iteración,
+si hago 20 iteraciones para cada punto del ensamble y separo esto en
+5 archivos con dos alfas cada uno, en una hora tendría que estar hecho.
+Habría que ver entonces si con 30 ciclos del sistema me alcanza. Yo diría de 
+mejor en ese caso hacer 500 ciclos. Si 100 ciclos tardaba 180 segundos,
+500 ciclos serán entonces 15 minutos. Eso por 20 me dan 5 horas.
+Me gusta la idea. Mañana a la mañana lo mando porque hoy las pc no están.
+
+-----------------------------------------------------------------------------------
+
+02/07/2021
+
+Luego de mucha pelea, logré mandar a correr en Oporto los programas que tenía armados.
+Por un lado, está armando las redes de Actividad con 500 ciclos, es decir rearmando
+las redes 500 veces. Hasta donde vi, eso tarda unos 500 segundos por iteración. Yo lo
+mandé a correr en 7 corridas diferentes, con tres alfas cada corrida, de manera de recorrer
+alfa entre 0 y 2 de a 0,1. El Cdelta se mueve entre -0,5 y 1,0 de a 0,1 y con 30 iteraciones
+por cada punto del ensamble. Si no calculé mal, en 4 días esto debería estar hecho.
+
+Por otro lado, mandé a hacer los gráficos de estado Final en el Espacio de Parámetros,
+e increíblemente el coso esto resolvió eso en dos pedos. Estoy totalmente sorpresa, no
+entiendo cómo pudo trabajar con una magnitud de 100 veces más archivos y lo resolvió
+en mucho menos tiempo. Veamos los gráficos. Mañana
+
+------------------------------------------------------------------------------------
+
+03/07/2021
+
+Tome los gráficos que hice de Estado Final en el espacio de Parámetros y los pasé
+a mi pc. Los gráficos salieron muy mal, no entiendo porqué se veían como consenso
+regiones de alfas altos, no aparecían regiones de polarización y sólo de
+Estado Ideológico. Por si acaso voy a descargar los gráficos de eso para ver
+que tal.
+
+-------------------------------------------------------------------------------------
+
+04/07/2021
+
+Ahora estoy armando los gráficos de TdO para mirarlos por mi mismo y ver que
+tal. Mientras, haré un archivo Py que grafique las TdO y el Estado Final en el
+espacio de Parámetros para las redes de Actividad. La idea es probar eso primero
+en mi pc, y luego lo paso para Oporto. Por otro lado, debería ver si tengo tiempo
+para armar un gráfico de Varianzas, Opiniones Promedio y de Entropía.
+
+Bueno, armé un archivo que se encarga de tomar las opiniones finales de las Redes
+de Actividad, las promedia y las grafica. Parece funcionar bárbaro, así que eso
+pareciar estar bárbaro. El único tema es que el valor de Alfa Crítico me queda muy
+por encima del lugar donde se da el cambio entre la región de Consenso y la región de
+Polarización. ¿Será porque la cantidad de veces que se arman las redes de Actividad
+es 30 veces nomás? ¿Si le doy más iteraciones a las redes, eso hace que todo quede mejor?
+¿Si no es eso, entonces qué?
+
+Ahora voy a mirar un poco el tema de la beca de Doctorado.
+
+--------------------------------------------------------------------------------------
+
+08/07/2021
+
+No quiero perderme en lo que estaba haciendo, en especial porque hoy no terminé logrando
+nada en particular. Por un lado quise preparar el programa para la corrida en mi pc
+en la cual agrego iteraciones a uno de los puntos del ensamble de Redes de Actividad
+y a su vez hacer que guarde la evolución de un grupo de 5 agentes. El tema es que
+se me ocurrió que para hacer esto iba a ser útil trabajar con un array de punteros,
+de manera de que cada puntero tenga la información de cada agente. Cuestión,
+todavía estoy probando como se arman los arrays de punteros, así que eso no está listo
+para correr.
+
+Por otro lado, estaba intentando mandar a correr el barrido fino en Cos(delta) de manera
+de ver cómo trabajan las redes Estáticas en la región de cos(delta) entre -0,2 y 0,2.
+El tema es que para eso necesitaba primero volver a mandar el main que tenía en la pc
+sobre redes estáticas, cosa que ya hice. También tuve que rearmar el instanciar y decidí
+guardarlo como un Instanciar2 para diferenciarlos y no sobreescribir el que ya tengo.
+Creo que eso ya casi estaba para correr, sólo faltaba pasar el Instanciar2 a la pc de
+Oporto. Hay que mirar correctamente los Cos(delta) que recorre el sistema, pasar el
+Instanciar2 a Oporto y luego correrlo en 4 instancias distintas esto. No quiero robarme
+TODOS los hilos, pero quiero que sepas que esto va a tardar una buena eternidad.
+De paso, antes de mandarlo, vale la pena probarlo, como para estar seguro de que esto
+realmente funca.
+
+Después cuando lo grafique tengo que tener en cuenta lo de acortar el tamaño del conjunto
+de Alfa Considerado, pero eso es un detalle.
+
+----------------------------------------------------------------------------------------
+
+09/07/2021
+
+Bueno, a ver, esto es un bardo de hacer. Cuestión que puse el Instanciar2.sh en la pc de
+Oporto y lo mandé a correr, pero eso no funcionaba porque estaba mal armado el código de Instanciar2.
+Y una vez que eso funcionaba, el problema es que el Cdelta y alfa no estaban bien en el programa,
+así que terminé teniendo que borrar ciertos datos, y por accidente borré datos que no quería.
+En particular, lo datos de Alfa=0.00 y Cdelta 0.20. Así que voy a rearmar esos datos de nuevo.
+Paja.
+
+Todo esto tuvo un problema extra, que es que cambié el archivo de Opiniones.e. Eso hizo
+que las corridas de Redes de Actividad dieran problemas, porque ahora corrían cualquier cosa.
+En cierto punto, lo bueno de eso es que tiró error, porque sino nunca me hubiera enterado.
+Cuestión, ahora tengo que re enviar el main de las redes de actividad, que antes reemplace
+porque necesitaba el de Redes Estáticas. Una vez reemplazado el main, tengo que hacer makefile
+con un nuevo archivo exe, el Opiniones2.e. Y tengo que correctamente mandar a correr las 
+siete instancias que me armen mis redes de actividad para alfa hasta 2. Es importante entonces
+aclarar que todas las instancias habían resuelto un alfa y Cdelta hasta 0,2. Así
+que empezaré las 7 instancias a partir del alfa corrido, y de Cdelta siendo 0,2,
+y luego además tendré que mandar a correr el Alfa final y Cdelta entre -0,5 y 0,2.
+(Hablo de alfas Final porque acordate que cada instancia recorría tres alfas, entonces
+el final es alfa =2 para primer instancia, alfa =5 para segunda instancia y así.)
+
+Bueno, ahí arreglé eso y ya tengo corriendo todo. Me robé 11 hilos de Oporto,
+soy un hoarder de las pcs de la facultad. Cuestión, tengo corriendo tanto los programas
+de Redes Estáticas como los de Redes de Actividad. Así que ahora a esperar. Stonks.
+
+--------------------------------------------------------------------------------------------
+
+12/07/2021
+
+Hoy estuve revisando cuanto tiempo van a tardar en resolverse las cuentas de Redes de Actividad y
+las de Redes Estáticas. Redes estáticas debería estar terminado para el 26/07, mientras
+que lo de Redes de Actividad debería estar resuelto para el viernes, suponiendo que el
+miércoles me acuerdo de poner a hacer las cuentas que faltan para el alfa final
+con los deltas entre -0,5 y 0,2.
+
+Por otra parte, estuve probando cómo hacer lo de los arrays a punteros. Ya lo probé y pasé
+el código al Archivo.c. Cuestión que estaba implementando eso en el main, quedé trunco a mitad
+de camino, mañana me encargaré de corregir eso poniendo en el bucle central de iteración
+los for necesarios de manera que en el array de punteros se anoten las opiniones de los
+agentes considerados.
+
+---------------------------------------------------------------------------------------------
+
+13/07/2021
+
+Ya hoy actualicé la función que arma los datos de las redes de Actividad de forma de que
+guarde además 5 filas extras con los datos de 5 agentes a lo largo de toda la evolución del
+sistema. Con eso me armé 40 iteraciones más de datos para el punto del ensamble con alfa = 0,3
+y Cdelta = 0
+
+Mañana tendría que ver de hacer los gráficos con estos datos.
+
+-----------------------------------------------------------------------------------------------
+
+14/07/2021
+
+A ver, veamos qué es lo que tenemos que hacer hoy. Se me ocurre aprovechar y mandar a
+armar más datos para otras regiones, como por ejemplo Alfa = 0,2 y todos los Cdelta.
+Como para aprovechar a la pc que labure en algo.
+
+Lo que estoy pensando en hacer hoy es:
+1) Plantear el tema de la implementación del modelo de actividad empezando en 
+un sistema de dos agentes y 1 tópico para ir probando el uso de la sigmoidea.
+2) Armar los gráficos de las trayectorias de los agentes de Redes de Actividad
+de manera de observar qué está pasando con ellos. Como para ver porqué el sistema
+está correctamente convergiendo, siendo que en parte uno esperaría que esto
+caiga todo al cero.
+3) Armar los gráficos de Varianza, Valor promedio y Entropía para las Redes Estáticas
+de forma de poder observar cómo se comportan estos sistemas.
+4) Mirar el tema de las bases y condiciones de la presentacióna beca doctoral.
+5) Leer Papers
+6) En algún momento, subir todo a Github
+
+-----------------------------------------------------------------------------------------------
+
+15/07/2021
+
+Ok, me faltaba poner a correr los datos para las redes de Actividad con el Alfa final
+de cada iteración y con Cos(delta) entre -0,5 y 0,1. El problema es que al hacer eso
+por accidente mandé a correr el código de Redes de actividad, por lo cual los datos
+de Alfa = 0 y Cos(delta) = 0,12 de Barabasi pueden no estar bien. Conviene que los mande
+a correr de nuevo a esos.
+
+Bueno, luego de mucha pelea y errores, ya dejé todo corriendo correctamente. Para el sábado
+debería estar todo lo de Redes de Actividad resuelto, por lo que estaría bueno que para
+entonces tenga bien visto el código que arma los gráficos con eso para evitar problemas
+o dudas.
+
+Tengo que pronto armar un MetaInstanciar que se encargue de mandar a correr los Instanciar
+de manera más rápida, porque esto así no estaría funcionando, es un bardo impresionante,
+además de que hay muchas posibilidades de error.
+
+Lo último que voy a hacer hoy, si me alcanza el tiempo, es ponerme a ver lo de la Tesis.
+
+------------------------------------------------------------------------------------------------
+
+17/07/2021
+
+Bajé unos cuantos archivos para leer sobre el tema de postularme a la beca de 
+doctorado. Por lo que vi hay varias modalidades, Pablo dijo que miremos el tema
+de la beca de temas generales y quizás el de temas Específicos.
+
+Ahí estuve mirando el archivo de TdO_Actividad.py. En ese archivo ahí estoy viendo
+que tengo que agregar el armado de las TdO de los agentes testigos. Esas TdO no
+necesitan ser promediadas, sino que simplemente tengo que tomar el conjunto de opiniones
+y graficarlos. Eso lo tengo que hacer sobre todas las iteraciones extras armadas.
+Para no tener que hacerme la cabeza, simplemente le metí un if al programa para
+que el programa sólo se entere de cuáles son los archivos que tienen datos Testigos.
+
+La idea del código entonces es que dentro del if me vaya guardando los datos de las
+opiniones de los testigos. Luego tendré que armarme un for extra para graficar
+todas las TdO correspondientes, una por cada testigo, y además eso para cada caso
+de alfa y Cdelta correspondiente. La idea es ver si las líneas tienden a un sólo lado
+o qué carajos pasa.
+
+Luego de eso, voy a tener que pasarme el archivo que grafica a Oporto y ahí
+armar los gráficos de Entropía, el de valor final Promedio y Varianza para las
+Redes Estáticas.
+
+Terminado eso, veré si me pongo a leer cosas de la introducción a becas o si me 
+pongo a hacer lo de mirar la implementación del campo externo
+
+-------------------------------------------------------------------------------------------------
+
+18/07/2021
+
+Armé el código para graficar las TdO de los agentes Testigos. Vamos a ver
+cuáles son las trayectorias que hacen los agentes testigos y con eso
+vamos a ver qué está pasando en el sistema
+
+--------------------------------------------------------------------------------------------------
+
+19/07/2021
+
+Luego de bastante pelear con esto, ahora sí creo que tengo resuelta la función
+que grafica los gráficos de Opiniones, las TdO y los estados finales en
+el espacio de parámetros. Lo siguiente que debería ahcer es pasar esto a oporto
+y mandarlo a correr con los datos de las Redes de actividad que hice en Oporto.
+
+Y ya que estoy, si esto funca, hoy debería subir todo a Github.

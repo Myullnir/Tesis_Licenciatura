@@ -39,14 +39,14 @@ int main(int argc, char *argv[]){
 		ps_datos->i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
 		ps_datos->i_Gradomedio = strtol(argv[5],NULL,10); // Valor de grado medio de los agentes de la red. Esto lo obtengo del input porque ahora armo redes de diferentes grados medios
 		ps_datos->f_K = 1; // Influencia social
-		ps_datos->f_dt = 0.1; // Paso temporal de iteración del sistema
-		ps_datos->i_ID = strtol(argv[6],NULL,10)%10; // La ID simplemente diferencia a las 10 redes que armé que son del mismo tipo, con el mismo N y el mismo Gm.
-		ps_datos->f_alfa = strtof(argv[3],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
+		ps_datos->f_dt = 0.01; // Paso temporal de iteración del sistema
+		ps_datos->i_ID = strtol(argv[6],NULL,10)%20; // La ID simplemente diferencia a las 20 redes que armé que son del mismo tipo, con el mismo N y el mismo Gm.
+		ps_datos->f_alfa = strtof(argv[3],NULL)/100; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		ps_datos->i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la variación promedio de las opiniones.
 		ps_datos->d_CritCorte = 0.0005; // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
 		ps_datos->i_Itextra = 15; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
-		ps_datos->f_Cosangulo = strtof(argv[4],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
+		ps_datos->f_Cosangulo = strtof(argv[4],NULL)/100; // Este es el coseno de Delta que define la relación entre tópicos.
 		
 		// Estos son unas variables que si bien podrían ir en el puntero red, son un poco ambiguas y no vale la pena pasarlas a un struct.
 		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.

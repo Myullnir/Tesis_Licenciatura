@@ -122,11 +122,13 @@ def Indice_Color(vector,Divisiones):
 # entonces estoy en Polarización Descorrelacionada.
 
 def EstadoFinal(Array):
-        
+    
+    Topicos = 2    
     # Primero veo el caso de que hayan tendido a cero
     
     ArrayAbs = np.absolute(Array)
-    if max(ArrayAbs)<0.01:
+    CantP = np.count_nonzero(ArrayAbs > 0.5)
+    if CantP/len(Array) < 0.5:
         return "Consenso"
     
     #----------------------------------------------------------
@@ -135,13 +137,28 @@ def EstadoFinal(Array):
     # con las opiniones del tópico 2.
     
     ArrayT1 = Array[0::2]
-    ArrayT2 = Array[1::2]    
-    ArrayProd = np.sign(np.multiply(ArrayT1,ArrayT2))
+    ArrayT2 = Array[1::2]
+    Maximo = max(ArrayAbs)
     
-    if -1 in ArrayProd:
-        return "Polarizacion"
-    else:
+    OpinionesFiltradas = np.zeros(len(Array))
+    
+    for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
+        if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
+            OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+    
+    ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+    
+    Cant1 = np.count_nonzero(ArrayCuad == 1)
+    Cant2 = np.count_nonzero(ArrayCuad == 2)
+    Cant3 = np.count_nonzero(ArrayCuad == 3)
+    Cant4 = np.count_nonzero(ArrayCuad == 4)
+    
+    if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
         return "Ideologico"
+    elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
+        return "Ideologico"
+    else:
+        return "Polarizacion"
 
 
 # Voy a definir una función que tome un array con opiniones del sistema y me 
@@ -206,9 +223,13 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
+
+T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
+# pero no tenía dónde más definirlo
+
 SuperDiccionario = dict()
 
-for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
+for REDES in ["Erdos-Renyi"]: # ["Barabasi"]: # ["Random Regulars"]:
 
 
     # Primero levanto datos de la carpeta de la red REDES
@@ -312,12 +333,12 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
 # las keys de mi SuperDiccionario.
 
-for REDES in ["Erdos-Renyi"]:    
+for REDES in ["Erdos-Renyi"]: # ["Barabasi"]: # ["Random Regulars"]:
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
 
-        for GM in [16]: #Conjunto_Gm:
+        for GM in Conjunto_Gm:
             
             Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
         
@@ -380,7 +401,7 @@ for REDES in ["Erdos-Renyi"]:
                         # Acá voy a calcular al sujeto que voy a usar para normalizar mis gráficos. Tiene que ser el máximo
                         # valor de opinión que haya alcanzado cualquier sujeto en cualquier momento.
                         
-                        MaxNorm = max(MaxNorm,max(np.absolute(Opi)))
+#                        MaxNorm = max(MaxNorm,max(np.absolute(Opi)))
                         
                         # Esto funciona perfecto. El único tema a considerar es que este valor MaxNorm se traspasa
                         # a otros módulos, entonces eso hace que esos módulos no sean tan independientes. En particular
@@ -430,14 +451,30 @@ for REDES in ["Erdos-Renyi"]:
                     # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
                     # colocar puntos marcando el final de mis trayectorias.
                     
-                    plt.rcParams.update({'font.size': 18})
-                    plt.figure("Trayectoria Opiniones",figsize=(20,15))
-                    for x1,x2 in zip (PuntosFinales[0::2],PuntosFinales[1::2]):
-                        indice = Indice_Color(np.array([x1,x2]),Divisiones)
-                        plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
-
-
-                    #----------------------------------------------------------------------------------------------
+#                    plt.rcParams.update({'font.size': 18})
+#                    plt.figure("Trayectoria Opiniones",figsize=(20,15))
+#                    for x1,x2 in zip (PuntosFinales[0::2],PuntosFinales[1::2]):
+#                        indice = Indice_Color(np.array([x1,x2]),Divisiones)
+#                        plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+#
+#
+#                    #----------------------------------------------------------------------------------------------
+                    
+                    # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
+                    # opiniones finales
+                    
+                    # Voy a agregar un paso extra en esto porque el sistema está teniendo problemas en clasificar algunos casos límite
+                    EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
+                    
+                    ResultadoEF = EstadoFinal(OpinionesFinales)
+                            
+                    # Esto es ya lo mismo que antes, dependiendo de ResultadoEF es el número que va en la matriz ZZ
+                    
+                    for estado in EC:
+                        if ResultadoEF == estado[0]:
+                            ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1] 
+                    
+                    #-----------------------------------------------------------------------------------------------------------
                     
                     # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
                     # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
@@ -447,32 +484,19 @@ for REDES in ["Erdos-Renyi"]:
                     #                bottom=False,
                     #                labelleft=False,
                     #                labelbottom=False)
-                    plt.xlabel("Tópico 1")
-                    plt.ylabel("Tópico 2")
-                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
-#                    plt.xlim((xmin,xmax))
-#                    plt.ylim((ymin,ymax))
-                    plt.annotate("{}".format(EstadoFinal(OpinionesFinales)), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.8),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Trayectoria de las opiniones_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
-                    plt.close("Trayectoria Opiniones")
+#                    plt.xlabel("Tópico 1")
+#                    plt.ylabel("Tópico 2")
+#                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
+##                    plt.xlim((xmin,xmax))
+##                    plt.ylim((ymin,ymax))
+#                    plt.annotate("{}".format(ResultadoEF), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.8),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Trayectoria de las opiniones_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+#                    plt.close("Trayectoria Opiniones")
                     
                     #------------------------------------------------------------------------------------------------
                     
-                            
-                    
-                    # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
-                    # opiniones finales
-                    
-                    ResultadoEF = EstadoFinal(OpinionesFinales)
-                    EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
-                    
-                    for estado in EC:
-                        if ResultadoEF == estado[0]:
-                            ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1] 
-                            
-                    #-----------------------------------------------------------------------------------------------------------
 
             # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
             

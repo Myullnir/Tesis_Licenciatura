@@ -13,17 +13,17 @@ if [ -z $decision ]
 then
 	for N in 1000
 	do
-		for Alfa in {2..10}
+		for Alfa in 2
 		do
 			for Cdelta in {0..10}
 			do
 				echo Alfa = $Alfa, Cdelta = $Cdelta
-				for iteracion in {0..4}
-				do 
+				for iteracion in {20..60}
+				do
 					./$1.e $N $Alfa $Cdelta $iteracion
 				done
 			done
-			done
+		done
 	done
 	
 	# ./Mover.sh

@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
 	time_t tt_prin,tt_fin,semilla;
 	time(&tt_prin);
 	semilla = time(NULL);
-	srand(semilla); // Voy a definir la semilla a partir de un número entero que es el número de iteración  srand(time(NULL));
+	srand(semilla); // Voy a definir la semilla a partir de time(NULL);
 	float f_tardanza; // Este es el float que le paso al printf para saber cuanto tardé
 	
 	// Creo mis punteros a structs y los malloqueo.
@@ -42,15 +42,16 @@ int main(int argc, char *argv[]){
 		ps_datos->d_epsilon = 0.01; // Mínimo valor de actividad de los agentes
 		ps_datos->d_gamma = 2.1; // Esta es la potencia que define la distribución de actividad
 		ps_datos->d_beta = 3; // Esta es la potencia que determina el grado de homofilia.
-		ps_datos->d_CritCorte = 0.001; // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
-		ps_datos->i_Itextra = 50; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
+		// ps_datos->d_CritCorte = 0.001; // Este valor es el criterio de corte. Con este criterio, toda variación más allá de la quinta cifra decimal es despreciable.
+		// ps_datos->i_Itextra = 50; // Este valor es la cantidad de iteraciones extra que el sistema tiene que hacer para cersiorarse que el estado alcanzado efectivamente es estable
 		ps_datos->f_Cosangulo = strtof(argv[3],NULL)/10; // Este es el coseno de Delta que define la relación entre tópicos.
 		
 		// Estos son unas variables que si bien podrían ir en el puntero red, son un poco ambiguas y no vale la pena pasarlas a un struct.
-		int i_contador = 0; // Esta variable se encarga de llevar la cuenta de las iteraciones extra que realiza mi sistema.
 		int i_renovar_Adyacencia = (int) (1/ps_datos->f_dt); // Este número es la cantidad de veces que itero el sistema antes de renovar la matriz de Adyacencia
-		int i_contador_Adyacencia = 0; // Esta variable lleva el control de cantidad de veces que iteré el sistema y cada vez que alcanzo un paso temporal discreto, renueva la matriz de Adyacencia
 		int i_iteracion = strtol(argv[4],NULL,10); // Número de instancia de la simulación.
+		int i_testigos = 5;
+		int i_momento = 0;
+		int a_Testigos[5] = {1,10,50,100,300};
 		
 		// Matrices de mi sistema. Estas son la de Adyacencia, la de Superposición de Tópicos y la de vectores de opinión de los agentes.
 		// También hay una matriz de paso previo del sistema y un vector para guardar la diferencia entre el paso previo y el actual.
@@ -127,6 +128,17 @@ int main(int argc, char *argv[]){
 		// Puntero a la función que define mi ecuación diferencial
 		double (*pf_EcDin)(ps_Red var, ps_Param par, ps_Tab tab) = &Din2;
 		
+		
+		// Voy a armar un array de punteros que se encarguen de guardar los datos de los
+		// agentes testigos.
+		double* ap_Testigos[i_testigos];
+		for(register int i_i=0; i_i<i_testigos; i_i++){
+			ap_Testigos[i_i] = (double*) malloc((2+(30*i_renovar_Adyacencia+1)*2)*sizeof(double));
+			*(ap_Testigos[i_i]) = 30*i_renovar_Adyacencia+1;
+			*(ap_Testigos[i_i]+1) = 2;
+			for(register int i_j=0; i_j<(30*i_renovar_Adyacencia+1)*2; i_j++) *(ap_Testigos[i_i]+i_j+2) = 0;
+		}
+		
 	
 	// Genero las redes de mi sistema
 	GenerarOpi(ps_red,ps_datos); // Esto me inicializa mis vectores de opinión, asignándole a cada agente una opinión en cada tópico
@@ -139,46 +151,67 @@ int main(int argc, char *argv[]){
 	// Queda para el futuro ver si vale la pena meter esto en una sola función.
 	fprintf(pa_archivo1, "\tVariacion Promedio\n");
 	
-	while(i_contador<ps_datos->i_Itextra){
-		// Inicializo el contador
-		i_contador = 0;
-		
-		// Evoluciono el sistema hasta que se cumpla el criterio de corte
-		do{
-			if(i_contador_Adyacencia%i_renovar_Adyacencia==0){
-				Adyacencia_Actividad(ps_red, ps_datos);
+	// Voy a separar esto en dos for por una cuestión de facilidad de lectura. Quiero correr de manera
+	// de que la red de actividad se genera en total 30 veces
+	for(register int i_ciclos=0; i_ciclos<30; i_ciclos++){
+		Adyacencia_Actividad(ps_red, ps_datos);
+		for(register int i_contador=0; i_contador<i_renovar_Adyacencia; i_contador++){
+			for(register int i_sujeto=0; i_sujeto<i_testigos; i_sujeto++) for(register int i_opinion=0; i_opinion<2; i_opinion++){
+				*(ap_Testigos[i_sujeto]+i_momento*2+i_opinion+2) = ps_red->pd_Opi[a_Testigos[i_sujeto]*ps_datos->i_T+i_opinion+2];
 			}
-			if(i_contador_Adyacencia%(i_renovar_Adyacencia*100)==0) printf("El contador va %d\n", i_contador_Adyacencia);
+			i_momento++;
 			for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
-			i_contador_Adyacencia++;
 			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
 			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
 		}
-		while(ps_red->d_Varprom > ps_datos->d_CritCorte);
-		
-		// Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
-		while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
-			if(i_contador_Adyacencia%(i_renovar_Adyacencia)==0){
-				Adyacencia_Actividad(ps_red, ps_datos);
-				printf("Rearme la matriz de Adyacencia\n");
-				printf("El contador va %d\n", i_contador_Adyacencia);
-			}
-			for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
-			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
-			i_contador_Adyacencia++;
-			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
-			Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
-			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
-			i_contador += 1;
-		}
-		// Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
-		// Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
-		// Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
 	}
+	for(register int i_sujeto=0; i_sujeto<i_testigos; i_sujeto++) for(register int i_opinion=0; i_opinion<2; i_opinion++){
+			*(ap_Testigos[i_sujeto]+i_momento*2+i_opinion+2) = ps_red->pd_Opi[a_Testigos[i_sujeto]*ps_datos->i_T+i_opinion+2];
+		}
+	
+	// while(i_contador<ps_datos->i_Itextra){
+		// // Inicializo el contador
+		// i_contador = 0;
+		
+		// // Evoluciono el sistema hasta que se cumpla el criterio de corte
+		// do{
+			// if(i_contador_Adyacencia%i_renovar_Adyacencia==0){
+				// Adyacencia_Actividad(ps_red, ps_datos);
+			// }
+			// if(i_contador_Adyacencia%(i_renovar_Adyacencia*100)==0) printf("El contador va %d\n", i_contador_Adyacencia);
+			// for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
+			// Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// i_contador_Adyacencia++;
+			// // Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+			// Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+			// ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			// fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
+		// }
+		// while(ps_red->d_Varprom > ps_datos->d_CritCorte);
+		
+		// // Ahora evoluciono el sistema una cantidad i_Itextra de veces. Le pongo como condición que si el sistema deja de cumplir la condición de corte, deje de evolucionar
+		// while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
+			// if(i_contador_Adyacencia%(i_renovar_Adyacencia)==0){
+				// Adyacencia_Actividad(ps_red, ps_datos);
+				// printf("Rearme la matriz de Adyacencia\n");
+				// printf("El contador va %d\n", i_contador_Adyacencia);
+			// }
+			// for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
+			// Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// i_contador_Adyacencia++;
+			// // Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
+			// Delta_Vec_d(ps_red->pd_Opi,ps_red->pd_PreOpi,ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+			// ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			// fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
+			// i_contador += 1;
+		// }
+		// // Si el sistema evolucionó menos veces que la cantidad arbitraria, es porque rompió la condiciones de corte.
+		// // Por tanto lo vuelvo a hacer trabajar hasta que se vuelva a cumplir la condición de corte.
+		// // Si logra evolucionar la cantidad arbitraria de veces sin problemas, termino la evolución.
+	// }
 	
 	// Guardo los datos finales del sistema y la semilla
 	
@@ -187,8 +220,13 @@ int main(int argc, char *argv[]){
 	Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
 	fprintf(pa_archivo1, "\tSemilla\n");
 	fprintf(pa_archivo1,"\t%ld\n",semilla);
+	for(register int i_sujeto=0; i_sujeto<i_testigos; i_sujeto++){
+		fprintf(pa_archivo1,"\tAgente %d\n",a_Testigos[i_sujeto]);
+		Escribir_d(ap_Testigos[i_sujeto],pa_archivo1);
+	}
 	
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
+	for(register int i_i=0; i_i<i_testigos; i_i++) free(ap_Testigos[i_i]);
 	free(ps_red->pd_Ang);
 	free(ps_red->pi_Ady);
 	free(ps_red->pd_Opi);

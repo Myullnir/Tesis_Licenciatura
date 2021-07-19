@@ -4781,3 +4781,63 @@ Todo el cambio entre este código y el anterior se encuentra enmarcado en la fun
 
 
 NUEVO_PROGRAMA
+
+Al parecer no tengo un código al respecto de esto así que mejor tener esto anotado. La idea es
+ver cómo funcionan los arrays de punteros. Cuestión que al armar un array de punteros lo que tengo
+que hacer es definir primero el tipo de datos que voy a guardar en los punteros, ya sea
+(int*) o (double*) o lo que sea. Luego pongo el nombre del array y entre corchetes el número de punteros
+que voy a contener. Si quiero, puedo asignar un puntero existente al array a partir de igualar el elemento del
+array con el puntero. ap_Array[i_indice] = p_puntero. En cambio, si no quiero asignar punteros existentes
+y quiero armar punteros nuevos, puedo malloquear el elemento del array como si fuera un puntero e inicializarlo
+tal cual. (Eso es lo que está hecho abajo).
+Finalmente, si quiero tomar un elemento del puntero es importante recordar que para seleccionar el puntero particular
+uso corchetes y para elegir el elemento del puntero tengo que usar el * para desreferenciar el elemento. (Como se muestra abajo básicamente).
+
+No lo mencioné, pero esto lo terminé el 12/07/2021.
+
+
+
+
+// #include<stdio.h>
+// #include<stdlib.h>
+// #include<math.h>
+// #include<time.h>
+// #include<string.h>
+
+
+// int main(int argc, char *argv[]){
+	// // Defino mis variables temporales para medir el tiempo que tarda el programa. También genero una nueva semilla
+	// time_t tt_prin,tt_fin;
+	// time(&tt_prin);
+	// srand(time(NULL));
+	// int i_tardanza;
+	
+	// // Armo un array a punteros y lo examino
+	// int* ap_Array[3];
+	
+	// for(register int i_i=0; i_i<3; i_i++){
+		// ap_Array[i_i] = (int*) malloc((2+5)*sizeof(int));
+		// *ap_Array[i_i] = 1;
+		// *(ap_Array[i_i]+1) = 4;
+		// for(register int i_j=0; i_j<4; i_j++) *(ap_Array[i_i]+i_j+2) = i_i*4+i_j;
+	// }
+	
+	// for(register int i_i=0; i_i<3; i_i++) for(register int i_j=0; i_j<4; i_j++) printf("El número de agente es %d\n",*(ap_Array[i_i]+i_j+2));
+	
+	// // Ejecuto los comandos finales para medir el tiempo y liberar memoria
+	// for(register int i_i=0; i_i<3; i_i++) free(ap_Array[i_i]);
+	// time(&tt_fin);
+	// i_tardanza = tt_fin-tt_prin;
+	// printf("Tarde %d segundos en terminar",i_tardanza);
+		
+	// return 0;
+// }
+
+
+
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+
+
+NUEVO_PROGRAMA

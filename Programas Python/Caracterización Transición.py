@@ -1,14 +1,9 @@
 
 # coding: utf-8
-
-# In[1]:
-
-
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 # from scipy.optimize import minimize
 #from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 #import random
 import time
@@ -586,9 +581,6 @@ for AGENTES in [1000]:
 #     plt.show()
 
     #---------------------------------------------------------------------------------------------------
-                
-                
-                
 
 Tiempo()
 
