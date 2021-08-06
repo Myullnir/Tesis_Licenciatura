@@ -123,10 +123,15 @@ def Indice_Color(vector,Divisiones):
 def EstadoFinal(Array):
     
     Topicos = 2    
-    # Primero veo el caso de que hayan tendido a cero
+    # Primero veo el caso de que hayan tendido a cero. En este caso lo importante
+    # es ver que la mayoría haya ido al cero y que alguno que se haya escapado no
+    # me joda el consenso. Pedir que el 90% esté debajo del umbral es lo mismo que
+    # decir que como máximo 100 sujetos se hayan escapado, que es un número
+    # me parece razonable.
     
     ArrayAbs = np.absolute(Array)
-    if max(ArrayAbs)<0.01:
+    Cant0 = np.count_nonzero(ArrayAbs < 0.01)/len(Array)
+    if Cant0 > 0.9:
         return "Consenso"
     
     #----------------------------------------------------------
@@ -192,7 +197,6 @@ def ClasificacionCuadrantes(Array):
     # Lo siguiente es crear el array SwitchDic, que va a funcionar como un Switch para los
     # casos que voy a considerar.
     
-    Signos = np.sign(Array)
     Resultado = np.zeros(int(len(Array)/2))
     SwitchDic = dict()
     
@@ -210,8 +214,13 @@ def ClasificacionCuadrantes(Array):
     
     # Repaso los elementos en Signos para identificar los cuadrantes de mis objetos.
     
-    for x1,x2,indice in zip(Signos[0::2],Signos[1::2],np.arange(len(Signos[0::2]))):
-        Resultado[indice] = SwitchDic[(x1,x2)]
+    for x1,x2,indice in zip(Array[0::2],Array[1::2],np.arange(len(Array[0::2]))):
+        Absolutos = np.abs(np.array([x1,x2]))
+        if max(Absolutos)<0.01:
+            Resultado[indice] = 0
+        else:
+            Signos = np.sign(np.array([x1,x2]))
+            Resultado[indice] = SwitchDic[(Signos[0],Signos[1])]
   
     return Resultado
 
@@ -243,9 +252,6 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
-
-T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
-# pero no tenía dónde más definirlo
 
 # Primero levanto datos de la carpeta de la red REDES
 
@@ -339,9 +345,11 @@ for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
 # de mi conjunto de datos y guardarme ese dato. También me armo una lista con los números de
 # los agentes testigos
     
-Datos = ldata("./Redes Actividad/Datos_Opiniones_alfa=0.20_Cdelta=0.00_N=1000_Iter=60")
+Datos = ldata("./Redes Actividad/Datos_Opiniones_alfa=0.00_Cdelta=0.00_N=1000_Iter=0")
 Iteraciones = len(Datos[7][1::])
 AgentesTestigos = [1,10,50,100,300]
+T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
+# pero no tenía dónde más definirlo
 
 
 #--------------------------------------------------------------------------------------------
@@ -355,7 +363,7 @@ for AGENTES in [1000]:
 
     Conjunto_Alfa = list(SuperDiccionario[AGENTES].keys())
 
-    Conjunto_Cdelta = list(SuperDiccionario[AGENTES][Conjunto_Alfa[0]].keys())
+    Conjunto_Cdelta = list(SuperDiccionario[AGENTES][Conjunto_Alfa[0]].keys())[0]
     
     # Primero me armo los grid para el gráfico de las fases. Para eso
     # primero tengo que armarme un array y con el np.meshgrid armarme 
@@ -382,124 +390,160 @@ for AGENTES in [1000]:
     
     for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
         
-        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+        CDELTA = 0
+        icdelta = 0
         
-            #-----------------------------------------------------------------------------------
-            
-            # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
-            # que voy a necesitar para después
-            
-            OpinionesFinales = np.array([])
-            PuntosFinales = np.array([])
-            Testigos = dict()
-            for i in range(5):
-                Testigos[i] = np.array([])
-            
-            #-------------------------------------------------------------------------------------
-            for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
+#        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+        
+        #-----------------------------------------------------------------------------------
+        
+        # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
+        # que voy a necesitar para después
+        
+        OpinionesFinales = np.array([])
+        Resultados = list()
+        Testigos = dict()
+        for i in range(5):
+            Testigos[i] = np.array([])
+        
+        #-------------------------------------------------------------------------------------
+        for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
 
-                #--------------------------------------------------------------------------------------------
+            #--------------------------------------------------------------------------------------------
+        
+            # Levanto los datos del archivo original y separo los datos en tres listas.
+            # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+        
+            Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
+        
+            # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
+            # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
+            Var = np.array([float(x) for x in Datos[1][1::]])
             
-                # Levanto los datos del archivo original y separo los datos en tres listas.
-                # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+            Opi = np.array([float(x) for x in Datos[3][1::]])
+        
+            #----------------------------------------------------------------------------------------------
             
-                Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
+            # Voy a mirar en cada una de las iteraciones el estado final y guardarme eso en una lista.
             
-                # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
-                # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                Var = np.array([float(x) for x in Datos[1][1::]])
-                
-                Opi = np.array([float(x) for x in Datos[3][1::]])
+            Resultados.append(EstadoFinal(Opi))
             
-                #----------------------------------------------------------------------------------------------
+            #------------------------------------------------------------------------------------------------
+            
+            # Armemos los gráficos de las TdO para los agentes que estoy usando de testigos en el sistema.
+            if(len(Datos)>6):
+                for i in range(5):
+                    Testigos[i] = np.concatenate((Testigos[i],np.array([float(x) for x in Datos[i*2+7][1::]])), axis=None)
                 
-                # Armemos los gráficos de las TdO para los agentes que estoy usando de testigos en el sistema.
-                if(len(Datos)>6):
-                    for i in range(5):
-                        Testigos[i] = np.concatenate((Testigos[i],np.array([float(x) for x in Datos[i*2+7][1::]])), axis=None)
-                    
-                    
                 
-                    # Acá voy a calcular al sujeto que voy a usar para normalizar mis gráficos. Tiene que ser el máximo
-                    # valor de opinión que haya alcanzado cualquier sujeto en cualquier momento.
-                    
-    #                        MaxNorm = max(MaxNorm,max(np.absolute(Opi)))
-                    
-                    # Esto funciona perfecto. El único tema a considerar es que este valor MaxNorm se traspasa
-                    # a otros módulos, entonces eso hace que esos módulos no sean tan independientes. En particular
-                    # me refiero al módulo que construye el diccionario OdT y el que arma la lista de puntos
-                    # finales PuntosFinales. Supongo que esto se podría solucionar directamente normalizando el 
-                    # vector de opiniones. Entonces los otros trabajaría por su cuenta sin mezclar cosas
-                    # de módulos que podrían no copiarse en futuros códigos.
-                    
-                    #-----------------------------------------------------------------------------------------------
+            
+                # Acá voy a calcular al sujeto que voy a usar para normalizar mis gráficos. Tiene que ser el máximo
+                # valor de opinión que haya alcanzado cualquier sujeto en cualquier momento.
                 
-                    # Como todavía tengo dos tópicos, puedo graficar esto en un plano. Así que ahora voy a hacer
-                    # un código presuponiendo que la cantidad de tópicos es 2. Sino, esto no debería realizarse.
-                    # Atento a eso.
-                    # Como ahora las listas en el diccionario no se sobreescriben, puedo hacer esto con un for aparte
-                    # de lo anterior
+#                        MaxNorm = max(MaxNorm,max(np.absolute(Opi)))
                 
+                # Esto funciona perfecto. El único tema a considerar es que este valor MaxNorm se traspasa
+                # a otros módulos, entonces eso hace que esos módulos no sean tan independientes. En particular
+                # me refiero al módulo que construye el diccionario OdT y el que arma la lista de puntos
+                # finales PuntosFinales. Supongo que esto se podría solucionar directamente normalizando el 
+                # vector de opiniones. Entonces los otros trabajaría por su cuenta sin mezclar cosas
+                # de módulos que podrían no copiarse en futuros códigos.
+                
+                #-----------------------------------------------------------------------------------------------
+            
+                # Como todavía tengo dos tópicos, puedo graficar esto en un plano. Así que ahora voy a hacer
+                # un código presuponiendo que la cantidad de tópicos es 2. Sino, esto no debería realizarse.
+                # Atento a eso.
+                # Como ahora las listas en el diccionario no se sobreescriben, puedo hacer esto con un for aparte
+                # de lo anterior
+            
 #                    plt.figure("Trayectoria Opiniones")
 #                    for agente in range(AGENTES):
 #                        plt.plot(Opi[::,0+T*agente],Opi[::,1+T*agente], color="gray",linewidth = 0.6, alpha=0.2)
-                    
-                    # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
-                    # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
-                    # el momento
-                        
-                    #-------------------------------------------------------------------------------------------------
                 
-                # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
-                # para después sobre esos datos determinar el estado final del sistema
-                
-                OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
-                
-                # Con esto me armo el array de estados finales de mi sistema
-                
-                #-------------------------------------------------------------------------------------------------
-                
-            # Cuando quiera graficar los puntos que indican el punto final de la trayectoria
-            # de un agente en el espacio de fases, voy a necesitar tomar promedios de las
-            # opiniones finales de todas las iteraciones
-            
-            PuntosFinales = PromediosOpiniones(OpinionesFinales)
-            
-            # Con esto me armo la lista de estados finales de mi sistema
+                # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
+                # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
+                # el momento
             
             #-------------------------------------------------------------------------------------------------
             
-            # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
-            # colocar puntos marcando el final de mis trayectorias.
+            # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
+            # para después sobre esos datos determinar el estado final del sistema
             
+            OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
+            
+            # Con esto me armo el array de estados finales de mi sistema
+            
+        #-------------------------------------------------------------------------------------------------
+            
+        # Hago un gráfico de los tópicos de los agentes testigos en función del tiempo. Hago un gráfico
+        # para todas las iteraciones de un agente y de un tópico
+        
+        if len(Testigos[0]>0):
+            for repeticion in np.random.choice(int(len(Testigos[0])/Iteraciones),5,False):
+                plt.rcParams.update({'font.size': 18})
+                plt.figure("Topico",figsize=(20,15))
+                X = np.arange(len(Testigos[0][0:Iteraciones:2]))*0.01
+                for sujeto in range(len(AgentesTestigos)):
+                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+0:(repeticion+1)*Iteraciones+0:2], label="T=0,agente={}".format(AgentesTestigos[sujeto]), linewidth = 4)
+                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2], label="T=1,agente={}".format(AgentesTestigos[sujeto]), linewidth = 4)
+                plt.xlabel("Tiempo")
+                plt.ylabel("Tópico")
+                plt.grid()
+                plt.legend()
+                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                plt.savefig("../Imagenes/RedAct/Topicos_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
+                plt.close("Topico")
+                
+#                plt.rcParams.update({'font.size': 18})
+#                plt.figure("Topico2",figsize=(20,15))
+#                X = np.arange(len(Testigos[0][1:Iteraciones+1:2]))*0.01
+#                for sujeto in range(len(AgentesTestigos)):
+#                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2],linewidth = 4)
+#                plt.xlabel("Tiempo")
+#                plt.ylabel("Tópico 2")
+#                plt.grid()
+#                plt.annotate("Agente {}".format(AgentesTestigos[sujeto]), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.savefig("../Imagenes/RedAct/Topico2_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
+#                plt.close("Topico2")
+            
+        #----------------------------------------------------------------------------------------------
+        
+        # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
+        # opiniones finales
+        
+        # Voy a agregar un paso extra en esto porque el sistema está teniendo problemas en clasificar algunos casos límite
+        EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
+        
+        # Voy a tomar la lista de todos los estados finales del sistema y contar cuál estado es el que más aparece.
+        # Ese estado es el que voy a pasarle al gráfico de los estados finales.
+        
+        Maximos = [0,0,0]
+        
+        # Para identificar cuál es el que aparece más veces, simplemente cuento cuantas veces aparece cada uno.
+        for estado in EC:
+            Maximos[estado[1]] = Resultados.count(estado[0])
+        
+        # Básicamente paso la posición del estado que haya aparecido más veces, total la posición puede ir entre
+        # 0,1 y 2, y esos números son justamente los que le pasaba a la matriz.
+        ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = Maximos.index(max(Maximos)) 
+        
+        #-----------------------------------------------------------------------------------------------------------
+        
+        # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
+        # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
+        # TdO.
+        
+        # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
+        # colocar puntos marcando el final de mis trayectorias.
+        
+        for repeticion in np.random.choice(int(len(OpinionesFinales)/len(Opi)),5,False):
             plt.rcParams.update({'font.size': 18})
             plt.figure("Grafico Opiniones",figsize=(20,15))
-            for x1,x2 in zip (PuntosFinales[0::2],PuntosFinales[1::2]):
+            for x1,x2 in zip (OpinionesFinales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2],OpinionesFinales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2]):
                 indice = Indice_Color(np.array([x1,x2]),Divisiones)
                 plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
-
-
-            #----------------------------------------------------------------------------------------------
-            
-            # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
-            # opiniones finales
-            
-            # Voy a agregar un paso extra en esto porque el sistema está teniendo problemas en clasificar algunos casos límite
-            EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
-            
-            ResultadoEF = EstadoFinal(OpinionesFinales)
-                    
-            # Esto es ya lo mismo que antes, dependiendo de ResultadoEF es el número que va en la matriz ZZ
-            
-            for estado in EC:
-                if ResultadoEF == estado[0]:
-                    ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1] 
-            
-            #-----------------------------------------------------------------------------------------------------------
-            
-            # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
-            # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
-            # TdO.
             
             #            plt.tick_params(left=False,
             #                bottom=False,
@@ -510,29 +554,29 @@ for AGENTES in [1000]:
 #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
 ##                    plt.xlim((xmin,xmax))
 ##                    plt.ylim((ymin,ymax))
-            plt.annotate("{}".format(ResultadoEF), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../Imagenes/RedAct/Grafico opiniones_alfa={:.2f}_Cdelta={:.2f}_N={}.png".format(ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.annotate("{}".format(EstadoFinal(OpinionesFinales[repeticion*len(Opi):(repeticion+1)*len(Opi)])), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={},iter={}".format(ALFA,CDELTA,AGENTES,repeticion), xy=(0.7,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.savefig("../Imagenes/RedAct/Grafico_opiniones_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
             plt.close("Grafico Opiniones")
+        
+        #------------------------------------------------------------------------------------------------
             
-            #------------------------------------------------------------------------------------------------
-            
-            # Acá me voy a armar los gráficos de las trayectorias de Opniones de los agentes Testigos.
-            
-            if len(Testigos[0]>0):
-                for sujeto in range(len(AgentesTestigos)):
-                    plt.rcParams.update({'font.size': 18})
-                    plt.figure("TdO",figsize=(20,15))
-                    for repeticion in range(int(len(Testigos[sujeto])/Iteraciones)):
-                        plt.plot(Testigos[sujeto][repeticion*Iteraciones+0:(repeticion+1)*Iteraciones+0:2],Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2], color="gray",linewidth = 1, alpha=0.5)
-                        indice = Indice_Color(np.array([Testigos[sujeto][(repeticion+1)*Iteraciones-2],Testigos[sujeto][(repeticion+1)*Iteraciones-1]]),Divisiones)
-                        plt.plot(Testigos[sujeto][(repeticion+1)*Iteraciones-2],Testigos[sujeto][(repeticion+1)*Iteraciones-1], "o" ,c = color[indice], markersize=10)
-                    plt.xlabel("Tópico 1")
-                    plt.ylabel("Tópico 2")
-                    plt.annotate("Agente {}".format(AgentesTestigos[sujeto]), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.savefig("../Imagenes/RedAct/TdO_alfa={:.2f}_Cdelta={:.2f}_N={}_testigo={}.png".format(ALFA,CDELTA,AGENTES,AgentesTestigos[sujeto]),bbox_inches = "tight")
-                    plt.close("TdO")
+        # Acá me voy a armar los gráficos de las trayectorias de Opniones de los agentes Testigos.
+#        
+#        if len(Testigos[0]>0):
+#            for sujeto in range(len(AgentesTestigos)):
+#                plt.rcParams.update({'font.size': 18})
+#                plt.figure("TdO",figsize=(20,15))
+#                for repeticion in range(int(len(Testigos[sujeto])/Iteraciones)):
+#                    plt.plot(Testigos[sujeto][repeticion*Iteraciones+0:(repeticion+1)*Iteraciones+0:2],Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2], color="gray",linewidth = 1, alpha=0.5)
+#                    indice = Indice_Color(np.array([Testigos[sujeto][(repeticion+1)*Iteraciones-2],Testigos[sujeto][(repeticion+1)*Iteraciones-1]]),Divisiones)
+#                    plt.plot(Testigos[sujeto][(repeticion+1)*Iteraciones-2],Testigos[sujeto][(repeticion+1)*Iteraciones-1], "o" ,c = color[indice], markersize=10)
+#                plt.xlabel("Tópico 1")
+#                plt.ylabel("Tópico 2")
+#                plt.annotate("Agente {}".format(AgentesTestigos[sujeto]), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.savefig("../Imagenes/RedAct/TdO_alfa={:.2f}_Cdelta={:.2f}_N={}_testigo={}.png".format(ALFA,CDELTA,AGENTES,AgentesTestigos[sujeto]),bbox_inches = "tight")
+#                plt.close("TdO")
             
             
 
@@ -561,7 +605,7 @@ for AGENTES in [1000]:
     
     # Grafico la línea del Alfa Crítico teórico
     
-    Xa = np.arange(-0.05,1.05,0.01)
+    Xa = np.arange(-0.05,0.05,0.01)
     Ya = np.array([AlfaC(x,0.817) for x in Xa]) # El grado Medio lo calculé aparte, después puedo ver de incorporar esto en el programa.
     plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
     plt.annotate("Red Actividad N={}".format(AGENTES), xy=(0.35,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))

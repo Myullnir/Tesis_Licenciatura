@@ -3730,4 +3730,190 @@ que grafica los gráficos de Opiniones, las TdO y los estados finales en
 el espacio de parámetros. Lo siguiente que debería ahcer es pasar esto a oporto
 y mandarlo a correr con los datos de las Redes de actividad que hice en Oporto.
 
-Y ya que estoy, si esto funca, hoy debería subir todo a Github.
+Y ya que estoy, si esto funca, hoy debería subir todo a Github. Bueno, ya subí todo
+a Github. Mañana empezaré entonces con el tema de la beca y ya el miércoles o jueves
+seguiré con el tema de los gráficos de Entropía y Varianza.
+
+---------------------------------------------------------------------------------------------------
+
+20/07/2021
+
+Armé los gráficos de Opiniones y el de estados finales en el espacio de Parámetros para
+las redes de Actividades con 500 ciclos. Al final, da más o menos igual que lo que hice
+en mi pc. Incluso, pareciera que los sistemas van cayendo a cero, porque las máximas
+opiniones van promediando a 3. Entonces me da que esto si va cayendo con el tiempo.
+Quizás con más iteraciones todo caería a cero. La abismal diferencia entre el 
+Alfa teórico y el experimental me hace pensar que hay un error fundamental en la
+forma de correr los programas de actividad. Tiene que haber otra forma de hacer esto.
+Además de un posible error sustancial en la forma en que se calcula el alfa teórico,
+aunque no creo que ese realmente sea un problema.
+
+Dicho esto, tengo para hacer entonces lo del campo externo, leer papers y lo de la presentación
+a beca. Diría de mirar un poco lo de campo externo y lo de la beca, ya mañana leeré papers
+y veré si tengo cómo encarar estos bardos que no funcionan.
+
+Bardos que no funcionan: Ver otras caracterizaciones de Redes Estáticas.
+¿Cómo carajos se supone que trabaje las redes de Actividad?
+
+Hablando con Sebas él me propone no mirar el promedio de los ensambles, sino mirar
+el estado final de cada elemento del ensamble, y juzgar el estado final en base
+al que aparezca más veces.
+
+También me dijo de analizar el valor de los tópicos en función del tiempo, para ver
+si llegan a algún estado más o menos estacionario.
+Ver gráficos de Estado final para los puntos del ensamble en Redes de Actividad.
+Mirar en Alfa=0.0, 0.2, 0.6.
+
+Armar sobre los gráficos de Estados Finales un mapa de porcentajes. Y sobre la
+corrida de agentes con rearmado de la red de 500 veces tomar un estado y guardar
+los datos de la trayectoria total de los agentes para ver si llegan a un estado
+estacionario o no, de manera de estar seguro de estar etiquetando estados finales.
+
+--------------------------------------------------------------------------------------------
+
+22/07/2021
+
+Ahí revisé los datos que están corriendo en Oporto y parece que van a tardar unos
+dos días más hasta terminar. Así que ahora me voy a poner a terminar lo de
+la entropía, el promedio de las opiniones y la Varianza de los sistemas.
+
+-------------------------------------------------------------------------------------------
+
+23/07/2021
+
+Armé el código que hace los gráficos de Entropía, de Varianza y el de Promedios.
+Por lo pronto parece que funcionan bien, aunque los gráficos no se ven tan lindos
+como esperaba. Quizás sea la falta de estadística o la falta de un barrido fino.
+
+Lo que voy a hacer ahora es modificar el código que clasifica a los puntos en cuadrantes
+ya que quiero diferenciar los puntos que caen al cero. También voy a modificar el archivo para
+que me muestre los graficos de Variación Promedio y el de clasificación de opiniones 
+en cuadrantes. Creo que ahí está hecho, ahora lo mando a correr y a ver que tal sale.
+
+Lo siguiente es trabajar el código de Redes de Actividad para que NO promedie las opiniones
+finales, sino que en cada iteración defina el estado final y con los estados finales
+de todos los elementos de un punto del ensamble, promedio y calculo el estado
+final del sistema. Una idea copada, habrá que ver cómo se hace, es en cada punto del ensamble
+colocar un porcentaje de cuál es la probabilidad de que ese estado marcado sea el estado final.
+Lo ideal sería ver que en las regiones bien definidas la probabilidad va al 100% mientras que
+en las zonas de transición la probabilidad debería decaer.
+
+Mirando el código de Redes de Actividad estoy notando que la cosa no funciona como pensaba.
+El estado final se determina en función de TODOS los valores de opiniones, no
+en función de los promedios. Aún así sigo teniendo que diferenciar el estado final
+para cada elemento del ensamble, pero estoy empezando a pensar que esto no será la solución.
+Entonces mañana tengo que hacer dos cosas con esto:
+1) En la iteración de los nombres usar la función que clasifica el estado final para armar
+un vector que contenga los estados finales de todos los elementos de ese punto del ensamble.
+Luego, cuando quiera poner en el elemento de la matriz el estado final de ese punto,
+ahí si promedio todos los estados y obtengo el verdadero estado final.
+2) Modificar el armado de los gráficos de opiniones de manera que grafique todos los puntos
+de opiniones, no que grafique las opiniones promediadas
+
+---------------------------------------------------------------------------------------------------
+
+24/07/2021
+
+Resolví los 2 puntos que marqué ayer. Hice los gráficos de Opiniones y el de Estados Finales
+con los nuevos cambios. 
+
+Analizando el gráfico de Estados Finales en el Espacio de Parámetros:
+En primera medida, considerando que por encima de la región de consenso
+debería haber Polarización en los cos(delta) entre 0 y 0,1, hay mucha más polarización de la
+que debería en el alfa=0,1. Luego de eso, pareciera que el programa ubica correctamente
+los estados finales.
+
+Esto suena muy bien, pero en realidad, según lo que marca el cálculo del Alfa
+teórico, estoy MUY por debajo del valor de alfa y debería estar cayendo
+al consenso, no logro entender porqué pasa esto. A esta altura, realmente
+queda pensar que mi cálculo del alfa crítico está mal, debería revisar eso.
+
+--------------------------------------------------------------------------------------------------
+
+25/07/2021
+
+Vamos a intentar hacer lo que me dijo Seba de graficar los tópicos en función del tiempo.
+Mañana debería intentar plantear lo del campo externo empezando a probar lo de la sigmoidea.
+Supongo que en la semana iré leyendo algunos papers. Aunque quizás esta semana no esté tan
+bien de tiempo como para hacerlo.
+
+--------------------------------------------------------------------------------------------------
+
+27/07/2021
+
+Cambié unas cosas en el archivo de Graficos Var RE.py de manera de que la varianza se calcule
+usando el método de numpy para ello. Ahora sólo queda pasar esto a la pc de Oporto y mandar
+a correr esto para tener los gráficos de esas redes. Y debería ver de implementar lo que me 
+dijo Seba sobre los cuartiles para reducir el tema del efecto de los Outliers.
+
+Por otro lado, en el archivo de TdO_Actividad.py puse la parte del código que grafica los
+tópicos en función del tiempo. Eso igual lo voy a tener que comentar al mandarlo a oporto.
+Aunque en Oporto ya está corriendo esto para los gráficos de Actividad con redes de 500
+ciclos de armado de la red de actividad. Ya tenía gráficos de eso, pero ahora acordate
+que lo que ocurre es que estás graficando las imágenes de gráficos de Opiniones y además
+ahora el estado final se define como el que aparece más veces en las iteraciones de un
+dado punto del ensamble.
+
+Habría que subir esto a Github y además hacer que en las redes de Actividad se grafique lo de
+los valores promedios, la ¿Varianza? y la Entropía
+
+----------------------------------------------------------------------------------------------------
+
+30/07/2021
+
+Estuve peleando pero no logré conseguir que mi idea sobre un programa que me mande a correr de
+de una todos los programas funcione. Está teniendo un problema de considerar como si fueran 
+strings los números que le paso y entonces no recorre los alfas en los valores que quiero.
+De paso descubrí que tengo que pedirle el nombre del script aparte. Eso es un poco paja porque
+no me lo está guardando en donde me gustaría pero por ahora todo bien. Esta forma
+de mandar a correr los archivos tiene sus claras ventajas, si logro dominarlo
+va a ser genial. Sólo me falta ese detalle de cómo configurar los intervalos.
+
+También tengo todavía que hacer lo que decía Seba de revisar los datos de la Mediana de los
+tiempos de Convergencia en vez de mirar la Varianza, eso debería ser una medida más robusta.
+Usar el scipy.stats.iqr. 
+
+Por último tengo que subir el Aval, el CV y los datos del Poster a la presentación de Beca.
+
+---------------------------------------------------------------------------------------------------
+
+01/08/2021
+
+Estuve haciendo bastante mierda hoy. Por un lado en Oporto mandé a correr los programas para graficar
+los gráficos de Estados finales, Varianza, Promedios y Entropía. Lo hice como cinco veces, creo
+que esta vez al fin está bien. Mañana cualquier cosa me entero si hubo problemas. Sobre esto,
+debería encargarme de modificar los gráficos de Varianza por gráficos de Medianas de tiempos
+de simulación (TideSi).
+
+También estuve haciendo lo de las redes de Actividad. Por un lado rearmé los gráficos de tópicos
+de manera de que cada gráfico corresponda a una simulación del sistema y que me muestre la evolución
+de los 2 tópicos de los 5 agentes testigos. También hice gráficos de Opiniones finales para cada
+iteración y coloqué la etiqueta a cada uno. Con esto queríamos ver si el etiquetado es correcto
+o no. Sobre el etiquetado cambié también la forma de definir consenso. El consenso se da si
+más del 90% de los agentes están en valores por debajo de 0,01.
+Lo malo de esta forma de graficar los datos es que básicamente voy a armar 4100 gráficos. Eso
+no va a ser bueno. Voy a tener que ver cómo filtrarlos, sintetizarlos o elegirlos correctamente.
+Espero que el graficado de los estados finales en el espacio de parámetros salga bien.
+Mañana debería mandar a correr todo o completar los que faltan. 
+
+También podría subir esto a Github. Y mañana debería arrancar con la presentación de esto.
+Y si puedo leer un paper, mejor.
+
+---------------------------------------------------------------------------------------------------
+
+02/08/2021
+
+Las cosas nunca van como uno quiere. En primer lugar, los gráficos sobre Redes Estáticas no se ven
+tan lindos como me gustaría. Queda revisar si los algoritmos para realizarlos están bien, tengo
+algunas sospechas. Además la Varianza difícilmente esté dando buenos resultados, hay que probar lo que
+dijo Sebas. Así que este tema NO está cerrado. Y de paso, por algún motivo desconocido, los gráficos
+de Entropía, varianza y cosas de la red Random Regulars no se armaron, no entiendo porqué.
+
+El algoritmo de la Entropía es muuuuy raro. Revisalo.
+
+Por otro lado, los gráficos hechos de Redes de Actividad parecen estar bastante bien, pero el gráfico
+de Estados finales no se armó, ese parece tener problemas. Entiendo que el problema surge porque
+tengo una sola columna para graficar. Si no es ese el problema, entonces no sé que es.
+
+Ahora lo que voy a hacer es empezar a preparar la presentación de mañana y ver qué se me ocurre
+para solucionar eso entre hoy y mañana. Es importante tener a mano todo lo que me pidió Pablo.

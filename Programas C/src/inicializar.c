@@ -15,9 +15,11 @@ int GenerarOpi(ps_Red ps_var, ps_Param ps_par){
 	int i_F,i_C;
 	i_F = (int) ps_var->pd_Opi[0];
 	i_C = (int) ps_var->pd_Opi[1];
+	double d_varianza;
+	d_varianza = sqrt(2.5);
 	
 	// Inicializo la "matriz" de opiniones de mis agentes.
-	for(register int i_i=0;i_i<i_F*i_C;i_i++) ps_var->pd_Opi[i_i+2] = ps_par->i_Mopi*(Random()-0.5)*2;
+	for(register int i_i=0;i_i<i_F*i_C;i_i++) ps_var->pd_Opi[i_i+2] = Gaussiana(0,d_varianza);
 	return 0;
 }
 

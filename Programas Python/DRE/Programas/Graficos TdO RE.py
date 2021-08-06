@@ -229,7 +229,7 @@ T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
 
 SuperDiccionario = dict()
 
-for REDES in ["Erdos-Renyi"]: # ["Barabasi"]: # ["Random Regulars"]:
+for REDES in ["Barabasi"]:
 
 
     # Primero levanto datos de la carpeta de la red REDES
@@ -333,14 +333,14 @@ for REDES in ["Erdos-Renyi"]: # ["Barabasi"]: # ["Random Regulars"]:
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
 # las keys de mi SuperDiccionario.
 
-for REDES in ["Erdos-Renyi"]: # ["Barabasi"]: # ["Random Regulars"]:
+for REDES in ["Barabasi"]:
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
 
         for GM in Conjunto_Gm:
             
-            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
+            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())[0:11]
         
             Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
             

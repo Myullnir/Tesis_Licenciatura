@@ -148,7 +148,6 @@ def ClasificacionCuadrantes(Array):
     # Lo siguiente es crear el array SwitchDic, que va a funcionar como un Switch para los
     # casos que voy a considerar.
     
-    Signos = np.sign(Array)
     Resultado = np.zeros(int(len(Array)/2))
     SwitchDic = dict()
     
@@ -166,8 +165,13 @@ def ClasificacionCuadrantes(Array):
     
     # Repaso los elementos en Signos para identificar los cuadrantes de mis objetos.
     
-    for x1,x2,indice in zip(Signos[0::2],Signos[1::2],np.arange(len(Signos[0::2]))):
-        Resultado[indice] = SwitchDic[(x1,x2)]
+    for x1,x2,indice in zip(Array[0::2],Array[1::2],np.arange(len(Array[0::2]))):
+        Absolutos = np.abs(np.array([x1,x2]))
+        if max(Absolutos)<0.01:
+            Resultado[indice] = 0
+        else:
+            Signos = np.sign(np.array([x1,x2]))
+            Resultado[indice] = SwitchDic[(Signos[0],Signos[1])]
   
     return Resultado
 
@@ -201,7 +205,7 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 SuperDiccionario = dict()
 
-for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
+for REDES in ["Barabasi"]:
 
 
     # Primero levanto datos de la carpeta de la red REDES
@@ -306,7 +310,7 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
 # las keys de mi SuperDiccionario.
 
-for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:    
+for REDES in ["Barabasi"]:    
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
@@ -330,8 +334,9 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
             
             XX,YY = np.meshgrid(x,y)
             
-            ZZ = np.zeros(XX.shape)
-            
+            ZZV = np.zeros(XX.shape) # Esta es la matriz de valores para la varianza
+            ZZP = np.zeros(XX.shape) # Esta es la matriz de valores para los valores de opiniones máximas
+            ZZE = np.zeros(XX.shape) # Esta es la matriz con valores de entropía para las distribuciones por cuadrantes
             # Con esto ya tengo armados los grids de XX,YY y de paso me armo el grid
             # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
             # los datos que ya guardé de antes. Para eso es el módulo siguiente
@@ -342,6 +347,10 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
             
             for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
                 
+#                fig = plt.figure("Distribucion por cuadrantes", figsize=(20,12))
+#                Xhisto = np.arange(5)
+#                Fondo = np.zeros(5)
+                
                 for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
                 
                     #-----------------------------------------------------------------------------------
@@ -349,10 +358,15 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
                     # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
                     # que voy a necesitar para después
                     
-                    plt.rcParams.update({'font.size': 18})
-                    plt.figure("Variaciones Promedio",figsize=(20,12))
+                    # Creo el array TideSi, la cual voy a usar para guardar un nuevo valor en la matriz ZZV
+                    # para cada combinación de Alfas y Cdelta
+                    # Creo el array Maximos 
+                    
+                    TideSi = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
+                    Promedios = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
+#                    plt.rcParams.update({'font.size': 18})
+#                    plt.figure("Variaciones Promedio",figsize=(20,12))
                     OpinionesFinales = np.array([])
-                    PuntosFinales = np.array([])
                     Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA])))
                     
                     #-------------------------------------------------------------------------------------
@@ -381,7 +395,7 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
         
                         X = np.arange(0,len(Var))*0.1 # El dt usado en todos los archivos es 0.1
                         
-                        plt.semilogy(X,Var, "--", linewidth = 5,c = Colores2[numero],linewidth = 2)
+                        plt.semilogy(X,Var, "--", linewidth = 3,c = Colores2[numero])
         
                         # El programa sigue funcionando bárbaro, lo cual es buenísimo. Corta en el momento
                         # adecuado y el comportamiento es razonbale. El guardado y el cerrado de la figura
@@ -389,6 +403,26 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
                         # tengo que iniciar el siguiente gráfico antes de cerrar este. Eso no es un problema
                         # para el código o de hacer, es sólo un tema de que dificulta un poquito más la modularidad
                         # del código porque ahora las cosas se mezclan y el cierre de este módulo está al final
+                        
+                        #----------------------------------------------------------------------------------------------
+
+                        # Voy a ir armando mi array con los valores de Tiempo de Simulación.
+                        # Lo voy a llamar TideSi
+                        
+                        TideSi[numero] = Var.shape[0]*0.1 # 0,1 es el paso temporal dt
+                        
+                        # Esto debería funcionar derechito.
+                        
+                        #------------------------------------------------------------------------------------------------
+                
+                        # Quiero hacer un estudio de cómo varía el máximo al cual llega el sistema en función del
+                        # cos(delta) y alfa. La idea es mirar las opiniones finales, promediar los máximos en
+                        # las simulaciones realizadas y desde ahí asignar ese valor a cada punto del colormap.
+                        
+                        Promedios[numero] = np.mean((np.abs(Opi)))
+                        
+                        # Esto me guarda en cada posición del array el máximo de las opiniones finales alcanzadas
+                        # en cada simulación
                         
                         #----------------------------------------------------------------------------------------------
                         
@@ -399,33 +433,79 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
                         
                         # Con esto me armo el array de estados finales de mi sistema
                         
-                        #-------------------------------------------------------------------------------------------------
+                    #------------------------------------------------------------------------------------------------
+                    
+                    # Acá lo que voy a hacer es rellenar el grid de ZZV con los valores de los resultados de
+                    # opiniones finales
+                   
+                    ZZV[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.log10(np.var(TideSi)+1)
+                    
+                    # Esto ya debería correctamente armarme el ZZV ubicando para cada par de valores
+                    # alfa y cos(delta) su respectiva Varianza. Lo siguiente es tomar eso al final y graficarlo.
                         
-                        # Cuando quiera graficar los puntos que indican el punto final de la trayectoria
-                        # de un agente en el espacio de fases, voy a necesitar que ese array contenga los puntos
-                        # correctamente normalizados. Para eso voy a construir el array PuntosFinales que involucre
-                        # normalización con el MaxNorm Correcto
+                    #-------------------------------------------------------------------------------------------------
+                    
+                    # Acá lo que voy a hacer es rellenar el grid de ZZM con los valores de los maximos promedios
+                    # de las opiniones finales
+                
+                    ZZP[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.mean(Promedios)
+                    
+                    # Esto ya debería correctamente armarme el ZZM ubicando para cada par de valores
+                    # alfa y cos(delta) su respectivo valor máximo. Lo siguiente es tomar eso al final y graficarlo.
                         
-                        PuntosFinales = np.concatenate((PuntosFinales,Opi*MaxNorm), axis=None)
-                        
-                        # Con esto me armo la lista de estados finales de mi sistema
-                        
-                     #------------------------------------------------------------------------------------------------
-            
-                    # Esto me guarda el gráfico de variaciones Promedio
+                    #-------------------------------------------------------------------------------------------------
+
+                    # Ok, esto me confundió mucho en un principio. La idea es que uso ClasificaciónCuadrantes para
+                    # armar el array que tenga los números de los cuadrantes en los que se encuentran las opiniones.
+                    # Defino los bins a mano, total sé que distribuyo mis opiniones en los cuadrantes del 1 al 4, y
+                    # el 0 es para aquellos en los que están muy cerca del cero.
+                    
+#                    plt.figure("Distribucion por cuadrantes")
+    
+                    Cuadrantes = ClasificacionCuadrantes(OpinionesFinales)
+                    Bins = [-0.5,0.5,1.5,2.5,3.5,4.5]
+                    
+                    # Calculo la distribución. Del np.histogram obtengo dos arrays, el primero es el histograma
+                    # y el segundo es los bins. Para evitar problemas, mando eso a la nada misma y listo.
+                    
+                    [Yhisto,nada] = np.histogram(Cuadrantes, bins = Bins)
+                    
+                    # Esto lo saqué del manual de uso. Simplemente grafica en el sistema de ejes del subplot
+                    # el gráfico de barras y se encarga de tomar siempre como piso el anterior gráfico de barras
+                    # de manera de ir stackeando las barras. Eso me va a permitir mostrar variso gráficos 
+                    # juntos y con eso recorrer varios alfas.
+                    
+#                    plt.bar(Xhisto, Yhisto, 0.5, bottom = Fondo, label = r"cos($\delta$) = {}".format(CDELTA))
+#                    Fondo = Fondo+Yhisto
+                    
+                    #---------------------------------------------------------------------------------------------------
+                    
+#                    Voy a aprovechar la cuenta hecha para distribucion por Cuadrantes para ir calculando la Entropía.
+#                    A fin de cuentas, la entropía va a estar vista en función de la distribución de las opiniones en
+#                    los cuadrantes. De paso, Seba me dijo que ignore el tema de las opiniones que se van a cero.
+#                    Son muy pocas en general, así que no importan mucho, ¿Pero debería simplemente ignorarlas?
+#                    Definitivamente son despreciables, dale para adelante.
+                    
+                    Probabilidades = Yhisto[1::][Yhisto[1::] != 0]/np.sum(Yhisto[1::])
+                    ZZE[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.matmul(Probabilidades, np.log2(Probabilidades))*(-1)
+                
+                #---------------------------------------------------------------------------------------------------
+                
+                # Esto me guarda el gráfico de variaciones Promedio
         #            plt.tick_params(left=False,
         #                bottom=False,
         #                labelleft=False,
         #                labelbottom=False)
-                    plt.xlabel("Tiempo Simulado")
-                    plt.ylabel("Variación promedio de las opiniones")
-                    plt.axis("tight")
-                    plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
-                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.65),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.grid()
-                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Variaciones Promedio_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
-                    plt.close("Variaciones Promedio")
+#                    plt.figure("Variaciones Promedio")
+#                    plt.xlabel("Tiempo Simulado")
+#                    plt.ylabel("Variación promedio de las opiniones")
+#                    plt.axis("tight")
+#                    plt.title(r"Variación Promedio del sistema para $\alpha$={}_cos($\delta$)={}_N={}".format(ALFA,CDELTA,AGENTES))
+#                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.grid()
+#                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Variaciones Promedio_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,AGENTES,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+#                    plt.close("Variaciones Promedio")
                     
                     #-------------------------------------------------------------------------------------------------
         
@@ -435,24 +515,124 @@ for REDES in ["Barabasi","Erdos-Renyi","Random Regulars"]:
                     # Como tengo 100 agentes y 40 simulaciones, entonces tengo 4000 opiniones para cada tópico. Me parece
                     # razonable separar esto en 40 bins.
                     
-                    Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=20)
-                    
-                    EjeX = [(Bordes_Bin[i+1]+Bordes_Bin[i])/2 for i in range(len(Bordes_Bin)-1)]
-                    
-                    plt.figure("Distribucion de Valores")
-                    plt.plot(EjeX,Histo,"--",linewidth = 3, label = r"$cos(\delta)$ = {}".format(CDELTA))
-            
-            
-                plt.rcParams.update({'font.size': 18})
-                plt.xlabel("Valores de Opiniones")
-                plt.ylabel("Ocurrencias")
-                plt.title(r"Distribucion de las opiniones para  N={}, Gm={} $\alpha$={:.2f}".format(ALFA, AGENTES))
-                plt.legend()
-                plt.grid()
-                plt.savefig("../Imagenes/ER2/N={}/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,AGENTES,ALFA),bbox_inches = "tight")
-                plt.close("Distribucion de Valores")
+#                    Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=20)
+#                    
+#                    EjeX = [(Bordes_Bin[i+1]+Bordes_Bin[i])/2 for i in range(len(Bordes_Bin)-1)]
+#                    
+#                    plt.figure("Distribucion de Valores")
+#                    plt.plot(EjeX,Histo,"--",linewidth = 3, label = r"$cos(\delta)$ = {}".format(CDELTA))
+#            
+#            
+#                plt.rcParams.update({'font.size': 18})
+#                plt.xlabel("Valores de Opiniones")
+#                plt.ylabel("Ocurrencias")
+#                plt.title(r"Distribucion de las opiniones para  N={}, Gm={} $\alpha$={:.2f}".format(ALFA, AGENTES))
+#                plt.legend()
+#                plt.grid()
+#                plt.savefig("../Imagenes/ER2/N={}/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,AGENTES,ALFA),bbox_inches = "tight")
+#                plt.close("Distribucion de Valores")
                     
                 #-----------------------------------------------------------------------------------------------------------
+                
+
+#                plt.figure("Distribucion por cuadrantes")
+#                plt.grid()
+#                plt.rcParams.update({'font.size': 18})
+#                plt.ylabel("Ocurrencias")
+#                plt.xlabel("Cuadrantes")
+#                plt.title(r"Distribución de opiniones en cuadrantes, $\alpha$ = {}".format(ALFA))
+#                plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.5,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.legend()
+#                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Distribucion Cuadrantes Alfa={}.png".format(REDES,GM,ALFA), bbox_inches = "tight")
+#                plt.close("Distribucion por cuadrantes")
+            #         plt.show()
+            
+            #------------------------------------------------------------------------------------------------------------
+    
+                
+            # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
+        
+            # Defino los parámetros usuales de mi gráfico
+        
+            plt.figure("Varianza TideSi",figsize=(20,12))
+            plt.rcParams.update({'font.size': 18})
+            plt.xlabel(r"cos($\delta$)")
+            plt.ylabel(r"$\alpha$")
+            plt.title("Varianza del Tiempo de Simulación en el espacio de parámetros")
+        
+            # Grafico la línea del Alfa Crítico teórico
+        
+            Xa = np.arange(-0.05,1.05,0.01)
+            Ya = np.array([AlfaC(x,GM) for x in Xa])
+            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+        
+            # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
+        
+            plt.legend()
+            plt.pcolormesh(XX,YY,ZZV,shading="nearest", cmap = "plasma")
+            plt.colorbar()
+            plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Varianza EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.close("Varianza TideSi")
+        #     plt.show()
+        
+            #---------------------------------------------------------------------------------------------------
+            
+            # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
+        
+            # Defino los parámetros usuales de mi gráfico
+        
+            plt.figure("Promedios EP",figsize=(20,12))
+            plt.rcParams.update({'font.size': 18})
+            plt.xlabel(r"cos($\delta$)")
+            plt.ylabel(r"$\alpha$")
+            plt.title("Promedios de Opiniones en el espacio de parámetros")
+        #
+        #    # Grafico la línea del Alfa Crítico teórico
+        #
+            Xa = np.arange(-0.05,1.05,0.01)
+            Ya = np.array([AlfaC(x,GM) for x in Xa])
+            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+        #
+        #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
+        #
+            plt.legend()
+            plt.pcolormesh(XX,YY,ZZP,shading="nearest", cmap = "viridis")
+            plt.colorbar()
+            plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Promedios EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.close("Promedios EP")
+        #     plt.show()
+        
+            #---------------------------------------------------------------------------------------------------
+            
+            # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
+        
+            # Defino los parámetros usuales de mi gráfico
+        
+            plt.figure("Entropia EP",figsize=(20,12))
+            plt.rcParams.update({'font.size': 18})
+            plt.xlabel(r"cos($\delta$)")
+            plt.ylabel(r"$\alpha$")
+            plt.title("Entropía de distribuciones en el espacio de parámetros")
+        #
+        #    # Grafico la línea del Alfa Crítico teórico
+        
+            Xa = np.arange(-0.05,1.05,0.01)
+            Ya = np.array([AlfaC(x,GM) for x in Xa])
+            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+        #
+        #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
+        #
+            plt.legend()
+            plt.pcolormesh(XX,YY,ZZE,shading="nearest", cmap = "viridis")
+            plt.colorbar()
+            plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Entropía EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.close("Entropia EP")
+        #     plt.show()
+        
+            #---------------------------------------------------------------------------------------------------
                     
                     
 

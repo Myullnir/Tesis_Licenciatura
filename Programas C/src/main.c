@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 		ps_datos->i_m = 10; // Cantidad de conexiones que hace el agente al activarse
 		ps_datos->f_K = 3; // Influencia social
 		ps_datos->f_dt = 0.01; // Paso temporal de iteración del sistema
-		ps_datos->f_alfa = strtof(argv[2],NULL)/10; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
+		ps_datos->f_alfa = strtof(argv[2],NULL)/30; // Controversialidad de los tópicos. Arranquemos con controversialidad intermedia. Voy a estar dividiendo esto acá para poder pasar enteros desde el instanciar.
 		ps_datos->i_Mopi = 3; // Este es el valor de máxima opinión inicial del sistema
 		ps_datos->d_NormDif = sqrt(ps_datos->i_N*ps_datos->i_T); // Este es el valor de Normalización de la variación del sistema, que me da la variación promedio de las opiniones.
 		ps_datos->d_epsilon = 0.01; // Mínimo valor de actividad de los agentes

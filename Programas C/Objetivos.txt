@@ -27,37 +27,16 @@ Cosas importantes para la semana que viene:
 2) Hacer más simulaciones para los casos de Redes de Actividad de algunos
 valores específicos como para comprobar porqué hay tanta discrepancia entre
 el valor de alfa teórico y el experimental.
-3) En algunas simulaciones, guardar datos de la trayectoria de algunos de los agentes
-de manera de ir revisando qué pasa exactamente con ese sujeto. Porque como dijo
-Seba, en principio si yo promedio las opiniones respecto de los elementos del
-ensamble, yo esperaría que los sujetos caigan a cero. Me sorprende que tomen el comportamiento
-esperado del sistema.
-4) Armar una carpeta sobre las bases y condiciones en el drive de las cosas de Tesis.
-5) Buscar el template del plan de trabajo para la postulación de Beca.
-6) Revisar mejor el tema de las bases y condiciones.
-7) Rearmar los gráficos de Redes Estáticas, fijate que no necesitás mirar hasta Alfa=4,
-con llegar a Alfa=1 estás hecho. Y tenés que barrer más fino para cos(delta) entre -0,2
-y 0,2. Habrá que ver si borro los datos que no necesito, o si simplemente los muevo, o los ignoro
-con el código. Creo que haré lo último.
 8) Para empezar a pensar el modelo estaría bueno arrancar con un modelo unidimensional
 para pegarle mejor a la implementación de la sigmoide y esas cosas. Hacemos primero dos
-agentes un rópico, después muchos agentes un tópico y por último muchos agentes dos tópicos
+agentes un tópico, después muchos agentes un tópico y por último muchos agentes dos tópicos
 9) Consolidar Redes Estáticas y Redes de Actividad. Qué cosas graficamos y qué cosas dejamos.
-
-
-
-
-
-Transcripción de Progreso:
---------------------------
-Organicémonos:
-5) Armemos un archivo de Python que levante estos datos y me arme los
-gráficos.
-6) Trabajemos los datos y armemos todos los gráficos.
 
 
 Bajar los 4 papers que cita Baumann y leerlos
 ¿Cómo cambiarían las ecuaciones del modelo si intentara introducir efecto Backfire?
+
+
 
 Capítulos Tesis:
 Introducción
@@ -67,13 +46,26 @@ Modelo sin campo externo
 Modelo con campo externo
 
 
+Para la semana que viene:
+1) Mirar en Cos(delta)=0, barrer Alfa de manera fina, tomar entre 20 y 50 posibles alfas
+y 100 elementos por ensamble. Preparar una presentación nueva sobre esto y tener código a 
+mano y cosas para revisarlo mejor.
+2) Revisar si el etiquetado del estado final se corresponde con lo que es realmente el gráfico.
+3) Los gráficos de los tópicos en función del tiempo rearmarlos para graficar agentes de
+ensambles iguales. La idea es ver si la opinión de los tópicos está más o menos convergiendo
+en función del tiempo, por lo que estás en un estado estacionario, o si estás en un estado
+todavía transitorio e
+4) Dibujar un circulito con la región que contiene a las opiniones iniciales en el gráfico.
+El radio debería ser de 2 sigma. También dibujar estados iniciales.
+5) Inicializar opiniones usando una distribución normal.
+6) Armar los gráficos con límites entre -30 y 30
+7) Revisar algún punto particular de la varianza para ver cuantos outliers surgen
+8) Ver de reemplazar la varianza por distancia entre cuartiles de tiempo de
+simulación.
 
-Cosas para Beca Doctoral:
-Buscar el template del plan de trabajo.
-Leer bien bases y condiciones
 
 
-----------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 
 ###################################
 Datos que tengo de Redes Estáticas
@@ -137,24 +129,14 @@ pip ...
 
 
 ID procesos:
-(Estos primeros siete programas son los que corren la red de Actividades con 500 ciclos)
-1) 194666
-2) 194701
-3) 194726
-4) 194734
-5) 194748
-6) 194761
-7) 194771
+(Estos primeros ocho programas son los que corren la red de Actividades con 30 ciclos y 100 Iteraciones)
+1) 525403
+2) 525407
+3) 525410
+4) 525415
+5) 525422
+6) 525425
 
-(Estos 4 procesos van a armar los datos de las redes Estáticas 
-con un barrido fino de Cos(delta) entre -0,2 y 0,2)
-8) 50102
-9) 50140
-10) 50182
-11) 50232
-
-(Esto es para reparar una cagada que me mandé, debe resolverse rápido)
-12) 194782
 
 
 
