@@ -1,0 +1,4 @@
+Acá voy a estar guardando las imágenes realizadas con los distintos datos de
+Redes de actividad. Los nombres de las carpetas serán iguales que los de
+las carpetas de datos. Buscá el archivo de Documentación en DilAct para una
+mayor información sobre qué datos son los usados al armar estas carpetas.

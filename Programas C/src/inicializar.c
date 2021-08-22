@@ -118,8 +118,14 @@ int Adyacencia_Actividad(ps_Red ps_red, ps_Param ps_datos){
 	// Desarmo todos los enlaces de la red
 	for(register int i_i=0; i_i<i_F*i_C; i_i++) ps_red->pi_Ady[i_i+2] = 0;
 	
+	// Limpio el vector de agentes activados
+	for(register int i_i=0; i_i< ps_red->pi_Activados[0]*ps_red->pi_Activados[1]; i_i++) ps_red->pi_Activados[i_i+2] = 0;
+	
 	// Ahora reviso todos los agentes, los intento activar y si se activa lo conecto con m agentes.
-	for(ps_red->i_agente=0; ps_red->i_agente<i_F; ps_red->i_agente++) if(Random()<ps_red->pd_Act[ps_red->i_agente+2]) Conectar_agentes(ps_red,ps_datos);
+	for(ps_red->i_agente=0; ps_red->i_agente<i_F; ps_red->i_agente++) if(Random()<ps_red->pd_Act[ps_red->i_agente+2]){
+		Conectar_agentes(ps_red,ps_datos);
+		ps_red->pi_Activados[ps_red->i_agente+2] = 1;
+	}
 	
 	return 0;
 }

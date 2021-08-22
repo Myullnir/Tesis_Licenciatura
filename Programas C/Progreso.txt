@@ -3917,3 +3917,211 @@ tengo una sola columna para graficar. Si no es ese el problema, entonces no sé q
 
 Ahora lo que voy a hacer es empezar a preparar la presentación de mañana y ver qué se me ocurre
 para solucionar eso entre hoy y mañana. Es importante tener a mano todo lo que me pidió Pablo.
+
+--------------------------------------------------------------------------------------------------
+
+04/08/2021
+
+Implementé el uso de la función Gaussiana que me devuelve un número a partir de una distribución
+Gaussiana para la inicialización de las redes de Actividad. Luego mandé a correr esto en la computadora
+de Oporto para barrer fino en alfa para un cos(delta) = 0. El alfa lo barrí entre 0 y 0,6
+con un paso de 1/60.
+
+---------------------------------------------------------------------------------------------------
+
+06/08/2021
+
+Ya subí a Github todas las nuevas implementaciones. Ahora lo que voy a hacer
+es descargarme de Oporto los datos de las simulaciones realizadas y usar eso para 
+ver qué pasó con Redes de Actividad. Me da bronca que por segunda vez no guardé correctamente
+el valor de Alfa. Como guardé sólo 2 números, tuvo que aproximar algunos resultados y da medio raro.
+
+Acabo de descubrir que al final me había equivocado al mandar a correr el programa porque no había
+hecho un make clean y make all. Así que por eso los alfas estaban todos mal, y no tenía los datos
+de inicio de la matriz. Por eso, de la bronca terminé rearmando el código de Metainstanciación
+y ahora funciona. En vez de pasarle el input a las llaves del for, decidí pasar el valor del input
+a la variable y luego meter eso en un while. Luego uso la variable como un contador y todo
+funca mejor. También de paso armé un código llamado asesinar que levanta desde los archivos
+de salida los ID de los script, de forma de borrar todos esos códigos de un plumazo. Revisarlo
+que la idea de eso es que levanta el id de los archivos salida*, así que atento con cuales salidas
+levantás.
+
+Metainstanciación es el que manda a correr los Instanciar y prepara las salidas. Requiere un input
+de un número, que es básicamente el número de hilos-1 que planeo mandar. Tomar en cuenta formas
+de reutilizar esto en el futuro cuando quiera barrer en otros parámetros.
+
+---------------------------------------------------------------------------------------------------------
+
+13/08/2021
+
+Entre el 06 y hoy claramente hice cosas, pero al parecer no las anoté. De lo que hice, claramente
+habré bajado los datos que mandé a correr con Metainstanciación y grafiqué lo que veía para tener
+una idea de lo que estaba pasando. Si no me equivoco, los datos que mandé a graficar son los
+de Reversión Actividad, que tienen las opiniones inicializadas con una distribución gaussiana
+de media 0 y sigma cuadrado = 2,5. 
+
+Por lo que estuvimos charlando con Seba y Pablo el martes, vamos a tener que hacer bastantes
+nuevas corridas para ir revisando datos y ver que todo cierra correctamente. Por esto es que
+entre ayer y hoy estuve ordenando los archivos que tengo en carpetas dentro de una carpeta llamada
+DilAct (Dilema Actividades). En esta carpeta están las otras carpetas con datos y además un archivo
+que guarda registro de qué cosas van en cada carpeta. Esto me pareció necesario para no marearme
+sobre qué cosa va donde.
+
+Ahora, lo siguiente que tengo que hacer es mandar a correr en la pc de Oporto ciertos códigos.
+Tengo varias cosas para hacer. En primer lugar tengo que mandar a correr un programa que guarde
+los valores de actividades, calcule valores medios y eso me lo compare con el valor medio de
+actividad que nosotros calculamos a mano. Eso lo puedo tranquilamente hacer en mi pc. Aunque
+considerando las otras cosas que tengo que mandar a correr, creo que casi que puedo simplemente
+guardarme los datos de actividad sorteados en las simulaciones realizadas y luego con eso calcular
+el valor de actividad media. No veo que vaya a ganar mucho por hacerlo por mi cuenta.
+
+Necesito armar histogramas de actividades sorteadas. Para eso tengo que guardarme las actividades
+sorteadas, así que eso es una cosa para agregar al main.
+Luego tengo que llevar registro de quiénes son los sujetos que se activan. Para eso necesito
+armar algunas corridas largas (500 aprox) en las cuales distribuya las actividades, guarde
+registro de eso y guarde también registro de cuáles son los agentes que se activan. Para evitar
+problemas, yo haría un programa aparte con eso. Esto lo puedo hacer en mi pc, esto si vale
+la pena hacerlo en la pc, porque la idea de esto es ver simplemente que los sujetos con cierta
+actividad se activan según lo que marca su actividad, no necesito correr la red de fondo. Así que
+puedo simplemente distribuir actividades y ver de que se activen correctamente.
+
+También tengo que hacer una corrida con Beta=0. Eso lo haría usando la configuración de la primer
+corrida descripta. Es decir, aprovecharía que me guardo los valores de actividad sorteadas, simplemente
+cambiaría el Beta y listo, lo vuelvo a mandar a correr.
+
+Por último tengo que también guardarme el valor de grado medio. Eso lo puedo calcular simplemente sumando
+todos los números en la matríz de Adyacencia y luego dividiendo por 1000.
+
+Ok, eso es todo lo que tengo que hacer. Se me ocurre una forma razonable de no mezclar información, que es
+simplemente agregar un nuevo archivo en el cual ir guardando los datos que sea:
+"Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$". De esta manera puedo guardar paso a paso los valores
+de actividades sin entrar en conflicto con la Variación Promedio. Y después, para no tener conflicto
+con el grado medio, a ese sí le armo un vector aparte y listo. Bueno, ahora sí tengo organizado
+el plan de trabajo. 
+
+Ahora tengo que rearmar el main y pasarlo a Oporto. Luego subir cosas a Github, armar nuevas carpetas
+en Oporto y luego ver de ir pasando las cosas necesarias a Algarve o Setubal para correr más cosas en
+paralelo.
+
+--------------------------------------------------------------------------------------------------------------
+
+14/08/2021
+
+Implementé el registro de las actividades de mis agentes, el registro de quienes se activan
+y del grado medio de las redes de Adyacencia armadas. Con todo eso debería estar el programa 
+en condiciones. Lo acabo de mandar a correr y parece funcionar.
+
+Ahora, si esto funca bien, la pregunta es cómo mandar a correr esto. En principio se me ocurre
+mandar a correr los datos en Oporto y en Setubal. Aunque para eso tendría que primero pasar
+todo a Oporto, asegurarme que está todo en condiciones, luego copiar la carpeta de Oporto
+a mi pc y de ahí pasarlo a la otra pc. Creo que es viable.
+
+De paso, no estoy guardando los datos de Opiniones iniciales. Al parecer eso es algo
+que tengo en la carpeta de Oporto, así que mejor lo agrego ahora y listo.
+
+Hice el traspaso de los archivos que estaban en Oporto a la computadora de Algarve.
+Ahora puedo correr cosas en Algarve, así que considerá que en general tenés 16
+hilos disponibles, y no solo 8 o 10. Siempre considerando que no les querés robar
+los 40 hilos a todos. 
+
+IMPORTANTE: En Oporto están corriendo los datos con beta = 3, en Algarve están corriendo
+los que tienen beta = 0. Igualmente se están guardando en carpetas diferenciadas, pero por
+si acaso lo registro. Si mis cuentas son correctas entonces, esto va a estar hecho mañana.
+
+--------------------------------------------------------------------------------------------------------------
+
+15/08/2021
+
+Bajé los datos de Oporto y Algarve y los pasé a mi PC. Empecé a armar el archivo de python
+con el cual analizar los datos. Ya me encargué de que guarde los nombres de los archivos
+de opiniones y actividades en el SuperDiccionario y me encargo de sólo tomar los de
+Actividades al levantar datos.
+
+También me encargué de armar los Arrays de Datos tales que guarde los valores
+de actividades, los registros de activación y demás. Aunque creo que debería
+encargarme de que los registros de activación se guarden todos como una única
+matriz, eso haría más fácil el revisar los datos de ella. Ya corregí eso.
+Queda mañana ir tomando los promedios, graficando cosas y ver cuál me falta
+hacer a mi aparte. Y ver si de una vez puedo ponerme a hacer lo de los cuartiles
+que charlamos con Sebas.
+
+-----------------------------------------------------------------------------------------------------------
+
+16/08/2021
+
+Estoy armando el archivo de Python que debería hacer los gráficos para estudiar
+las actividades, grados medios y demás. Acabo de terminar el código que levanta
+las actividades y con eso me armo un gráfico que tiene la distribución de actividades,
+la Función distribución de actividades por encima y los valores medios calculados
+y empíricos graficados.
+
+Hice el gráfico de probabilidad de activación en función de la actividad. La verdad
+que dió bastante mal, porque esperaba una función identidad y estoy observando cualquier
+cosa. Me parece muy raro esto. Charlarlo.
+
+Tengo hecho el código que grafica la distribución de los grados medios de la red.
+Este histograma está dando que el grado medio de la red de actividad se distribuye
+como una gaussiana centrada en el valor teórico.
+
+-------------------------------------------------------------------------------------------------------------
+
+17/08/2021
+
+Esto lo estoy escribiendo un día tarde. Ayer logré armar el gráfico que coloca
+la fracción de agentes por debajo del umbral de consenso en vez de la fracción
+de simulaciones que terminan en consenso.
+
+Luego tuvimos una charla con Sebas y Pablo y hablamos sobre que quizás el cálculo
+de las distancias o la probabilidad de conexión está mal. Revisar las pruebas que
+hice y mostrárselas a Pablo y Sebas.
+
+La otra cosa que quizás es el error puede ser el criterio de etiquetado. O el
+criterio de finalización de corrida. Habría que investigar eso.
+
+También anotamos algunas cosas para hacer para comprobar en los datos. 
+
+--------------------------------------------------------------------------------------------------------
+
+18/08/2021
+
+Ya pasaron varios días así que no me acuerdo exactamente lo que iba a anotar acá.
+Creo que por un lado iba a mencionar que mandé a correr nuevamente en Oporto y
+Algarve las corridas de Regact y HomofiliaCero respectivamente. Lo hice porque
+las corridas anteriores tenían el problema de que el guardado del registro de
+agentes activados estaba mal hecho porque guardaba los agentes en 2 casilleros
+más atrás de lo que debía, corriendo totalmente los registros de activación
+por un lado, por no mencionar que eso a veces hacía que se sobreescribieran los
+casilleros que guardaban el tamaño del vector como info. Ahora corregido
+eso lo mandé a correr esperando que ahora sí el gráfico de probabilidad de activación
+en función de la actividad estuviera funcionando correctamente.
+
+Por otro lado, también armé una corrida llamada TiempoExtra, la cual tiene como objetivo
+barrer alfa entre 0 y 1, no tan fino como lo que barrí antes. Tomé 21 valores de alfa en
+ese intervalo, por lo que alfa varió de a 0,05. En esta corrida también extendí el tiempo
+de simulación al aumentar la cantidad de veces que debo rearmar la red a 100. Por otro lado
+reduje la cantidad de simulaciones por punto de ensamble a 50. La idea con esto es ver
+si el gráfico de Consenso vs Alfa muestra más variación en los sujetos que quedan debajo
+del umbral de consenso y si al aumentar el alfa hasta 1 esto empieza a caer fuerte.
+
+------------------------------------------------------------------------------------------------------
+
+21/08/2021
+
+Ya tengo tres tiras de datos armados, debería pasarlos a mi pc y empezar a mirarlos. Vamos
+a bajarlos y de ahí empezar a hacer los estudios.
+
+Descargué los datos y los llevé a sus carpetas correspondientes. Ahora estoy armando los
+gráficos de distribución de actividades, distribución de grados medios y probabilidad
+de activación de agentes en función de su actividad. Por un lado tuve que corregir
+el armado de la distribución de grado medio porque de la forma en que estaba hecho antes
+esto pasaba que como buscaba los grados medios en una fila específica, entonces tenía
+error al armar el gráfico debido a que TiempoExtra tenía más filas que Regact u 
+HomofiliaCero.
+Por el otro ahora que corregí el guardado de datos del registro de Actividades, el gráfico
+ese da bárbaro. Es una alegría más eso.
+
+Ahora queda entonces ir armando los otros gráficos que me pidieron Seba y Pablo. Voy a mandar
+a armar el de Consenso vs Alfa ahora mismo, y ya el lunes haré lois de distribución de
+opiniones según tópico y varianza y correlación de opiniones. Seguro Numpy tiene formas
+de calcular la correlación de forma fácil haciendo que eso sea una boludez.
+

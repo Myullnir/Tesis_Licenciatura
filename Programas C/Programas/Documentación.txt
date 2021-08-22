@@ -203,3 +203,36 @@ un barrido fino. En la pc tengo también algunos archivos obtenidos con este
 programa que planeo usar para probar simplemente el armado de los gráficos.
 Después tengo que armar los gráficos desde Oporto y traerlos. O traer
 los archivos y graficar acá, lo que sea más rápido.
+
+--------------------------------------------------------------------------------------
+
+21/08/2021
+
+En la carpeta Analizando Actividades guardé el código que estaba usando
+para armar y simular redes de Actividades. Ese código recibe valores de
+N,alfa,Cdelta e iteración y guarda dos archivos, uno de Opiniones donde
+registra Opinión inicial del sistema, Variación Promedio, Opinión final,
+Semilla y Opiniones de cinco agentes testigos; el segundo archivo
+guarda datos sobre actividades como los valores de actividad de todos
+los agentes, un registro de cuáles agentes se activan al armar cada red
+y el valor del grado medio de cada red armada.
+El archivo con datos de Opiniones se llama 
+"Datos_Opiniones_alfa=$_Cdelta=$_N=$_Iter=$.png",
+mientras que el archivo con datos de Actividades se llama
+"Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$.png".
+
+Este programa en principio la idea era que me iba a servir para estudiar
+las redes de Actividades, pero estas resultaron tener bastantes más complicaciones
+de las esperadas, por lo que se transformó en un programa para un análisis profundo
+del armado y comportamiento de estas redes. En particular aprovecho
+para guardar ahora este código debido a que estuve haciendo unas mediciones
+con los datos de Actividades y parecieran dar bien todos, por lo que 
+creo que no voy a necesitar seguir armando ese archivo. Eso es importante
+porque es un archivo de datos menos, lo cual es menos espacio ocupado
+al armar mis datos. Pero por si acaso en el futuro volviera a necesitarlo
+es que me guardo el código.
+
+Los tipos de datos armados por esto los podés buscar mejor descriptos
+en el archivo de Documentación dentro de la carpeta DilAct, la cual
+contiene el bache de datos de Actividades, Reversión Actividades,
+Regact, HomofiliaCero, TiempoExtra y en el futuro habrá más seguro.

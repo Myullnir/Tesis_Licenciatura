@@ -1,0 +1,92 @@
+Hoy es 12/08/2021, me encuentro en la situación de que tenemos que descifrar porqué
+hay una diferencia tan grande entre el alfa crítico teórico y el empírico en mis
+datos de Redes de Actividad. Esto me lleva a tener que armar muchos sets de datos
+variados y no quiero mezclármelos. Así que a partir de ahora, cada nuevo set de datos lo
+voy a diferenciar en una carpeta aparte y eso lo voy a ir documentando qué es y qué
+tiene y con qué objetivo armé esa carpeta de forma de no confundirme, borrar datos importantes
+o sobreescribir otros que ya tenía.
+
+De paso, llamé a la carpeta DilAct por "Dilema de Actividades".
+
+.)Redes Actividad Oporto:
+--------------------------
+Estos son los archivos que armé usando una distribución aleatoria entre -3 y 3
+y con un armado de 500 veces de la red de Actividad. Esto lo armé en la computadora de
+Oporto y barre Alfa entre 0 y 2 y Cos(delta) entre -0.5 y 1. Ambos los mueve de a 0.1.
+Tiene datos de la variación Promedio, Opiniones Finales y la Semilla.
+Cada punto del ensamble tiene 30 iteraciones.
+
+.) Redes Actividad:
+-------------------
+Esta carpeta tiene algunos archivos armados en mi pc y algunos armados en Oporto.
+Todos tienen un armado de 30 veces de la red de Actividad. En mi pc lo hice barrer
+Alfa entre 0 y 1 y Cos(delta) entre 0 y 1, ambos moviendo de a 0.1.
+A estos datos le agregué una corrida que hice desde la facultad barriendo Alfa entre
+0 y 0,5 de a 1/60 creo, con cos(delta) = 0. El tema es que el barrido no se 
+nota muy bien porque el alfa se escribe con dos decimales nomás, entonces parece un
+poco raro el cómo se mueve el alfa.
+Los datos que armé en mi pc sólo contienen los datos de Variación Promedio, los de
+Opiniones Finales y la Semilla, mientras que los que hice en Oporto también suman 
+las opiniones en función del tiempo de los agentes testigos. Vale aclarar que estos
+datos también fueron armados inicializando las opiniones de manera aleatoria con
+valores entre -3 y 3. Por último cabe destacar que los datos calculados en Oporto
+tienen 100 iteraciones, mientras que los realizados en mi pc tienen 20 iteraciones.
+
+.) Actividad Reversión:
+-----------------------
+Esta carpeta tiene archivos armados en Oporto que barren Alfa entre 0 y 0,5 de 
+a 1/80 y para cos(delta) = 0. Los valores de alfa están guardados con tres decimales
+para que el registro no se sobreescriba en ciertos archivos. Cada punto de este
+ensamble tiene 100 iteraciones y las redes están rearmadas 30 veces.
+En estos archivos están guardados los valores de Variación promedio, las Opiniones
+iniciales y las finales, así como la semilla y las opiniones de 5 testigos.
+Las opiniones iniciales se inicializan utilizando una distribución gaussiana
+de media cero y varianza cuadrada = 2,5.
+
+.) Regact:
+----------
+Esta carpeta se llama así por Registro Actividades. Estos archivos barren los valores
+de Alfa entre 0 y 0,5 de a 1/80 y para cos(delta) = 0. Los valores de alfa están guardados con tres decimales
+para que el registro no se sobreescriba en ciertos archivos. Cada punto de este
+ensamble tiene 100 iteraciones y las redes están rearmadas 30 veces.
+En estos archivos están guardados los valores de Variación promedio, las Opiniones
+iniciales y las finales, así como la semilla y las opiniones de 5 testigos.
+Las opiniones iniciales se inicializan utilizando una distribución gaussiana
+de media cero y varianza cuadrada = 2,5. El valor de Beta utilizado es 3.
+Además también armé unos archivos llamados "Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$".
+los cuales guardan los valores de actividad de los agentes, el registro de cuáles agentes
+se activan y los grados medios de las redes armadas. Esto lo tengo que usar para revisar
+las cosas que estábamos hablando con pablo y demás.
+
+.) HomofiliaCero:
+-----------------
+Esta carpeta se llama así porque el valor de Beta utilizado es 0.
+Estos archivos barren los valores de Alfa entre 0 y 0,5 de a 1/80
+y para cos(delta) = 0. Los valores de alfa están guardados con tres decimales
+para que el registro no se sobreescriba en ciertos archivos. Cada punto de este
+ensamble tiene 100 iteraciones y las redes están rearmadas 30 veces.
+En estos archivos están guardados los valores de Variación promedio, las Opiniones
+iniciales y las finales, así como la semilla y las opiniones de 5 testigos.
+Las opiniones iniciales se inicializan utilizando una distribución gaussiana
+de media cero y varianza cuadrada = 2,5.
+Además también armé unos archivos llamados "Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$".
+los cuales guardan los valores de actividad de los agentes, el registro de cuáles agentes
+se activan y los grados medios de las redes armadas. Esto lo tengo que usar para revisar
+las cosas que estábamos hablando con pablo y demás.
+
+.) TiempoExtra:
+-----------------
+Esta carpeta se llama así porque para estos datos aumenté la cantidad de veces
+que se rearma la matriz de actividades de forma de ver si aumentando ese valor
+el sistema converge a alguna solución distinta a la que teníamos cuando rearmábamos
+la matriz 30 veces. Para estos datos recorrí alfa entre 0 y 1 de a 0.05 y mantuve
+cos(delta) = 0. Los valores de alfa están guardados con tres decimales
+para que el registro no se sobreescriba en ciertos archivos. Cada punto de este
+ensamble tiene 50 iteraciones y las redes están rearmadas 100 veces.
+En estos archivos están guardados los valores de Variación promedio, las Opiniones
+iniciales y las finales, así como la semilla y las opiniones de 5 testigos.
+Las opiniones iniciales se inicializan utilizando una distribución gaussiana
+de media cero y varianza cuadrada = 2,5.
+Además también armé unos archivos llamados "Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$".
+los cuales guardan los valores de actividad de los agentes, el registro de cuáles agentes
+se activan y los grados medios de las redes armadas.

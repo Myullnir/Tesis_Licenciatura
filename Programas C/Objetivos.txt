@@ -47,21 +47,28 @@ Modelo con campo externo
 
 
 Para la semana que viene:
-1) Mirar en Cos(delta)=0, barrer Alfa de manera fina, tomar entre 20 y 50 posibles alfas
-y 100 elementos por ensamble. Preparar una presentación nueva sobre esto y tener código a 
-mano y cosas para revisarlo mejor.
-2) Revisar si el etiquetado del estado final se corresponde con lo que es realmente el gráfico.
-3) Los gráficos de los tópicos en función del tiempo rearmarlos para graficar agentes de
-ensambles iguales. La idea es ver si la opinión de los tópicos está más o menos convergiendo
-en función del tiempo, por lo que estás en un estado estacionario, o si estás en un estado
-todavía transitorio e
-4) Dibujar un circulito con la región que contiene a las opiniones iniciales en el gráfico.
-El radio debería ser de 2 sigma. También dibujar estados iniciales.
-5) Inicializar opiniones usando una distribución normal.
-6) Armar los gráficos con límites entre -30 y 30
+Problemas de Redes Estáticas:
+-----------------------------
 7) Revisar algún punto particular de la varianza para ver cuantos outliers surgen
 8) Ver de reemplazar la varianza por distancia entre cuartiles de tiempo de
 simulación.
+
+Problemas de Redes de Actividad:
+--------------------------------
+12) Ver que la cantidad de veces que un agente se activa sea correspondiente con su 
+actividad asignada. Debería ser la identidad. Para eso mandar nueva corrida guardando
+la actividad de los sujetos y la cantidad de veces que cada uno se activa.
+(Esto lo hice, pero da terrible. Revisar que las cuentas estén bien.)
+
+16) Intentar meter la homofilia en las redes estáticas de forma que los agentes
+conectados tengan una probabilidad de interactuar en base a que tan parecidos son
+en sus opiniones.
+
+17) Ver en más alfas y más tiempo para ver cómo el gráfico de consenso vs alfa cambia.
+18) Hacer el gráfico de Consenso de agentes vs alfa reduciendo el valor del umbral de los 2 sigmas
+19) Hacer la distribución de los tópicos. Tomar 10 valores de Alfa. Calcular
+proyección de cada opinión
+20) Graficar Varianza y Correlación de tópicos en función de Alfa
 
 
 
@@ -129,13 +136,6 @@ pip ...
 
 
 ID procesos:
-(Estos primeros ocho programas son los que corren la red de Actividades con 30 ciclos y 100 Iteraciones)
-1) 525403
-2) 525407
-3) 525410
-4) 525415
-5) 525422
-6) 525425
 
 
 
