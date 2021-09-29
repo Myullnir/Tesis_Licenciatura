@@ -38,14 +38,6 @@ Bajar los 4 papers que cita Baumann y leerlos
 
 
 
-Capítulos Tesis:
-Introducción
-Modelo en Redes Fijas
-Modelo en Redes de Actividad
-Modelo sin campo externo
-Modelo con campo externo
-
-
 Para la semana que viene:
 Problemas de Redes Estáticas:
 -----------------------------
@@ -55,21 +47,34 @@ simulación.
 
 Problemas de Redes de Actividad:
 --------------------------------
-12) Ver que la cantidad de veces que un agente se activa sea correspondiente con su 
-actividad asignada. Debería ser la identidad. Para eso mandar nueva corrida guardando
-la actividad de los sujetos y la cantidad de veces que cada uno se activa.
-(Esto lo hice, pero da terrible. Revisar que las cuentas estén bien.)
-
 16) Intentar meter la homofilia en las redes estáticas de forma que los agentes
 conectados tengan una probabilidad de interactuar en base a que tan parecidos son
 en sus opiniones.
 
-17) Ver en más alfas y más tiempo para ver cómo el gráfico de consenso vs alfa cambia.
-18) Hacer el gráfico de Consenso de agentes vs alfa reduciendo el valor del umbral de los 2 sigmas
-19) Hacer la distribución de los tópicos. Tomar 10 valores de Alfa. Calcular
-proyección de cada opinión
-20) Graficar Varianza y Correlación de tópicos en función de Alfa
+20) Graficar Correlación de tópicos en función de Alfa
 
+23) Empezar a armar presentación de Tesis, arrancar con tema de Redes Estáticas.
+El armado, los datos, los criterios usados para estudiarlos. La idea es ir dejando
+explicitados los criterios de cómo están definidos y por tanto cómo definimos las
+transiciones.
+24) Probar de pasar los datos a un plot radial.
+25) Mandar a correr en la Red de Actividad la idea de hacer la red más densa.
+26) Armar un zip separando las redes según grado medio
+
+
+Para la tesis:
+27) En introducción inspirarme en lo que pone Baumann y lo que es la introducción del
+plan de trabajo.
+28) Antes del tema de Redes estáticas podría ir un capítulo de explicación del modelo
+de Baumann.
+29) También se podría poner un capítulo describiendo las propiedades de las redes estáticas
+
+
+31) Puse algo sobre gráficos de distribución de grado en la tesis.
+32) Ver de hacer un barrido con otro criterio en zona de transición
+de manera de que el programa corra por más tiempo.
+34) Pensar en armar algunos gráficos de la trayectoria de las opiniones.
+35) 
 
 
 ---------------------------------------------------------------------------------------------

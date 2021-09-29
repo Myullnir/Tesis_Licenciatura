@@ -4121,7 +4121,309 @@ Por el otro ahora que corregí el guardado de datos del registro de Actividades, 
 ese da bárbaro. Es una alegría más eso.
 
 Ahora queda entonces ir armando los otros gráficos que me pidieron Seba y Pablo. Voy a mandar
-a armar el de Consenso vs Alfa ahora mismo, y ya el lunes haré lois de distribución de
+a armar el de Consenso vs Alfa ahora mismo, y ya el lunes haré los de distribución de
 opiniones según tópico y varianza y correlación de opiniones. Seguro Numpy tiene formas
 de calcular la correlación de forma fácil haciendo que eso sea una boludez.
 
+Estaba pensando, se podría intentar hacer que todo el gráfico de fracción de agentes
+en el consenso se arme en un sólo gráfico, colocando los datos de todos los sigmas en
+el mismo lugar.
+
+--------------------------------------------------------------------------------------------------
+
+23/08/2021
+
+Ya hice lo de que el gráfico de las fracciones de agentes en el consenso se coloque todo
+en un solo gráfico. Va a ser mejor, y más colorido, para comparar mejor los datos.
+
+También me armé los gráficos de distribución de opinión para cada tópico en función del
+Alfa. Me parece que lo mejor sería cambiarlos para que la calificación del estado final sea
+el título y no un cartelito que tapa el gráfico. Ahora mirando los resultados estamos creo
+ante una muestra de qué está pasando. Son todas curvas centradas en cero, no veo cómo
+esto pasa del consenso a la polarización.
+
+Por último me armé los gráficos de Varianza en función del alfa. Por lo que se puede ver,
+la Varianza está creciendo con el Alfa.
+
+--------------------------------------------------------------------------------------------------
+
+27/08/2021
+
+Creo que me faltó anotar uno de los días de trabajo. Cuestión, ya me armé una parte del
+código que grafica la varianza con sus errores para todas las redes.
+
+Luego agregué una parte que grafica las distribuciones de las opiniones de todas las 
+simulaciones de un ensamble y junta las curvas de un conjunto de alfas. Esa parte la coloqué
+al final del código para que no me mantenga el archivo abierto eternamente.
+
+Hecho esto, tengo que ver de pasar esto al código de redes fijas. Eso no suena muy difícil,
+tengo que copiar lo que tengo al final, tener cuidado con el tema de que el SuperDiccionario se
+arma usando GM en el caso de redes fijas y después darle para adelante. Ah, y mirar cómo están
+hechos los datos para que se armen correctamente los Arrays de Opiniones.
+
+---------------------------------------------------------------------------------------------------
+
+28/08/2021
+
+Pasé el código que arma las distribuciones de Opiniones al archivo de Redes estáticas, y con eso
+me armé las distribuciones de Opiniones para Redes Estáticas. El código funca bien, aunque Pablo
+me dijo que tendría que estudiar los alfas en el entorno del Alfa crítico, así que voy a tener
+que volver a cargar el main de cálculo de Redes Estáticas, armarme nuevas redes estáticas y mandar
+a correr toda la cosa. Mañana haré eso.
+
+--------------------------------------------------------------------------------------------------
+
+29/08/2021
+
+Mandé a correr lo que me dijo Pablo sobre datos de redes Estáticas de Erdos-Renyi entorno al
+alfa crítico. En particular fue para una red de GM=8, con dt de 0,001. Los datos los guardé
+en una carpeta llamada ERZoom la cual recorre alfas entre 1 y 1,5 de a 0.005. El alfa crítico
+es 0.125.
+
+Cuando estén terminados los datos, me los paso a mi pc y desde ahí voy a armar las distribuciones.
+Ahora voy a modificar el archivo de Graficos TDO RE.py para que levante esos datos y me arme
+los gráficos correspondientes. Luego con el tiempo extra de hoy voy a ponerme a corregir tarea
+de los chicos y ya mañana y el martes me dedicaré a lo del tema de releer los papers de Baumann
+a ver si encuentro el motivo de que no esté funcando la cosa. Cierto que Pablo me dijo
+de intentar armar datos de redes de Actividad donde la red se reconstruya en cada paso temporal,
+para ver si ese cambio brusco en el armado de la red afecta al comportamiento.
+
+Ya armé los gráficos de Distribución de Opiniones para la red de Erdos-Renyi Zoomeada. Aunque
+el resultado no me convence, siento que necesito mirar algunos alfas más, así que mandaré a armar
+esos datos extra. Los datos con Alfa hasta 0,15 no terminan de formar la bimodal. Voy a sacar datos
+hasta 0,175.
+
+Cabe mencionar que cambié el archivo de Python porque los datos que estoy armando en ERZoom
+tienen agregada la fila de datos de Estado inicial de la Matriz de Opiniones, lo cual corrió
+los valores de opiniones finales de la fila 3 a la 5. Atento a eso.
+
+Hacer el gráfico de las distribuciones mañana, hoy no llego a eso.
+
+Mañana lo que voy a hacer es a la mañana voy a corregir tareas de los pibes y a la tarde
+ponerme con esto y con lo de tomar la mediana a los datos, así como corregir lo de la
+Entropía que no daba del todo correcto. También tengo que empezar a buscarme momentos para hacer
+cosas de la partida de rol. Eso me resulta importante.
+
+--------------------------------------------------------------------------------------------------
+
+30/08/2021
+
+Me descargué los datos de Redes Estáticas así como el de la red de Actividad con red continuamente
+cambiante. Los datos de redes estáticas los estoy llamando ERZoom, porque es una red de Erdos-Renyi en
+la que estoy haciendo Zoom en una cierta región de Alfa para Cos(delta)=0 de manera de observar cómo
+se da la transición de la distribución de opiniones unimodal a bimodal. Para esto uso alfa entre
+0,1 y 0,2 barriendo de a 0,005, 100 simulaciones para cada alfa, dt=0,01 y red de Erdos-Renyi.
+En cambio los datos de Redes de Actividades los llamé RCC por Redes Continuamente Cambiantes,
+tienen dt=0,01, rearma la red 5000 veces, no guarda datos sobre las actividades, Alfa se mueve
+entre 0 y 0,5 y guarda datos de los testigos.
+
+Grafiqué los resultados de los datos de RCC, y lo que se observa es que al final no resultaron
+como esperábamos. El rearmar las redes en cada interacción no sirvió para que el sistema
+escapara el consenso, sino que por el contrario el constante cambio es tal que no permite
+que el sistema logre despegar.
+
+Ahora Pablo me dijo de armar esto de los gráficos de Proyección de las opiniones en una serie
+de subplots. Para eso entonces voy a armar esto en un conjunto de subplots de 3x3.
+
+-----------------------------------------------------------------------------------------------------
+
+18/09/2021
+
+Vamos a trabajar un poco los gráficos de Redes Estáticas para ir agregando eso a la Tesis.
+Los datos de Redes estáticas fueron armados con una distribución aleatoria de los datos entre
+-3 y 3. Además el valor de K usado es 1, por lo que al polarizar los agentes como mínimo van 
+a tender a 1 ya que al polarizar tienden a Nro vecinos*K, y como la red es conexa tenen por
+lo menos un vecino.
+
+Entonces se me ocurre modificar el criterio para pedir que se considere al agente polarizado
+si su opinión es mínimo 1. Le puse 0,95 por si tiende a 1 por abajo. Luego como están distribuidos
+de manera homogénea entre -3 y 3 para ambas opiniones, eso significa que en un espacio de 6x6 tengo
+1000 opiniones. Luego si la distribución es homogénea, en un área de 36 tengo mis 1000 opiniones.
+Luego yo voy a asumir que si mis opiniones se encuentran en el cuadrado entre -1 y 1 no están
+polarizadas. El cuadrado entre -1 y 1 tiene un área de 2x2, por lo que mide 4. Finalmente, si tengo
+1000 opiniones en un área de 36, por regla de tres simple sé que en un área de 4 tengo una novena parte.
+Es decir, 111 opiniones. Bueno, igual ahora que lo pienso lo importante no es la cantidad sino la
+proporción. Es decir, 1/9 es la proporción que tengo ahí. Finalmente todo este análisis es para
+hacer un criterio similar al que hicimos en Redes de Actividad. En Redes de Actividad decimos
+que el sistema está en Consenso si la cantidad de agentes dentro del círculo de 2 Sigmas es
+igual o mayor a la cantidad inicial. Por tanto, en este caso vamos a decir que si la proporción
+de agentes en el cuadrado de [-1,1]x[-1,1] es mayor a 1/9 entonces el sistema está en Consenso.
+
+Modificar el programa GraficosTDORE.py porque en los gráficos de Opiniones está graficando
+cada simulación de un punto del Ensamble por separado, y en Redes Estáticas si quiero recuperar
+el comportamiento de Polarización o Estado ideológico tengo que sumar TODAS las simulaciones
+en un sólo gráfico.
+
+---------------------------------------------------------------------------------------------------------
+
+19/09/2021
+
+Luego de varias iteraciones, logré que el programa corra y me arme los gráficos de opiniones y 
+el de soluciones en el espacio de Parámetros. Queda discutir un poco con Pablo y Sebas el criterio,
+pero creo que ahora el criterio resulta un poco más claro. Ahora mismo la línea del valor teórico
+me queda claramente por abajo de la línea del valor experimental, pero las líneas son bastante parecidas,
+por lo que pareciera ser un tema de que el criterio quizás es muy laxo.
+
+Por otro lado, luego de un fuerte pero breve momento de crisis, creo que logré armar una subsección
+de la tesis, la que corresponde a Redes de Erdos-Renyi. Ahora me queda entonces usar eso como base
+para ir armando la de redes Scale-Free y Random Regulars. Luego sobre Redes de Actividad me conviene
+basarme mucho en lo que dice Baumann en su paper, y lo que diga el paper original y así. Es decir,
+buscá fuerte lo que los creadores de esto escribieron, no quieras hacerte el bardo de armar
+por tu cuenta una descripción de esta red.
+
+Fue una boludez, pero es un paso importante, ya tengo una parte. Ahora tengo que seguir.
+Dios, que mes me espera.
+
+De paso, también tengo que ponerme a trabajar en el armado de los gráficos de Entropía y el
+de usar los cuartiles y la mediana. Hace tanto de eso, ya ni me acuerdo dónde es que Sebas
+me pasó lo que charlamos. Muy mala mía
+
+--------------------------------------------------------------------------------------------------------
+
+20/09/2021
+
+Viendo el largo tiempo que el programa tarda en recorrer y clasificar todos los archivos para
+formar el SuperDiccionario, quizás sea conveniente hacerle caso a Pablo y dividir los archivos
+según GM. Eso reduciría el trabajo. El super diccionario actualmente toma unos 24 minutos en armarse.
+Es mucho para mis trabajos en pc, pero nada una vez que lo mande a correr en la pc de Oporto,
+no vale la pena pelearse con esto.
+
+Ya hablé con Sebas y corregí entonces el gráfico de la Varianza en función del tiempo para que
+grafique los valores de Mediana de Tiempo de Simulación. Así que habría que mandarlo a correr
+y ver que tal. Queda ver el tema del graficado de la entropía y para eso hay que mirar un poco
+el cómo se define que un punto esté en el consenso. Se me ocurre finalmente usar esa definición
+dada antes sobre que los sujetos polarizados son los que finalmente llegan a estar en un valor
+1. También podríamos discutir que como la región de transición intermedia los sujetos NO van
+a llegar a 1 como mínimo sino a un valor intermedio, quizás podemos hablar de que los sujetos
+polarizan un poco antes. Como en 0,5 por ejemplo. Eso cambiaría un poco las cosas. Y definitivamente
+bajaría la curva de alfa crítico experimental.
+
+--------------------------------------------------------------------------------------------------------
+
+21/09/2021
+
+Ahí modifiqué el archivo para armar los gráficos de Promedios, el de Entropía y el de Cuantiles, anteriormente
+el de Varianza. A los Promedios no los toqué, total ese tenía pinta de estar bien. El de Cuantiles en cambio
+lo modifiqué de manera de que no tomo la varianza de los TideSi, sino que ahora excluyo los valores que se
+encuentran en el 5% inferior y 95% superior de los datos, de manera de quedarme con el 90% de los datos que
+están en el interior. A esos datos les calculo la longitud del intervalo y eso es lo que le tomo logaritmo
+y luego grafico. La idea es que va a ser un valor mucho más robusto a outliers esto. Veremos que tal.
+
+Por otro lado, la parte de la Entropía la modifiqué porque estaba arbitrariamente descartando los casos
+en que los agentes caen al consenso, es decir la categoría cero del cálculo. Me parece que hacer eso
+justamente es el problema de que la región de Polarización Descorrelacionada y la región de Consenso
+terminen como una única gran cosa, y ahora deberían quedar claramente separadas. Espero, si todo sale
+bien.
+
+De paso, todavía no apliqué esto que mencioné ayer sobre que quizás un mejor criterio de polarización
+sea 0,5 en vez de 1. HABLAR ESTO CON PABLO Y SEBA
+
+Luego de hablar con Pablo y Seba quedamos en que sería una buena idea armar una neuva corrida de datos
+haciendo zooom a la región de transición, cambiando un poco el criterio de corte, de manera de que
+
+---------------------------------------------------------------------------------------------------------
+
+23/09/2021
+
+Hoy dejé pasar el día tranca, la verdad debería ponerme a hacer más cosas. Anotemos la lista de cosas
+para hacer. Igual agradezco la sensación de no ser tan un fracaso, de estar bien hoy.
+
+Por su puesto que tengo que seguir escribiendo la Tesis, eso queda para el sábado y domingo.
+El viernes tengo que empezar a ver sobre la forma de ir graficando redes con gephi. Y lo otro
+que tengo que hacer es mandar a correr datos de las regiones de transición. Para eso tengo que
+ponerme a modificar el main de generación de Redes Estáticas. Pablo decía de hacer que el
+sujeto mire a 20 pasos atrás y con eso me arme compare la variación. Si mantengo el mismo valor
+de variación promedio como Criterio de Corte, pero cambio la cantidad de pasos en el pasado con
+la que comparo, esto debería funcionar mejor. El tema es que eso me requiere tener un vector que
+guarde datos de hace 20 pasos. Y que luego haga la diferencia como hasta ahora. Y tengo que
+constantemente guardar esa info. Ok, habrá que ver de modificar el programa. Y quizás hacerlo como
+un programa aparte.
+
+Las carpetas donde guarde estos datos las debería llamar TransicionER, TransicionB y TransicionRR.
+Podría diferenciar transicion del consenso con transición en región entre Descorrelacionada e
+Ideológica. Ya fue, que sea Transicion1 y Transicion2. Y el tema de que para cada GM voy a
+recorrer distintos alfas se me ocurre resolverlo mandando manualmente a correr las 4 cosas
+y listo. Aunque atento con el tema de los archivos donde guardo el out. Hay que mirarlo bien esto.
+
+-----------------------------------------------------------------------------------------------------------
+
+26/09/2021
+
+Armé la corrección para que el programa de Redes Estáticas corra comparando las opiniones del
+sistema en el paso actual con lo visto en un paso previo 20 iteraciones atrás. Las cosas que
+agregué son un array de opiniones, un int que lleva la cuenta del paso temporal con el que
+hay que comparar y un free al final que se encarga de liberar todos los punteros. La idea de
+ir ciclando entre las opiniones guardadas de pasos temporales previos es usar la función %
+que se encarga de colocar como índice el valor que es el resto de la división.
+
+También agregué unos pasos de "Termalización" que uso para guardar los primeros P pasos
+tales que pueda empezar a comparar la evolución del sistema con esos pasos. Mañana lo mejor
+sería ya poder probarlo, cosa del martes poder dedicarme a anotar cosas en la tesis y avanzar
+con eso.
+
+--------------------------------------------------------------------------------------------------------------
+
+28/09/2021
+
+Ya pasé el código que voy a usar para hacer Zoom en redes estáticas a la computadora de Algarve.
+Así que ya estoy en condiciones de mandarlo a correr. El zoom lo voy a ahcer en la región de
+transición. Cambié el criterio de corte para que el sistema corte comparando su estado actual con
+su estado en un paso 20 iteraciones previas. Cada uno de los archivos creados va a una carpeta
+correspondiente a su grado medio, es decir que para Erdos-Renyi tengo diferenciado los datos
+obtenidos de las redes con GM=4, 8, 12 y 16 en 4 carpetas separadas.
+
+La idea sería recorrer una región acotada donde se produce el cambio entre la zona de polarización
+descorrelacionada, estado ideológico y consenso. Para eso voy a moverme en Cdelta entre -0,2 y 0,2
+de a 0,01. (Por eso tengo el Cdelta divido 100). El alfa lo voy a mover entre -0,01 y 0,02 del alfa
+crítico para Cdelta = 0. Me voy a mover de a 0,001 (Tengo que dividir el alfa por 1000).
+
+Esto determina que para cada GM me tengo que mover en regiones de alfa diferentes. Esas regiones son:
+.) GM=4: [0.24,0.27] (240,270)
+.) GM=8: [0.135,0.155] (135,155)
+.) GM=12: [0.073,0.103] (73, 103)
+.) GM=16: [0.052,0.082] (52,82)
+
+Ya mandé a correr en Algarve los programas, estoy consumiendo 20 hilos. Supongamos que en promedio
+cada simulación tarda 90 segundos. Voy a tener 100 simulaciones, por cada uno de los 41 cos(delta)
+por cada uno de los 6 alfas para cada una de las tres redes. 
+Entonces eso significa que cada corrida tardará en promedio 76 días. Demasiado.
+
+Hice las cuentas, pareciera que voy a tener que reducir el paso en el Cdelta y en la cantidad
+de iteraciones, porque sino esto tardaría unos 75 días. No tengo ese tiempo, claramente.
+Si reduzco el Cdelta a la mitad y las iteraciones también, ese tiempo se reduce en
+4 veces, que sería 18 días. Es mucho, pero más aceptable. También puedo ayudar
+a reducir esto usando las dos pcs, pero me da cosa ocuparme TODOS los hilos. Podría ocupar algunos hilos menos 
+en Oporto, pero eso haría que divida las corridas de forma rara. No sé si me convence. Quizás podría
+sino ocuparme de obtener datos en sólo 2 Gm primero, y de ahí si necesitamos más lo charlamos.
+
+Maté todas las instanciaciones anteriores y lo volví a mandar esta vez para que genere los datos
+más rápido. Reduje el recorrido de Cdelta a la mitad, ya no son 41 sino 21 Cdeltas. (Entre -0,2 y
+0,2 de a 0,02). Reduje la cantidad de simulaciones por punto del ensamble a 50. Y como estoy sólo
+armando datos para 2 de las redes, entonces ahora estoy usando la misma cantidad de hilos pero con
+menor cantidad de alfas por cada hilo. Entonces esto ahora es 3 alfas por hilo. En conclusión,
+cada corrida total va a tardar en promedio: 9,84 días. Esto es algo más aceptable. Después cualquier
+cosa mando a correr los gm que faltan.
+
+Mañana tengo dos cosas para hacer. Primero, revisar el tema de usar la varianza de las distribuciones de
+opininiones como un criterio válido a la hora de determinar si el sistema se encuentra en consenso o en
+polarización. También estaría bueno usar la correlación entre tópicos como forma de definir si está en
+estado ideológico o polarización descorrelacionada. Luego de eso, continuar escribiendo la tesis.
+
+------------------------------------------------------------------------------------------------------------------
+
+29/09/2021
+
+Acabo de modificar el armado del SuperDiccionario de forma tal que reduzca el tiempo que tarda en armarse.
+Lo que hice fue saltear toda una sección del código que armaba el SuperDiccionario luego de haber recorrido
+todos los archivos. Esa sección consumía mucho tiempo porque recorría TODA la lista de archivos montones de
+veces y tenía muchos if en esos for. Lo reduje a recorrer una sola vez la lista de archivos y listo. Y comprobé
+que el SuperDiccionario esté bien armado, así que eso soluciona el problema de que el código tardara 1 hora
+en armar el SuperDiccionario. Ahora tardó sólo 100 segundos.
+
+Ahora que terminé esto, conviene empezar con la parte de ver cómo varía la varianza de las opiniones para poder
+usar eso como criterio de si el sistema está en consenso o polarización.
+
+Bien, armé el código de esto, ahora sólo me queda ver que tal salen los gráficos. Dicho esto, quedaría lo de
+mandar esto a Oporto y hacerlo correr y listo. Ya que estoy, voy a borrar los archivos no necesarios en Oporto
+de Redes Estáticas, y subir todo a Github. Luego de eso, me pondré a preparar clases de Electro y después
+seguiré con esto.

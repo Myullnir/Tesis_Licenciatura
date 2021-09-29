@@ -3983,7 +3983,7 @@ que esos agentes se conecten. Hago una tirada random contra esa probabilidad. Si
 sino busco otro agente y vuelvo a repetir el proceso hasta que alguno se conecte. Así con las m conexiones
 para el agente activo.
 
-El programa acá tiene anotadas TODOS los mensajes que usé apra poder ir revisando que todo estuviera bien.
+El programa acá tiene anotadas TODOS los mensajes que usé para poder ir revisando que todo estuviera bien.
 Cuando lo implemente voy a borrar esos printf.
 
 

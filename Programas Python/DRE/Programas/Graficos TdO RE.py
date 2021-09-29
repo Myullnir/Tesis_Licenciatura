@@ -127,8 +127,8 @@ def EstadoFinal(Array):
     # Primero veo el caso de que hayan tendido a cero
     
     ArrayAbs = np.absolute(Array)
-    CantP = np.count_nonzero(ArrayAbs > 0.5)
-    if CantP/len(Array) < 0.5:
+    Cant0 = np.count_nonzero(ArrayAbs < 1)
+    if Cant0/len(Array) > (1/9):
         return "Consenso"
     
     #----------------------------------------------------------
@@ -229,7 +229,7 @@ T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
 
 SuperDiccionario = dict()
 
-for REDES in ["Barabasi"]:
+for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
 
 
     # Primero levanto datos de la carpeta de la red REDES
@@ -256,6 +256,8 @@ for REDES in ["Barabasi"]:
     Conjunto_N = []
     Conjunto_Gm = []
     
+    SuperDiccionario[REDES] = dict()
+    
     for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
         alfa = float(nombre.split("_")[2].split("=")[1])
         Cdelta = float(nombre.split("_")[3].split("=")[1])
@@ -269,85 +271,56 @@ for REDES in ["Barabasi"]:
             Conjunto_N.append(N)
         if Gm not in Conjunto_Gm:
             Conjunto_Gm.append(Gm)
+        if N not in SuperDiccionario[REDES].keys():
+            SuperDiccionario[REDES][N] = dict()
+            SuperDiccionario[REDES][N][Gm] = dict()
+            SuperDiccionario[REDES][N][Gm][alfa] = dict()
+            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+        elif Gm not in SuperDiccionario[REDES][N].keys():
+            SuperDiccionario[REDES][N][Gm] = dict()
+            SuperDiccionario[REDES][N][Gm][alfa] = dict()
+            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+        elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+            SuperDiccionario[REDES][N][Gm][alfa] = dict()
+            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+        elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+        else:
+            SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
+        
+            
+            
     
     Conjunto_Alfa.sort()
     Conjunto_Cdelta.sort()
     Conjunto_N.sort()
     Conjunto_Gm.sort()
     
-    # Bien, esto ya me arma el conjunto de Alfas, Cdelta, N y Gm correctamente y ordenados
-    # Ahora podemos pasar a lo importante de esta celda
-    
+    # Le hice una modificación a esta parte del código, ahora esto trabaja
+    # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+    # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+    # es mucho más rápido.
+
     #--------------------------------------------------------------------------------------------
-    
-    # Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
-    # a un cierto N, Alfa, Cdelta y Gm. Me armo primero el superdiccionario, que es el diccionario,
-    # que contiene diccionarios, que llevan a diccionarios que lleva a diccionarios
-    # que lleva a diccionarios que llevan a las listas de los nombres
-    # de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa,
-    # el Cdelta, el tipo de red y el Gm respectivos. 
-    # Entonces la lista se accede sabiendo el Alfa, Cdelta y N correspondiente de antemano.
-    
-    SuperDiccionario[REDES] = dict()
-    
-    for AGENTES in Conjunto_N:
-        SuperDiccionario[REDES][AGENTES] = dict()
-        for ALFA in Conjunto_Alfa:
-            for CDELTA in Conjunto_Cdelta:
-                for GM in Conjunto_Gm:
-                    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-                        alfa = float(nombre.split("_")[2].split("=")[1])
-                        Cdelta = float(nombre.split("_")[3].split("=")[1])
-                        N = int(nombre.split("_")[4].split("=")[1])
-                        gm = int(nombre.split("_")[5].split("=")[1])
-                        if N==AGENTES and alfa==ALFA and Cdelta==CDELTA and gm==GM:
-                            if gm not in SuperDiccionario[REDES][AGENTES].keys():
-                                SuperDiccionario[REDES][AGENTES][GM] = dict()
-                            if alfa not in SuperDiccionario[REDES][AGENTES][GM].keys():
-                                SuperDiccionario[REDES][AGENTES][GM][ALFA] = dict()
-                            if Cdelta not in SuperDiccionario[REDES][AGENTES][GM][ALFA].keys():
-                                SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA] = []
-                            else:
-                                break
-                    
-                
-    
-    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-        alfa = float(nombre.split("_")[2].split("=")[1])
-        Cdelta = float(nombre.split("_")[3].split("=")[1])
-        N = int(nombre.split("_")[4].split("=")[1])
-        gm = int(nombre.split("_")[5].split("=")[1])
-        SuperDiccionario[REDES][N][gm][alfa][Cdelta].append(nombre)
-        
-    # Ya mejoré el armado del SuperDiccionario de manera de que cada N tenga los Alfa y cada
-    # Alfa tenga los Cdelta y cada Cdelta tenga los GM correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
-    # de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
-    # Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
-    # armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
-    # definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
-    # iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
 
-#--------------------------------------------------------------------------------------------
+    # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
+    # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
+    # las keys de mi SuperDiccionario.
     
-# Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
-# la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
-# las keys de mi SuperDiccionario.
-
-for REDES in ["Barabasi"]:
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
 
         for GM in Conjunto_Gm:
             
-            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())[0:11]
+            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
         
             Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
             
             # Primero me armo los grid para el gráfico de las fases. Para eso
             # primero tengo que armarme un array y con el np.meshgrid armarme 
             # los grids del pcolormesh.
-            
+
             Conjunto_Alfa.reverse() # Lo invierto para que me quede el uno arriba y no abajo
             
             x = np.array(Conjunto_Cdelta)
@@ -362,6 +335,7 @@ for REDES in ["Barabasi"]:
             # Con esto ya tengo armados los grids de XX,YY y de paso me armo el grid
             # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
             # los datos que ya guardé de antes. Para eso es el módulo siguiente
+
             
             #---------------------------------------------------------------------------------------------
 
@@ -369,20 +343,22 @@ for REDES in ["Barabasi"]:
             
             for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
                 
-                for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+                XVAR = Conjunto_Cdelta
+                YVAR1 = []
+                YVAR2 = []
                 
+                for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+            
                     #-----------------------------------------------------------------------------------
                     
                     # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
                     # que voy a necesitar para después
                     
                     OpinionesFinales = np.array([])
-                    PuntosFinales = np.array([])
-                    MaxNorm = 0
                     
                     #-------------------------------------------------------------------------------------
                     for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
-
+    
                         #--------------------------------------------------------------------------------------------
                     
                         # Levanto los datos del archivo original y separo los datos en tres listas.
@@ -395,20 +371,6 @@ for REDES in ["Barabasi"]:
                         Var = np.array([float(x) for x in Datos[1][1::]])
                         
                         Opi = np.array([float(x) for x in Datos[3][1::]])
-                    
-                        #----------------------------------------------------------------------------------------------
-                        
-                        # Acá voy a calcular al sujeto que voy a usar para normalizar mis gráficos. Tiene que ser el máximo
-                        # valor de opinión que haya alcanzado cualquier sujeto en cualquier momento.
-                        
-#                        MaxNorm = max(MaxNorm,max(np.absolute(Opi)))
-                        
-                        # Esto funciona perfecto. El único tema a considerar es que este valor MaxNorm se traspasa
-                        # a otros módulos, entonces eso hace que esos módulos no sean tan independientes. En particular
-                        # me refiero al módulo que construye el diccionario OdT y el que arma la lista de puntos
-                        # finales PuntosFinales. Supongo que esto se podría solucionar directamente normalizando el 
-                        # vector de opiniones. Entonces los otros trabajaría por su cuenta sin mezclar cosas
-                        # de módulos que podrían no copiarse en futuros códigos.
                         
                         #-----------------------------------------------------------------------------------------------
                     
@@ -436,29 +398,79 @@ for REDES in ["Barabasi"]:
                         # Con esto me armo el array de estados finales de mi sistema
                         
                         #-------------------------------------------------------------------------------------------------
+    
+                        # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
+                        # colocar puntos marcando el final de mis trayectorias.
                         
-                        # Cuando quiera graficar los puntos que indican el punto final de la trayectoria
-                        # de un agente en el espacio de fases, voy a necesitar que ese array contenga los puntos
-                        # correctamente normalizados. Para eso voy a construir el array PuntosFinales que involucre
-                        # normalización con el MaxNorm Correcto
+    #                    plt.rcParams.update({'font.size': 18})
+    #                    plt.figure("Trayectoria Opiniones",figsize=(20,15))
+    #                    for x1,x2 in zip (OpinionesFinales[0::2],OpinionesFinales[1::2]):
+    #                        indice = Indice_Color(np.array([x1,x2]),Divisiones)
+    #                        plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+    #
+    #
+                        #-----------------------------------------------------------------------------------------------------------
                         
-                        PuntosFinales = np.concatenate((PuntosFinales,Opi), axis=None)
+                        # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
+                        # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
+                        # TdO.
                         
-                        # Con esto me armo la lista de estados finales de mi sistema
+                        #            plt.tick_params(left=False,
+                        #                bottom=False,
+                        #                labelleft=False,
+                        #                labelbottom=False)
+    #                    plt.xlabel("Tópico 1")
+    #                    plt.ylabel("Tópico 2")
+    #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
+    ##                    plt.xlim((xmin,xmax))
+    ##                    plt.ylim((ymin,ymax))
+    #                    plt.annotate("{}".format(ResultadoEF), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+    #                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+    #                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.8),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+    #                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Trayectoria de las opiniones_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+    #                    plt.close("Trayectoria Opiniones")
                         
-                        #-------------------------------------------------------------------------------------------------
-
-                    # Genial, así como está esto ya arma el gráfico de las trayectorias de las opiniones. Ahora, me gustaría
-                    # colocar puntos marcando el final de mis trayectorias.
+                        #------------------------------------------------------------------------------------------------
+                    """
+                    # Defino cuáles iteraciones del total voy a graficar
+                    Graficar = np.random.choice(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]),1,False)
                     
-#                    plt.rcParams.update({'font.size': 18})
-#                    plt.figure("Trayectoria Opiniones",figsize=(20,15))
-#                    for x1,x2 in zip (PuntosFinales[0::2],PuntosFinales[1::2]):
-#                        indice = Indice_Color(np.array([x1,x2]),Divisiones)
-#                        plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
-#
-#
-#                    #----------------------------------------------------------------------------------------------
+                    
+                    #-----------------------------------------------------------------------------------------------------
+                    
+                    # Armo el gráfico de las opiniones de los agentes
+                    
+                    Xcuad = [-1,1,1,-1,-1]
+                    Ycuad = [1,1,-1,-1,1]
+                
+                    plt.rcParams.update({'font.size': 18})
+                    plt.figure("Grafico Opiniones",figsize=(20,15))
+                    
+                    # Grafico los puntos finales de las opiniones
+                    for x1,x2 in zip (OpinionesFinales[0::100],OpinionesFinales[1::100]):
+                        indice = Indice_Color(np.array([x1,x2]),Divisiones)
+                        plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+                    
+                    # Grafico el cuadrado de tamaño [-1,1]x[-1,1]
+                    plt.plot(Xcuad,Ycuad,"--",linewidth=4,alpha=0.7)
+                    
+                    #            plt.tick_params(left=False,
+                    #                bottom=False,
+                    #                labelleft=False,
+                    #                labelbottom=False)
+                    plt.xlabel("Tópico 1")
+                    plt.ylabel("Tópico 2")
+                    plt.xlim(-2*GM,2*GM)
+                    plt.ylim(-2*GM,2*GM)
+        #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
+        ##                    plt.xlim((xmin,xmax))
+        ##                    plt.ylim((ymin,ymax))
+                    plt.annotate("{}".format(EstadoFinal(OpinionesFinales)), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}.png".format(REDES,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+                    plt.close("Grafico Opiniones")
+                    
+                    #----------------------------------------------------------------------------------------------
                     
                     # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
                     # opiniones finales
@@ -472,32 +484,37 @@ for REDES in ["Barabasi"]:
                     
                     for estado in EC:
                         if ResultadoEF == estado[0]:
-                            ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1] 
+                            ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1]
+                    """     
+                    #-----------------------------------------------------------------------------------------------
                     
-                    #-----------------------------------------------------------------------------------------------------------
+                    # Acá voy a ir juntando los datos para hacer el gráfico de Varianza de las opiniones de cada tópico en función
+                    # del Cosdelta. La idea es que para cada Cos(delta) guardo el valor de la varianza de todas las opiniones
+                    # de cada tópico. Voy a querer en un grafico mostrar dos curvas, una para cada tópico.
                     
-                    # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
-                    # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
-                    # TdO.
+                    YVAR1.append(np.var(OpinionesFinales[0::2]))
+                    YVAR2.append(np.var(OpinionesFinales[1::2]))
                     
-                    #            plt.tick_params(left=False,
-                    #                bottom=False,
-                    #                labelleft=False,
-                    #                labelbottom=False)
-#                    plt.xlabel("Tópico 1")
-#                    plt.ylabel("Tópico 2")
-#                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
-##                    plt.xlim((xmin,xmax))
-##                    plt.ylim((ymin,ymax))
-#                    plt.annotate("{}".format(ResultadoEF), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-#                    plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-#                    plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.75,0.8),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-#                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Trayectoria de las opiniones_Gm={}_alfa={:.2f}_Cdelta={}_N={}.png".format(REDES,GM,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
-#                    plt.close("Trayectoria Opiniones")
+                    #-----------------------------------------------------------------------------------------------
                     
-                    #------------------------------------------------------------------------------------------------
+                # Una vez que tengo todos los datos de las varianzas de las opinones de los tópicos guardados
+                # hago lso gráficos correspondientes.
+                
+                plt.rcParams.update({'font.size': 18})
+                plt.figure("Varianza Opiniones",figsize=(20,15))
+                plt.plot(XVAR,YVAR1,"-o",linewidth=4,markersize=8, label="Tópico 0")
+                plt.plot(XVAR,YVAR2,"-o",linewidth=4,markersize=8, label="Tópico 1")
+                plt.xlabel(r"$Cos(\delta)$")
+                plt.ylabel(r"$\sigma_{(opiniones)}$")
+                plt.title(r"Varianza de las opiniones, con $\alpha$={}".format(ALFA))
+                plt.legend()
+                plt.grid()
+                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Varianza_opiniones_alfa={:.3f}_N={}.png".format(REDES,GM,ALFA,AGENTES),bbox_inches = "tight")
+                plt.close("Varianza Opiniones")
                     
-
+            #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            """
+            
             # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
             
             # Armo mi colormap. Para eso armo una lista con los colores que voy a usar,
@@ -523,7 +540,7 @@ for REDES in ["Barabasi"]:
             
             # Grafico la línea del Alfa Crítico teórico
             
-            Xa = np.arange(-0.05,1.05,0.01)
+            Xa = np.arange(-0.55,1.05,0.01)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
             plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
             plt.annotate("N={}_Gm={}_Red={}".format(AGENTES,GM,REDES), xy=(0.35,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
@@ -547,17 +564,97 @@ for REDES in ["Barabasi"]:
             plt.pcolormesh(XX,YY,ZZ,shading="nearest", cmap = ColMap)
             plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Estados finales EP.png".format(REDES,GM), bbox_inches = "tight")
             plt.close("Espacio parametros")
-            
+
             #---------------------------------------------------------------------------------------------------
             
             # Me falta guardar los valores de ZZ en un archivo, por si necesito hacerle un retoque al archivo y no 
             # quiero volver a correr todo de una
             
             np.savetxt("Grafico Fases Red={}_N={}_GM=_{}.csv".format(REDES,AGENTES,GM), ZZ, delimiter = ",")
-            
-            
+            """
             # -------------------------------------------------------------------------------------------------
-
+            
+            for TOPICO in [0]:
+            
+                plt.rcParams.update({'font.size': 18})
+                
+                fig = plt.figure("Distribucion Opiniones",figsize=(64,36))
+                
+                gs = fig.add_gridspec(4,4,hspace=0,wspace=0)
+                axs = gs.subplots(sharex=True, sharey=True)
+                
+                # Defino los alfas que voy a usar en el gráfico de Distribución de Opiniones
+                
+                Alfas_Dist = [Conjunto_Alfa[int(indice*math.floor(len(Conjunto_Alfa)/16))] for indice in range(0,16)]
+                
+                Columnas = [0,1,2,3]*4
+                Filas = [i for i in range(0,4) for j in range(0,4)]
+                
+                
+                for ALFA,filas,columnas in zip(Alfas_Dist,Filas,Columnas):
+                
+                    CDELTA = 0
+                    icdelta = 0
+                    
+                    OpinionesFinales = np.array([])
+                    
+            #        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+        
+                    #-------------------------------------------------------------------------------------
+                    for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
+                        if nombre.split("_")[1] == "Opiniones":
+                
+                            #--------------------------------------------------------------------------------------------
+                        
+                            # Levanto los datos del archivo original y separo los datos en tres listas.
+                            # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                        
+                            Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
+                            
+                            # Array con los valores de opiniones finales del sistema
+                            Opi = np.array([float(x) for x in Datos[3][1::]])
+                            
+                            #-------------------------------------------------------------------------------------------------
+                            
+                            # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
+                            # para después sobre esos datos determinar el estado final del sistema
+                            
+                            OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
+                            
+                            # Con esto me armo el array de estados finales de mi sistema
+                            
+                
+                # -------------------------------------------------------------------------------------------------
+                    
+                    # Acá voy a armar los gráficos de las proyecciones de las opiniones de los agentes. Para eso simplemente
+                    # voy a tomar los valores de opiniones de los agentes de una simulación, calcularle el histograma
+                    # con np.histogram y luego graficar eso como líneas.
+                    
+                    
+                    # Armo los histogramas correspondientes
+                    Histo,Bins = np.histogram(OpinionesFinales[TOPICO::2],bins=70)
+                    
+                    # Ahora grafico las curvas de distribución de ambas opiniones
+                    axs[filas,columnas].plot((Bins[0:len(Bins)-1]+Bins[1::])/2,Histo,"-o",linewidth = 4,markersize = 8, label="Alfa = {}".format(ALFA))
+                    axs[filas,columnas].legend()
+                    axs[filas,columnas].grid()
+                
+                
+                
+#                for ax in axs.flat:
+#                    ax.label_outer()
+#                plt.xlabel("Opinion")
+#                plt.ylabel("Cuentas")
+#                plt.xlim(-15,30)
+#                plt.title(r"Datos {}, Distribucion Topico {}, Cos($\delta$)=0, <k>={}, $\alpha_C$={}".format(REDES,TOPICO,GM,AlfaC(0,GM)))
+#                plt.legend()
+#                plt.grid()
+                
+                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Distribucion_opiniones_T={}_Cdelta={:.1f}_N={}_GM={}.png".format(REDES,GM,TOPICO,CDELTA,AGENTES,GM),bbox_inches = "tight")
+#                plt.show()
+                plt.close("Distribucion Opiniones")
+                
+                #--------------------------------------------------------------------------------------------------------
 
 
 

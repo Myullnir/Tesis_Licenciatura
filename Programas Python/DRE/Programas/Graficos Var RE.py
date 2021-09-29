@@ -157,17 +157,13 @@ def ClasificacionCuadrantes(Array):
     SwitchDic[(-1,1)] = 2
     SwitchDic[(-1,-1)] = 3
     SwitchDic[(1,-1)] = 4
-    SwitchDic[(1,0)] = 0
-    SwitchDic[(0,1)] = 0
-    SwitchDic[(0,-1)] = 0
-    SwitchDic[(-1,0)] = 0
-    SwitchDic[(0,0)] = 0
+
     
     # Repaso los elementos en Signos para identificar los cuadrantes de mis objetos.
     
     for x1,x2,indice in zip(Array[0::2],Array[1::2],np.arange(len(Array[0::2]))):
         Absolutos = np.abs(np.array([x1,x2]))
-        if max(Absolutos)<0.01:
+        if max(Absolutos)<0.5:
             Resultado[indice] = 0
         else:
             Signos = np.sign(np.array([x1,x2]))
@@ -205,7 +201,7 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 SuperDiccionario = dict()
 
-for REDES in ["Barabasi"]:
+for REDES in ["Erdos-Renyi"]:
 
 
     # Primero levanto datos de la carpeta de la red REDES
@@ -310,12 +306,12 @@ for REDES in ["Barabasi"]:
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
 # las keys de mi SuperDiccionario.
 
-for REDES in ["Barabasi"]:    
+for REDES in ["Erdos-Renyi"]:    
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
 
-        for GM in Conjunto_Gm:
+        for GM in [12]:  #Conjunto_Gm:
             
             Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
         
@@ -350,6 +346,8 @@ for REDES in ["Barabasi"]:
 #                fig = plt.figure("Distribucion por cuadrantes", figsize=(20,12))
 #                Xhisto = np.arange(5)
 #                Fondo = np.zeros(5)
+#                plt.rcParams.update({'font.size': 18})
+#                plt.figure("Distribucion de Valores", figsize=(20,12))
                 
                 for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
                 
@@ -386,7 +384,7 @@ for REDES in ["Barabasi"]:
                         Opi = np.array([float(x) for x in Datos[3][1::]])
                     
                         #----------------------------------------------------------------------------------------------
-
+                        """
                         # Para algunos valores de dt me ocurre que el sistema llega a valores de variación cero muy rápido.
                         # Eso en el gráfico de logaritmo lo único que hace es incluir muchos valores del eje x en los
                         # cuales no hay nada graficado. Comprimiendo de manera artificial mi gráfico a la izquierda, y 
@@ -403,13 +401,13 @@ for REDES in ["Barabasi"]:
                         # tengo que iniciar el siguiente gráfico antes de cerrar este. Eso no es un problema
                         # para el código o de hacer, es sólo un tema de que dificulta un poquito más la modularidad
                         # del código porque ahora las cosas se mezclan y el cierre de este módulo está al final
-                        
+                        """
                         #----------------------------------------------------------------------------------------------
 
                         # Voy a ir armando mi array con los valores de Tiempo de Simulación.
                         # Lo voy a llamar TideSi
                         
-                        TideSi[numero] = Var.shape[0]*0.1 # 0,1 es el paso temporal dt
+                        TideSi[numero] = Var.shape[0]*0.01 # 0,1 es el paso temporal dt
                         
                         # Esto debería funcionar derechito.
                         
@@ -434,18 +432,23 @@ for REDES in ["Barabasi"]:
                         # Con esto me armo el array de estados finales de mi sistema
                         
                     #------------------------------------------------------------------------------------------------
-                    
                     # Acá lo que voy a hacer es rellenar el grid de ZZV con los valores de los resultados de
-                    # opiniones finales
+                    # opiniones finales. Vamos a modificar esto porque la Varianza resulta muy sensible ante
+                    # outliers. Vamos a tomar la mediana de los tiempos de simulación y con eso ver si obtenemos
+                    # un gráfico más claro de cómo surgen las regiones de transición entre consenso y polarización
+                    # a partir de la variación en los Tiempos de Simulación.
+                    
+                    Cuantiles = np.quantile(TideSi,[0.05,0.95])
                    
-                    ZZV[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.log10(np.var(TideSi)+1)
+                    ZZV[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.log10(Cuantiles[1]-Cuantiles[0]+1)
                     
                     # Esto ya debería correctamente armarme el ZZV ubicando para cada par de valores
-                    # alfa y cos(delta) su respectiva Varianza. Lo siguiente es tomar eso al final y graficarlo.
+                    # alfa y cos(delta) la diferencia entre el valor que define el cuantil de 0,05 y el de 0,95.
+                    # Lo siguiente es tomar eso al final y graficarlo.
                         
                     #-------------------------------------------------------------------------------------------------
                     
-                    # Acá lo que voy a hacer es rellenar el grid de ZZM con los valores de los maximos promedios
+                    # Acá lo que voy a hacer es rellenar el grid de ZZP con los valores de los maximos promedios
                     # de las opiniones finales
                 
                     ZZP[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.mean(Promedios)
@@ -486,7 +489,7 @@ for REDES in ["Barabasi"]:
 #                    Son muy pocas en general, así que no importan mucho, ¿Pero debería simplemente ignorarlas?
 #                    Definitivamente son despreciables, dale para adelante.
                     
-                    Probabilidades = Yhisto[1::][Yhisto[1::] != 0]/np.sum(Yhisto[1::])
+                    Probabilidades = Yhisto[Yhisto != 0]/np.sum(Yhisto)
                     ZZE[len(Conjunto_Alfa)-1-ialfa, icdelta] = np.matmul(Probabilidades, np.log2(Probabilidades))*(-1)
                 
                 #---------------------------------------------------------------------------------------------------
@@ -508,30 +511,29 @@ for REDES in ["Barabasi"]:
 #                    plt.close("Variaciones Promedio")
                     
                     #-------------------------------------------------------------------------------------------------
-        
+                    """
                     # Puedo armar acá el gráfico de distribución de valores. Además, para esto puedo usar una lista que
                     # ya armé antes que es la de Opiniones Finales. A partir de esta voy a hacer las distribuciones del
                     # Tópico 1 y del 2 y eso voy a graficar. Las distribuciones las voy a calcular con el np.histogram.
                     # Como tengo 100 agentes y 40 simulaciones, entonces tengo 4000 opiniones para cada tópico. Me parece
                     # razonable separar esto en 40 bins.
                     
-#                    Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=20)
-#                    
-#                    EjeX = [(Bordes_Bin[i+1]+Bordes_Bin[i])/2 for i in range(len(Bordes_Bin)-1)]
-#                    
-#                    plt.figure("Distribucion de Valores")
-#                    plt.plot(EjeX,Histo,"--",linewidth = 3, label = r"$cos(\delta)$ = {}".format(CDELTA))
-#            
-#            
-#                plt.rcParams.update({'font.size': 18})
-#                plt.xlabel("Valores de Opiniones")
-#                plt.ylabel("Ocurrencias")
-#                plt.title(r"Distribucion de las opiniones para  N={}, Gm={} $\alpha$={:.2f}".format(ALFA, AGENTES))
-#                plt.legend()
-#                plt.grid()
-#                plt.savefig("../Imagenes/ER2/N={}/Distribución opiniones_N={}_alfa={:.2f}.png".format(AGENTES,AGENTES,ALFA),bbox_inches = "tight")
-#                plt.close("Distribucion de Valores")
+                    Histo,Bordes_Bin = np.histogram(OpinionesFinales,bins=80)
                     
+                    EjeX = (Bordes_Bin[1::]-Bordes_Bin[0:len(Bordes_Bin)-1])/2
+                    
+                    plt.figure("Distribucion de Valores")
+                    plt.plot(EjeX,Histo,"--",linewidth = 3, label = r"$cos(\delta)$ = {}".format(CDELTA))
+            
+            
+                plt.xlabel("Valores de Opiniones")
+                plt.ylabel("Ocurrencias")
+                plt.title(r"Distribucion de las opiniones para  N={}, Gm={} $\alpha$={:.2f}".format(AGENTES,GM,ALFA))
+                plt.legend()
+                plt.grid()
+                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Distribución opiniones_N={}_alfa={:.2f}_GM={}.png".format(REDES,GM,AGENTES,ALFA,GM),bbox_inches = "tight")
+                plt.close("Distribucion de Valores")
+                """
                 #-----------------------------------------------------------------------------------------------------------
                 
 
@@ -549,22 +551,22 @@ for REDES in ["Barabasi"]:
             
             #------------------------------------------------------------------------------------------------------------
     
-                
+            
             # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
         
             # Defino los parámetros usuales de mi gráfico
         
-            plt.figure("Varianza TideSi",figsize=(20,12))
             plt.rcParams.update({'font.size': 18})
+            plt.figure("Cuantil TideSi",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
-            plt.title("Varianza del Tiempo de Simulación en el espacio de parámetros")
+            plt.title("Largo del Cuantil del Tiempo de Simulación en el espacio de parámetros")
         
             # Grafico la línea del Alfa Crítico teórico
         
-            Xa = np.arange(-0.05,1.05,0.01)
+            Xa = np.arange(-0.55,1.05,0.01)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
         
             # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
         
@@ -572,8 +574,8 @@ for REDES in ["Barabasi"]:
             plt.pcolormesh(XX,YY,ZZV,shading="nearest", cmap = "plasma")
             plt.colorbar()
             plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Varianza EP.png".format(REDES,GM), bbox_inches = "tight")
-            plt.close("Varianza TideSi")
+            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Cuantil EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.close("Cuantil TideSi")
         #     plt.show()
         
             #---------------------------------------------------------------------------------------------------
@@ -582,17 +584,17 @@ for REDES in ["Barabasi"]:
         
             # Defino los parámetros usuales de mi gráfico
         
-            plt.figure("Promedios EP",figsize=(20,12))
             plt.rcParams.update({'font.size': 18})
+            plt.figure("Promedios EP",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
             plt.title("Promedios de Opiniones en el espacio de parámetros")
         #
         #    # Grafico la línea del Alfa Crítico teórico
         #
-            Xa = np.arange(-0.05,1.05,0.01)
+            Xa = np.arange(-0.55,1.05,0.01)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
         #
         #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
         #
@@ -610,17 +612,17 @@ for REDES in ["Barabasi"]:
         
             # Defino los parámetros usuales de mi gráfico
         
-            plt.figure("Entropia EP",figsize=(20,12))
             plt.rcParams.update({'font.size': 18})
+            plt.figure("Entropia EP",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
             plt.title("Entropía de distribuciones en el espacio de parámetros")
         #
         #    # Grafico la línea del Alfa Crítico teórico
         
-            Xa = np.arange(-0.05,1.05,0.01)
+            Xa = np.arange(-0.55,1.05,0.01)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
         #
         #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
         #
@@ -633,7 +635,7 @@ for REDES in ["Barabasi"]:
         #     plt.show()
         
             #---------------------------------------------------------------------------------------------------
-                    
+
                     
 
 

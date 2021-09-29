@@ -90,3 +90,16 @@ de media cero y varianza cuadrada = 2,5.
 Además también armé unos archivos llamados "Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$".
 los cuales guardan los valores de actividad de los agentes, el registro de cuáles agentes
 se activan y los grados medios de las redes armadas.
+
+.) RCC:
+---------
+Esta carpeta se llama así porque para estos datos voy a estar cambiando 
+la red de actividad en cada interacción del sistema. Este programa corre
+rearmando la red de actividades 5000 veces, lo cual le es el equivalente de
+tiempo de simulación a que en los programas anteriores rearmara la red 50
+veces. Nuevamente recorrí alfa entre 0 y 0,5 de a 0,0125, mantuve cos(delta)=0,
+dt=0,01, 100 simulaciones por punto de ensamble, opiniones iniciales armadas
+con distribución gaussiana centrada en cero y varianza cuadrada de 2,5. 
+Para estos datos no me guardé los datos de Actividades y grado Medio porque
+entiendo que ya habíamos visto que eso daba bien y no era necesario seguir
+registrándolo.

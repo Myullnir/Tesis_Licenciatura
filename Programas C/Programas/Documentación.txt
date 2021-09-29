@@ -236,3 +236,33 @@ Los tipos de datos armados por esto los podés buscar mejor descriptos
 en el archivo de Documentación dentro de la carpeta DilAct, la cual
 contiene el bache de datos de Actividades, Reversión Actividades,
 Regact, HomofiliaCero, TiempoExtra y en el futuro habrá más seguro.
+
+----------------------------------------------------------------------------------
+
+25/09/2021
+
+En la Carpeta de "Redes Estáticas NCC" lo que voy a hacer es copiar los archivos
+de la carpeta de Redes Estáticas y lo que voy a hacer es cambiar el criterio de Corte.
+La idea es que por lo que estábamos viendo con Seba, pareciera que en la región de
+transición de mis redes estáticas, mis sistemas frenan antes de tiempo, porque
+si hubieran seguido corriendo hubieran llegado a resultados diferentes a los
+que tenían. Por eso la idea es cambiar el criterio de corte. No cambiando el valor del
+criterio de corte, sino que haciendo que el sistema calcule la variación promedio entre
+el paso actual y varios pasos anteriores, posiblemente 20 pasos anteriores.
+Para eso tengo que agregar un array de punteros que contengan los datos calculados de cada
+paso temporal hasta 20 pasos anteriores y así ir calculando. Por eso es que es un cambio
+sobre el programa de Redes Estáticas que mejor tenerlo en un código aparte.
+
+-----------------------------------------------------------------------------------
+
+27/09/2021
+
+En la carpeta "Actual" puse el código que tenía actualmente en src. Ese código es 
+el que usé para ver cómo funcionaba el sistema de la red de Actividades cuando
+variaba constantemente la red en todos los pasos temporales. Por lo que vi no había
+guardado estos archivos antes, así que por si acaso los guardo aparte mientras
+pongo a prueba el código de redes estáticas con nuevo criterio de Corte.
+
+Entonces para aclarar, este código en vez de rearmar la red de actividad cada un número
+discreto de tiempo, rearma la red en cada iteración. Además, para tener una buena
+cantidad de iteraciones es que le pido que rearme la red 5000 veces.

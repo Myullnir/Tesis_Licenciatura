@@ -256,9 +256,9 @@ t0 = time.time()
 
 # Primero levanto datos de la carpeta de la red REDES
 
-Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra"]
+Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra","RCC"]
 #SelCarpeta = 1
-for SelCarpeta in range(1,len(Carpetas)):
+for SelCarpeta in [4]: # range(1,len(Carpetas)):
     
     CarpCheck=[[root,files] for root,dirs,files in os.walk("./DilAct/{}".format(Carpetas[SelCarpeta]))]
     
@@ -389,6 +389,17 @@ for SelCarpeta in range(1,len(Carpetas)):
         # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
         # los datos que ya guardé de antes. Para eso es el módulo siguiente
         
+        # Me armo los arrays que voy a necesitar para graficar la varianza. Xvar es los valores
+        # de alfa para los cuales calculo la varianza. Yvar1 es la varianza del tópico 1,
+        # Yvar2 es la varianza del tópico 2, Varvar1 es el valor de Desviación media de la varianza
+        # 1 para cada valor de Alfa correspondiente y lo mismo Varvar2 para el tópico 2.
+        
+        Xvar = np.array(Conjunto_Alfa)
+        Yvar1 = np.zeros(len(Conjunto_Alfa))
+        Yvar2 = np.zeros(len(Conjunto_Alfa))
+        Varvar1 = np.zeros(len(Conjunto_Alfa))
+        Varvar2 = np.zeros(len(Conjunto_Alfa))
+        
         #--------------------------------------------------------------------------------------------
         
         for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
@@ -411,6 +422,7 @@ for SelCarpeta in range(1,len(Carpetas)):
                 Testigos[i] = np.array([])
             
             #-------------------------------------------------------------------------------------
+            
             for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
                 if nombre.split("_")[1] == "Opiniones":
         
@@ -458,11 +470,14 @@ for SelCarpeta in range(1,len(Carpetas)):
                     # Con esto me armo el array de estados finales de mi sistema
                     
                     #-------------------------------------------------------------------------------------------------
-                
+
+            Graficar = np.random.choice(int(len(Testigos[0])/Iteraciones),2,False)
+            
+
             # Hago un gráfico de los tópicos de los agentes testigos en función del tiempo. Hago un gráfico
             # para todas las iteraciones de un agente y de un tópico
             
-            for repeticion in np.random.choice(int(len(Testigos[0])/Iteraciones),2,False):
+            for repeticion in Graficar:
                 plt.rcParams.update({'font.size': 18})
                 plt.figure("Topico",figsize=(20,15))
                 X = np.arange(len(Testigos[0][0:Iteraciones:2]))*0.01
@@ -491,6 +506,7 @@ for SelCarpeta in range(1,len(Carpetas)):
     #                plt.savefig("../Imagenes/RedAct/Topico2_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
     #                plt.close("Topico2")
                 
+            """
             #----------------------------------------------------------------------------------------------
             
             # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
@@ -545,7 +561,7 @@ for SelCarpeta in range(1,len(Carpetas)):
             Ycirc = 2*math.sqrt(2.5)*np.sin(Tita)
             
             
-            for repeticion in np.random.choice(int(len(OpinionesFinales)/len(Opi)),2,False):
+            for repeticion in Graficar:
                 plt.rcParams.update({'font.size': 18})
                 plt.figure("Grafico Opiniones",figsize=(20,15))
                 
@@ -576,7 +592,7 @@ for SelCarpeta in range(1,len(Carpetas)):
                 plt.annotate(r"$\alpha$={},cos($\delta$)={},N={},iter={}".format(ALFA,CDELTA,AGENTES,repeticion), xy=(0.7,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
                 plt.savefig("../Imagenes/RedAct/{}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
                 plt.close("Grafico Opiniones")
-            
+
             #------------------------------------------------------------------------------------------------
                 
             # Acá me voy a armar los gráficos de las trayectorias de Opiniones de los agentes Testigos.
@@ -595,8 +611,29 @@ for SelCarpeta in range(1,len(Carpetas)):
     #                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
     #                plt.savefig("../Imagenes/RedAct/{}/TdO_alfa={:.2f}_Cdelta={:.2f}_N={}_testigo={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,AgentesTestigos[sujeto]),bbox_inches = "tight")
     #                plt.close("TdO")
-                
-                
+            
+            #----------------------------------------------------------------------------------------------------------
+            """
+            # Para graficar los valores de la Varianza en función de Alfa necesito primero aprovechar el for del Alfa
+            # y armar mis datos al respecto.
+            
+            # Armo los arrays que me guardan los valores de varianza de todas las simulaciones
+            # y con eso me voy a guardar los valores promedios
+            Var1 = np.zeros(int(len(SuperDiccionario[AGENTES][ALFA][CDELTA])/2))
+            Var2 = np.zeros(int(len(SuperDiccionario[AGENTES][ALFA][CDELTA])/2))
+            
+            for repeticion in np.arange(int(len(SuperDiccionario[AGENTES][ALFA][CDELTA])/2)):
+                Var1[repeticion] = np.var(OpinionesFinales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2])
+                Var2[repeticion] = np.var(OpinionesFinales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2])
+            
+            Yvar1[ialfa] = np.mean(Var1)
+            Varvar1[ialfa] = math.sqrt(np.var(Var1))
+            Yvar2[ialfa] = np.mean(Var2)
+            Varvar2[ialfa] = math.sqrt(np.var(Var2))
+            
+            # Con esto me armé los datos que voy a graficar de la varianza. Ahora sólo tengo que hacer el gráfico.
+            
+            #----------------------------------------------------------------------------------------------------------
     
         # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
         
@@ -655,16 +692,123 @@ for SelCarpeta in range(1,len(Carpetas)):
         
     #    np.savetxt("Grafico Fases RedAct N={}.csv".format(AGENTES), ZZ, delimiter = ",")
     
+    
+        #---------------------------------------------------------------------------------------------------
+        
+        # Acá armo los gráficos de Varianza en función de Alfa.
+        
+        plt.rcParams.update({'font.size': 18})
+        plt.figure("Varianza Opiniones",figsize=(20,15))
+        
+        # Ahora grafico las curvas de Varianza de ambos tópicos
+        plt.errorbar(Xvar,Yvar1,yerr=Varvar1,fmt="-o",label="Topico 1",linewidth = 4,markersize=10,elinewidth=3,ecolor="black",capsize=5)
+        plt.errorbar(Xvar,Yvar2,yerr=Varvar2,fmt="-o",label="Topico 2",linewidth = 4,markersize=10,elinewidth=3,ecolor="black",capsize=5)
+        plt.xlabel("Alfa")
+        plt.ylabel("Varianza")
+        plt.title("Datos {}, Varianza vs Alfa".format(Carpetas[SelCarpeta]))
+        plt.legend()
+        plt.grid()
+        plt.savefig("../Imagenes/RedAct/{}/Varianza_opiniones_Cdelta={:.2f}_N={}.png".format(Carpetas[SelCarpeta],CDELTA,AGENTES),bbox_inches = "tight")
+        plt.close("Varianza Opiniones")
+
 
 #---------------------------------------------------------------------------------------------------------
-
 # Voy a separar el armado del gráfico de Consenso Vs Alfa de forma de
 # poder armar varios gráficos variando el umbral de detección del consenso entre
 # 2 sigmas y 0.5 sigmas supongo
 
-Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra"]
+Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra","RCC"]
 #SelCarpeta = 1
-for SelCarpeta in range(1,len(Carpetas)):
+for SelCarpeta in [4]:  #range(1,len(Carpetas)):
+    
+    CarpCheck=[[root,files] for root,dirs,files in os.walk("./DilAct/{}".format(Carpetas[SelCarpeta]))]
+    
+    # El elemento en la posición x[0] es el nombre de la carpeta
+    
+    for x in CarpCheck:
+        # dada = x[0].split("\\")
+        Archivos_Datos = [nombre for nombre in x[1]]
+        Archivos_Datos.insert(0,x[0])
+    
+    # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
+    # Archivos_Datos tiene en la primer coordenada el principio de la dirección
+    # de la carpeta, y el resto de elementos son los archivos en la carpeta.
+    
+    #---------------------------------------------------------------------------------------------
+    
+    # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Iter=$"
+    
+    Conjunto_Alfa = []
+    Conjunto_Cdelta = []
+    Conjunto_N = []
+    
+    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+        alfa = float(nombre.split("_")[2].split("=")[1])
+        Cdelta = float(nombre.split("_")[3].split("=")[1])
+        N = int(nombre.split("_")[4].split("=")[1])
+        if alfa not in Conjunto_Alfa:
+            Conjunto_Alfa.append(alfa)
+        if Cdelta not in Conjunto_Cdelta:
+            Conjunto_Cdelta.append(Cdelta)
+        if N not in Conjunto_N:
+            Conjunto_N.append(N)
+    
+    Conjunto_Alfa.sort()
+    Conjunto_Cdelta.sort()
+    Conjunto_N.sort()
+    
+    # Bien, esto ya me arma el conjunto de Alfas, Cdelta, N y Gm correctamente y ordenados
+    # Ahora podemos pasar a lo importante de esta celda
+    
+    #--------------------------------------------------------------------------------------------
+    
+    # Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
+    # a un cierto N, Alfa, Cdelta y Gm. Me armo primero el superdiccionario, que es el diccionario,
+    # que contiene diccionarios, que llevan a diccionarios que lleva a diccionarios
+    # que lleva a diccionarios que llevan a las listas de los nombres
+    # de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa,
+    # el Cdelta, el tipo de red y el Gm respectivos. 
+    # Entonces la lista se accede sabiendo el Alfa, Cdelta y N correspondiente de antemano.
+    
+    SuperDiccionario = dict()
+    
+    for AGENTES in Conjunto_N:
+        SuperDiccionario[AGENTES] = dict()
+        for ALFA in Conjunto_Alfa:
+            for CDELTA in Conjunto_Cdelta:
+                for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+                    alfa = float(nombre.split("_")[2].split("=")[1])
+                    Cdelta = float(nombre.split("_")[3].split("=")[1])
+                    N = int(nombre.split("_")[4].split("=")[1])
+                    if N==AGENTES and alfa==ALFA and Cdelta==CDELTA:
+                        if alfa not in SuperDiccionario[AGENTES].keys():
+                            SuperDiccionario[AGENTES][ALFA] = dict()
+                        if Cdelta not in SuperDiccionario[AGENTES][ALFA].keys():
+                            SuperDiccionario[AGENTES][ALFA][CDELTA] = []
+                        else:
+                            break
+                    
+                
+    
+    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+        alfa = float(nombre.split("_")[2].split("=")[1])
+        Cdelta = float(nombre.split("_")[3].split("=")[1])
+        N = int(nombre.split("_")[4].split("=")[1])
+        SuperDiccionario[N][alfa][Cdelta].append(nombre)
+        
+    # Ya mejoré el armado del SuperDiccionario de manera de que cada N tenga los Alfa y cada
+    # Alfa tenga los Cdelta y cada Cdelta tenga los GM correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
+    # de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
+    # Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
+    # armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
+    # definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
+    # iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
+    
+    #--------------------------------------------------------------------------------------------
+
+    plt.rcParams.update({'font.size': 24})
+    plt.figure("Consenso vs alfa",figsize=(20,12))
+
     for umbral in range(1,5):
         for AGENTES in [1000]:
         
@@ -709,21 +853,100 @@ for SelCarpeta in range(1,len(Carpetas)):
             # no estaría pudiendo hacerse corréctamente. Así que ahora mejor veo de graficar la cantidad de estados
             # finales de consenso en función del Alfa.
             
-            plt.rcParams.update({'font.size': 24})
-            plt.figure("Consenso vs alfa",figsize=(20,12))
-            plt.plot(Xcons,Ycons,"o")
-            plt.vlines(AlfaC(0,0.817),0,1,colors="red", label="Alfa Critico")
-            plt.xlabel(r"$\alpha$")
-            plt.ylabel("Fraccion de agentes")
-            plt.title("Fraccion de agentes en consenso en funcion de Alfa")
+            plt.plot(Xcons,Ycons,"o",markersize = 16-3*umbral, label=r"umbral = {}$\sigma$".format((umbral/2)))
+    
+    plt.vlines(AlfaC(0,0.817),0,1,colors="red", label="Alfa Critico")
+    plt.xlabel(r"$\alpha$")
+    plt.ylabel("Fraccion de agentes")
+    plt.title("Fraccion de agentes en consenso en funcion de Alfa, Datos {}".format(Carpetas[SelCarpeta]))
+    plt.legend()
+    plt.grid()
+    plt.annotate(r"{}$\sigma$".format(umbral/2), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+    plt.savefig("../Imagenes/RedAct/{}/Consenso vs Alfa.png".format(Carpetas[SelCarpeta]), bbox_inches = "tight")
+    plt.close("Consenso vs alfa")
+    
+    
+    # Voy a colocar acá el gráfico de la distribución de las opiniones porque no me gusta mucho eso de tener un gráfico abierto
+    # durante el proceso de TOOODAS las otras cosas.
+    
+    for AGENTES in [1000]:
+    
+        Conjunto_Alfa = list(SuperDiccionario[AGENTES].keys())
+    
+        Conjunto_Cdelta = list(SuperDiccionario[AGENTES][Conjunto_Alfa[0]].keys())[0]
+        
+        # Abro acá el archivo de Distribucion de opiniones. La idea es armar un gráfico sólo
+        # con las distribuciones de 10 alfas.
+        
+        for TOPICO in range(0,2):
+        
+            plt.rcParams.update({'font.size': 18})
+            
+            plt.figure("Distribucion Opiniones",figsize=(20,15))
+            
+            # Defino los alfas que voy a usar en el gráfico de Distribución de Opiniones
+            
+            Alfas_Dist = [Conjunto_Alfa[int(indice*math.floor(len(Conjunto_Alfa)/10))] for indice in range(0,10)]
+    
+            
+            for ALFA,ialfa in zip(Alfas_Dist,np.arange(len(Alfas_Dist))):
+                
+                CDELTA = 0
+                icdelta = 0
+                
+                OpinionesFinales = np.array([])
+                
+        #        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+    
+                #-------------------------------------------------------------------------------------
+                for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
+                    if nombre.split("_")[1] == "Opiniones":
+            
+                        #--------------------------------------------------------------------------------------------
+                    
+                        # Levanto los datos del archivo original y separo los datos en tres listas.
+                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                    
+                        Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
+                        
+                        # Array con los valores de opiniones finales del sistema
+                        Opi = np.array([float(x) for x in Datos[5][1::]])
+                        
+                        #-------------------------------------------------------------------------------------------------
+                        
+                        # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
+                        # para después sobre esos datos determinar el estado final del sistema
+                        
+                        OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
+                        
+                        # Con esto me armo el array de estados finales de mi sistema
+                        
+            
+            # -------------------------------------------------------------------------------------------------
+                
+                # Acá voy a armar los gráficos de las proyecciones de las opiniones de los agentes. Para eso simplemente
+                # voy a tomar los valores de opiniones de los agentes de una simulación, calcularle el histograma
+                # con np.histogram y luego graficar eso como líneas.
+                
+                
+                # Armo los histogramas correspondientes
+                Histo,Bins = np.histogram(OpinionesFinales[TOPICO::2],bins=100)
+                
+                # Ahora grafico las curvas de distribución de ambas opiniones
+                plt.plot((Bins[0:len(Bins)-1]+Bins[1::])/2,Histo,"-o",linewidth = 4,markersize = 8, label="Alfa = {}".format(ALFA))
+            
+            
+            plt.xlabel("Opinion")
+            plt.ylabel("Cuentas")
+            plt.xlim(-5,5)
+            plt.title(r"Datos {}, Distribucion Topico {}, Cos($\delta$)=0".format(Carpetas[SelCarpeta],TOPICO))
             plt.legend()
             plt.grid()
-            plt.annotate(r"{}$\sigma$".format(umbral/2), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../Imagenes/RedAct/{}/Consenso vs Alfa {}sigma.png".format(Carpetas[SelCarpeta],umbral), bbox_inches = "tight")
-            plt.close("Consenso vs alfa")
-    
-    
-
+            
+            plt.savefig("../Imagenes/RedAct/{}/Distribucion_opiniones_T={}_Cdelta={:.2f}_N={}.png".format(Carpetas[SelCarpeta],TOPICO,CDELTA,AGENTES),bbox_inches = "tight")
+            plt.close("Distribucion Opiniones")
+                
+            #--------------------------------------------------------------------------------------------------------
 
 
 

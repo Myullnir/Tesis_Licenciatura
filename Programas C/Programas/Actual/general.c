@@ -16,7 +16,7 @@ double Random(){
 // Esta función me da un valor tomado de una distribución gaussiana con valor medio mu y desviación sigma
 double Gaussiana(float f_mu, float f_sigma){
 	// Defino mis variables iniciales
-	int i_n=10;
+	int i_n=100;
 	double d_z=0;
 	
 	// Genero el número que voy a obtener de mi Gaussiana.
