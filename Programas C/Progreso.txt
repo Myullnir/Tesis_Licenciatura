@@ -4379,7 +4379,7 @@ crítico para Cdelta = 0. Me voy a mover de a 0,001 (Tengo que dividir el alfa po
 
 Esto determina que para cada GM me tengo que mover en regiones de alfa diferentes. Esas regiones son:
 .) GM=4: [0.24,0.27] (240,270)
-.) GM=8: [0.135,0.155] (135,155)
+.) GM=8: [0.115,0.145] (115,145)
 .) GM=12: [0.073,0.103] (73, 103)
 .) GM=16: [0.052,0.082] (52,82)
 
@@ -4427,3 +4427,1186 @@ Bien, armé el código de esto, ahora sólo me queda ver que tal salen los gráficos
 mandar esto a Oporto y hacerlo correr y listo. Ya que estoy, voy a borrar los archivos no necesarios en Oporto
 de Redes Estáticas, y subir todo a Github. Luego de eso, me pondré a preparar clases de Electro y después
 seguiré con esto.
+
+-----------------------------------------------------------------------------------------------------------------
+
+01/10/2021
+
+Pablo me propuso que viera si esto que mandé a correr en Algarve va a realmente cubrir la región de transición o no.
+Para eso me conviene mandar a correr la cosa en Oporto con un barrido menos fino y en una región más pequeña.
+Robemos tres hilos para esto. Al final robé seis.
+
+Lo que hice fue mandar a correr datos para una red de grado medio 8, en sólo 2 cosenos deltas (0 y 0,2), con 
+31 iteraciones y moviendo alfa de a 0,005 entre 0,135 y 0,165. Por eso con seis hilos me alcanza. Confío en que eso
+mañana ya está resuelto y lo puedo revisar.
+
+Mañana empezá a charlar con Sofi sobre lo de graficar con Gephi y andá escribiendo cosas en la tesis. YA AMIGO.
+
+-----------------------------------------------------------------------------------------------------------------
+
+02/10/2021
+
+Ya me bajé los datos de las redes estáticas armados para revisar si estoy conteniendo la región de transición en
+los datos que mandé a armar en Algarve. Veamos de graficarlos.
+
+------------------------------------------------------------------------------------------------------------------
+
+04/10/2021
+
+El código que trabaja con la carpeta Subdividida ya funciona. Este código tiene una variable al 
+inicio llamada Subdividido que dependiendo de si es True o False activa partes del código que
+operan con la carpeta subdividida o partes que trabajan con la carpeta con datos mezclados.
+Esta variable la defino yo a mano, aunque podría armar que se defina de manera automática midiendo la cantidad
+de carpetas dentro de la carpeta. Si la cantidad es cero, que no haga nada. Si la cantidad es mayor
+a 1 que trabaje. No se me ocurre que haya una sola carpeta.
+
+Por otro lado, los datos que mandé a correr para investigar si la región considerada estaba bien no funcionaron.
+Mandé a investigar la región del GM=8 para el GM=12. Eso terminó en que no estaba viendo la región de transición,
+sino que había llegado a una región de polarización muy clara. Todavía hay tiempo para mandar a correr una
+simulación y ver si estoy correctamente levantando la región que quiero ver.
+
+Ahí mandé a correr una simulación en Oporto para grado medio 8, entre 0,13 y 0,17. Esta vez debería ver
+que la región de transición está contenida en los datos medidos. Estimo que esto va a tomar unas 6 horas.
+
+--------------------------------------------------------------------------------------------------------------------
+
+05/10/2021
+
+Estoy viendo que por alguna razón que desconozco, para el GM=8 la región que estuve revisando está totalmente
+mal. Está claramente por encima de la región de transición teórica. El valor de alfa teórico es 0,125 y yo 
+arranco a mirar en alfa igual a 0,13. No entiendo porqué, no logro comprender porqué puse eso. Hice mal la
+cuenta. Esto significa que lo que está calculando en la pc de Algarve sobre el GM=8 está mal. Lo que está
+sobre GM=12 parece estar bien, pero GM=8 está mal. Supongo que lo puedo subsanar si mando a correr el programa
+en Oporto lo que me falta. Confío en que podré encontrarle ahí una solución. Entonces, el plan es dejar corriendo
+lo que falta de Algarve y cuando termine usar 20 hilos de Algarve para dos grados medios, 4 y 8 posiblemente,
+y otros 10 hilos en Oporto para GM=16. Con eso sé que voy a tener todos los datos listo para el 18 de Octubre,
+más o menos. Carajos
+
+Bueno, mandé a correr en la computadora de Oporto 8 hilos para poder tener datos de GM=8. Ahora sí, mandé a correr
+en la región de alfa [0.11,0.15], siendo que el alfa crítico está en 0.125. Esperemos que esta vez esté todo bien.
+
+-------------------------------------------------------------------------------------------------------------------
+
+06/10/2021
+
+En Oporto mandé a correr las simulaciones para grado medio 8. Esto es porque los datos que mandé a correr en Algarve
+con el GM=12 en su momento recorren una región de Alfa que NO es la región en la cual se encuentra la zona
+de transición. No entiendo cómo es que me equivoqué al hacer la cuenta, pero pasó. Ahora lo corregí.
+El plan es que dentro de uno o dos días, cuando el programa termine de calcular los datos para
+GM=12, ya podré empezar a usar eso para revisar cosas, mientras que podré mandar en Algarve a que se
+construyan los datos de las redes con GM=4 y 16 en Algarve. También hice una modificación al armado
+de los datos según lo que me dijo Sebas. Que es que en vez de correr todas las simulaciones primero y después
+cambiar el Alfa y Cdelta, mejor primero barrer todos los Alfa, Cdelta y demás y después avanzar en la cantidad
+de simulaciones. Esa es una forma de ir teniendo datos para ver sin tener que esperar hasta el último momento.
+
+--------------------------------------------------------------------------------------------------------------------
+
+11/10/2021
+
+Ya casi están terminados los datos de la red de GM=12. Así que aproveché y mandé a correr los datos para la
+red de GM=4. Quizás ya mañana o pasado puedo mandar a correr los datos de la red de GM=16. Los datos
+en Oporto están bastante avanzados, ya casi terminaron con la red de Erdos-Renyi, ahora
+están por empezar a calcular los datos en Random Regulars. Los datos que estoy calculando en Oporto
+son los datos para la red de GM=8.
+
+-------------------------------------------------------------------------------------------------------------------
+
+12/10/2021
+
+Me quiero morir, recién terminaron las cuentas de GM=12. Las únicas cuentas con datos que me podían servir,
+y recién ahora noto que los datos guardaban alfa con dos decimales y yo me movía con tres. Entonces el
+programas estuvo constantemente sobreescribiendo datos, así que estuvo trabajando para nada. Me quiero
+comprar un burro y hacerme cagar a patadas. Cuestión, tengo que buscarle una solución a esto. Para eso
+se me ocurre primero borrar los datos ya calculados. Eso es porque estos datos no van a estar bien, no los
+puedo usar. Fijate que el programa estuvo aproximando los valores de alfa, así que muy posiblemente alfa=0,08
+en realidad sea alfa =0,084. Entonces esto no va a estar funcionando, tengo que volver a calcular todo desde cero.
+Para apurar el trabajo y tener datos que mirar, lo que se me ocurre hacer es lo siguiente. Voy a mandar a correr
+los datos en las dos pc usando 15 hilos. Y voy a generar sólo 30 iteraciones. Después si en el futuro necesito más
+estadística, que seguro voy a necesitar, lo mando, pero por lo menos ya tengo algún gráfico que mostrar.
+Mierda.
+
+Ahora mandé a correr 15 hilos en Oporto y 15 en Algarve. Los 15 de Algarve están armando datos para GM=12,
+mientras que los 15 de Oporto están armando datos de GM=8. Hice caso a lo que dijo Sebas, así que esto debería
+armar unos datos suficientes como para mandar a correr ya mañana y así tener un gráfico y en una semana
+debería estar más que terminado esto. De ahí decidiré si hacer más estadística o más GM primero.
+
+Ya copié todo lo que se me ocurre para el capítulo 2, el de Redes. Se me ocurre que falta agregarle, pero el
+concepto grande lo tengo. Voy a hacerme anotaciones ahora de las cosas que me gustaría charlar o preguntarle
+a Sebas y Pablo mañana.
+
+.) La introducción me parece larga, diría de recortarla y agregarle una o dos citas a papers que traten
+sobre lo ejemplificado.
+.) Cuando tomo texto de algo previamente escrito, ¿Dónde debería poner la cita?
+.) Mencionar que en los gráficos de distribución de opiniones corregí lo de que algunos valores
+caían abruptamente al ser cero.
+.) Preguntar si están bien hechos los gráficos de Redes, si debería hacerlos diferentes o cambiar
+el comentario extra que escribo abajo de los gráficos.
+.) En la página 8, justo por encima de la distribución de grado de las redes Libre de Escala,
+hay varias citas incompletas. Mencionarles que tal.
+.) Consultar sobre lo del comentario final del armado de las redes
+.) La introducción de Redes Dinámicas me parece que es muy larga, no sé si se llega a entenderse
+bien o si es necesaria.
+.) No se me ocurre qué poner en Propiedades Topológicas
+.) Me quedé sin contar la parte de que se puede construir una red sumando o acumulando redes
+de actividad instantáneas. Preguntar dónde iría eso.
+
+------------------------------------------------------------------------------------------------------------
+
+13/10/2021
+
+-) En los gráficos de Distribuciones, hacer con puntos lo experimental y con líneas lo teórico.
+-) El gráfico de Erdos-Renyi de Distribución no hacer en Y la escala logarítmica, hacerla lineal.
+-) En los gráficos de representaciones de redes usar redes de grado medio 4 para que no haya tantos enlaces
+y sea más visual.
+-) Quizás hacer que Random Regulars sea simplemente una extensión de Erdos-Renyi.
+-) En lo de red Libre de Escala colocar la cita del paper de Barabasi-Albert
+-) En el primer párrafo de Libre de Escala, no es del todo cierto que Erdos-Renyi o Random Regulars
+no sean generativos. El problema es que las redes de interés en general no tienen distribución
+binomial.
+-) Leer el paper de Barabasi-Albert
+-) En todos los dibujos de redes cambiar el tamaño de nodos en función del grado.
+-) El comentario final sobre el armado de redes no es necesario agregarlo
+-) En redes dinámicas en el primer párrafo de la introducción debería decir que nos vamos a 
+enfocar en redes dinámicas de actividad
+-) Mencionar modelos del votante con recableado. Paper de Maxi,San Miguel
+-) Buscar algún review de Redes dinámicas
+-) Nombrar algunos modelos dinámicos existentes
+-) En la parte final de la introducción de redes dinámicas mencionar que nos enfocamos en la red
+de actividad del paper específico que estamos usando.
+-) Revisar lo que dice el paper de Redes de Actividad sobre Redes dinámica para poner
+en la introducción a Redes Dinámicas
+-) En la parte de propiedades topológicas empezar a hablar de cómo varía la distribución de grado
+al ir acumulando gráficos.
+-) Armar los códigos para hacer redes que vayan creciendo en el tiempo y usar eso para replicar
+los gráficos del paper de redes de actividad.
+-) No olvidarse de mencionar que en cada snapshot la red queda muy esparsa
+
+Para el futuro:
+-) En la introducción al capítulo 4, se puede introducir el modelo de Baumann
+como un modelo de redes adapativas. Ahí poner los modelos que mencionó Pablo sobre
+Sasahara, Maxi San miguel y Baumann.
+
+-------------------------------------------------------------------------------------------------------------------
+
+17/10/2021
+
+Los otros días hasta hoy estuve copiando cosas en el capítulo de MOMRE. Avancé, creo que voy a llegar bien.
+Hoy se terminó el cálculo de datos de Redes estáticas de GM=12 en Algarve y GM=8 en Oporto.
+A la noche me pasaré los datos a la pc. Ahora voy a mandar a correr GM=16 en Algarve y
+GM=4 en Oporto. Ya mandé a correr eso. Ahora queda resolver lo de armar los gráficos de distribución
+2D, lo de la red de Actividad que se vaya acumulando y corregir los gráficos de representación
+de redes. Eso, junto con completar el capítulo de Redes estáticas es lo que tengo que hacer para el
+miércoles. Creo que llego para eso. Espero que salga bien la cosa.
+
+--------------------------------------------------------------------------------------------------------------------
+
+18/10/2021
+
+Mañana primero arrancar armando lo de las redes que se acumulan y luego de la clase con Martina
+continuar escribiendo Tesis.
+
+----------------------------------------------------------------------------------------------------------------
+
+19/10/2021
+
+Al final las cosas no salieron como esperaba. Así que veré de hacer esto mañana a la mañana.
+Mientras tanto, modifiqué el armado de datos de redes Estáticas para que la próxima vez
+que lo mande a correr no arme redes de Barabasi. Así esa no calcula al pedo.
+Sólo para dejar en claro, estoy armando datos que se mueven en la región propuesta y tienen
+30 simulaciones por punto. Esto es para cada uno de mis grados medios. La región propuesta es la
+calculada el 28/09. Así que eso, cuando quieras aumentar la estadística o barrer más bajo
+para las redes de Barabasi, tomá eso en cuenta. Para Barabasi supongo que haré 0,3 más
+abajo y tomaré una estadística de 60 simulaciones cuando lo haga.
+
+-----------------------------------------------------------------------------------------------------------------
+
+20/10/2021
+
+- Buscar trabajo Maxi, San Miguel para ver el modelo del votante. "Voter model coevolution network"
+- Ver de mencionar el paper este de redes driven by Homophily que me pasó Pablo para mencionar
+a la hora de mencionar redes dinámicas.
+- Buscar papers usando estas palabras para ver redes dinámicas que varían
+por Homofilia: --Mauro Mobilia “How homophile shape networks”--
+- Buscar papers de Claudia Wagner sobre redes dinámicas.
+- Para Solución de Campo medio mirar el caso de 2 tópicos, no el caso general.
+- No ser tan genérico al explicar de manera general el modelo, dirigirme más a las cosas
+que estoy haciendo. Mandarme más de cabeza al tema de que nuestro modelo es de 2 tópicos,
+que la matriz Phi se representa con el cos(delta) y así, no ser tan general como Baumann.
+- Quizás en un apéndice poner lo de la extensión del modelo a más tópicos.
+- Hacer bines más anchos para el gráfico de distribución de tópicos
+
+------------------------------------------------------------------------------------------------------------------
+
+22/10/2021
+
+Las computadoras de Oporto y Algarve terminaron de hacer las cuentas para grados medios 4 y 16.
+Recordá que en las computadoras de Algarve tengo los datos de grados medio 12 y 16, mientras que
+en Oporto tengo los grados medios de 4 y 8.
+
+Ahora mandé a la computadora de Oporto a que hagan más simulaciones para aumentar la estadística
+de los datos de GM=12 de Erdos-Renyi y Oporto. En total la idea es que haya unas 70 simulaciones.
+Después lo mejor va a ser que en vez de bajarme los datos a mi pc, use el programa de Python
+en Oporto y Algarve. También mandé en Oporto a que aumente la estadística de los datos de redes
+de GM=8.
+
+Por otro lado, en Barabasi lo voy a hacer recorrer 0.3 más por debajo de lo ya recorrido para
+los grados medios vistos. Pero eso lo voy a recorrer con 5 hilos nomás. En Algarve voy a
+correr datos para GM=12 y en Oporto para GM=8 de Barabasi.
+
+Cuestión: Dentro de otros cinco días debería tener 70 simulaciones de RandomR y Erdos-Renyi
+con GM=12 en Algarve y con GM=8 en Oporto. 
+Por otro lado, en Algarve debería haber una barrida de datos más bajos en alfa en 
+Barabasi para GM=12 y en Oporto debería ser lo mismo pero para GM=8. Dios, no sé
+qué hacer con las máquinas, pero las voy a ocupar todas.
+
+------------------------------------------------------------------------------------------------------------------
+
+26/10/2021
+
+Revisando los archivos en la carpeta src y en la carpeta Programas/Redes Estáticas NCC, el programa
+main.c es el mismo. Es también el mismo que mandé a correr en las pcs de Oporto y Algarve, así que
+eso está bárbaro. Si quiero analizar el tema de cómo crece una red de Actividad al ir acumulándolas,
+debería tomar el archivo de Actual y de ahí empezar a laburar. Creo que eso va a venir bien para
+el análisis.
+
+Estoy borrando muchas cosas del archivo, pero sé que no hay problema porque al final el programa
+de main se encuentra en la carpeta de Actual. Así que nada de lo que estoy haciendo elimina el trabajo
+que tenía de antes. De paso, voy a tener que modificar la inicialización del programa, ya que ahora está 
+trabajando con la matriz de Activados y con el uso de la homofilia, pero eso no debería pasar en 
+la conexión de Agentes. Creo igual que una vez corregidos esos dos programas, debería estar todo listo
+para funcionar. Al final igual creo que voy a armar un sólo programa, no necesito muchos datos.
+Digo, lo mando a correr el tiempo suficiente y ya está. No hay estadística o promedio que tomar de esto.
+
+-------------------------------------------------------------------------------------------------------------------
+
+27/10/2021
+
+- En Implementación numérica, dentro de MOMRE, mencionar que no barremos en K porque
+no cambia sustancialmente la dinámica del modelo. Mostrar gráficos de eso.
+Por ejemplo, una red con un cierto grado medio y un cos(delta) fijo, le hago
+un gráfico de Alfa en función de K y veo cómo varía el alfa crítico en función de K.
+Hacer lo mismo con Grado medio, que sean cuatro puntos. Podría graficar los puntos 
+empíricos de alfa crítico con una amplitud de error que sea la región de transición.
+- También se podría mencionar eso en Implementación numérica
+
+-----------------------------------------------------------------------------------------------------------------
+
+30/10/2021
+
+Si bien lo tengo anotado de antes, voy a volver a anotar esto para tenerlo resumido en un
+sólo lugar. Los datos que tengo calculados son los siguientes:
+
+En Algarve:
+----------
+
+.) Simulaciones con grado Medio 12 y 16 de las tres redes.
+.) Erdos-Renyi y Random Regulars tienen 70 simulaciones por punto de ensamble para grado
+medio 12.
+.) Todo el resto de datos tiene 30 simulaciones en Algarve.
+.) Barabasi tiene en GM=12 un segundo barrido 0,3 por debajo del intervalo inicial, también
+con 30 simulaciones. Lo cual efectivamente extiende su región de alfa a [0,043;0,103].
+Cuando haga los gráficos con esto, tener eso en cuenta.
+
+
+En Oporto:
+----------
+
+.) Simulaciones con grado medio 4 y 8.
+.) Erdos-Renyi y Random Regulars tienen 70 simulaciones por punto de ensamble para grado
+medio 8.
+.) Todo el resto de datos tiene 30 simulaciones en Algarve.
+Barabasi tiene en GM=8 un segundo barrido 0,3 por debajo del intervalo inicial, también
+con 30 simulaciones. Lo cual efectivamente extiende su región de alfa a [0,085;0,145].
+Cuando haga los gráficos con esto, tener eso en cuenta.
+
+Ya tengo aclarado los datos que tengo. Es importante notar que en Algarve AlePardo está
+mandando a correr algo con 6 hilos creo. Así que mejor ser moderado y usar 10 hilos
+mientras lo de Ale está corriendo.
+
+La idea es ir preparando los datos de K variable para armar el gráfico de alfa crítico
+en función de K. Para eso voy a armar datos con redes de Erdos-Renyi y valores de 
+K=1, 2, 5, 10. El valor de 1 ya lo tengo, así que me haría falta K=2, 5 y 10.
+Para eso calculo entonces la región de alfas que voy a necesitar. Los valores
+de K=1 los copio de los datos de Erdos-Renyi que ya tengo en la carpeta de NCC.
+Me armo además una nueva carpeta Kvariable en DRE, la armo en Oporto para
+poder tener ahí los datos de GM=8.
+
+Para que quede claro, voy a barrer Alfa entre los valores críticos, fijo cos(delta)=0,
+guardo los datos en una nueva carpeta, armo datos sólo para Red de Erdos-Renyi y me
+voy a armar un total de 50 simulaciones. Total esto no va a tomar más de un día.
+Voy a ocupar 18 hilos porque lo voy a hacer con 6 hilos para cada K y sólo necesito
+calcular 3 K, total K=1 ya lo tengo de los datos de Erdos-Renyi. Voy a armar los
+datos en la PC de Oporto con GM=8.
+
+.) K=1 : [0.115,0.145]
+.) K=2 : [0,052;0,082]
+.) K=5 : [0,015;0,045]
+.) K=10: [0,002;0,032]
+
+Ya mandé a correr los datos, los voy a guardar en la carpeta Kvariable y a su
+vez en subcarpetas K=1, K=2, K=5 y K=10. La idea es que estas carpetas distingan
+los archivos según su valor de K, porque en los nombres no hay ninguna mención
+al K utilizado.
+
+----------------------------------------------------------------------------------------
+
+31/10/2021
+
+Hoy me pasé el día intentando armar gráficos para subir a la tesis. Estuve un 
+buen rato poniendo a punto el programa de Python de manera tal que lo pueda subir a
+las pcs de Oporto y Algarve para que funcione de una. (Nunca va a funcionar de una).
+
+Cuestión que revisé que la cosa funque y que arme TODOS los gráficos, modifiqué el criterio
+de etiquetar los estados finales para que haga lo del tema de la moda que charlamos con Pablo
+y Sebas. Aproveché y le agregué que según eso los gráficos de Distribución de Opiniones
+grafiquen por color las distribuciones cosa de que se vea cuál es la etiqueta de esa
+distribución. Por otro lado empecé a modificar la función que hace los gráficos de
+Entropía y demás cosas para que me tome los datos de NCC. Aunque todavía no terminé
+de modificarla. IMPORTANTE, los datos que tenían las redes antes NO tenían datos
+del sistema inicial así que si lo mando a correr con las modificaciones nuevas,
+esto no va a resultar bien que digamos.
+
+Bueno, por lo que pude ver en los datos de GM=8, pareciera que ahora el programa
+está catalogando correctamente los estados. Lo cual es genial. Peeeero, no
+me grafica en el mapa de colores lo mismo que me grafica en la Distribución
+de Opiniones. No entiendo porqué no se ven las mismas cosas.
+
+------------------------------------------------------------------------------------------
+
+02/11/2021
+
+Para tener a las pcs haciendo algo, aunque técnicamente no son las pcs las que estén laburando,
+voy a pasarme los archivos de Oporto a Algarve. Creo que eso va a hacer que todo funque mejor.
+Después podría también directamente copiar la carpeta de imágenes en Algarve y listo. Eso
+suena como una forma rápipara evitar tener que armar las carpetas yo una por una. Esto
+veremos si se resuelve en el día de hoy.
+
+Ahora sí, vamos a ponernos a ver porqué lo que veo en el gráfico de estados finales en el
+espacio de Parámetros se ve tan distinto de lo que veo en los gráficos de Distribución.
+Noté dos cosas que quizás tienen un efecto, aunque no terminaría de explicar todo.
+La primera en realidad no afectaba, pero es que al Mapa de Colores le pasaba unas
+Opiniones Finales modificada que tenía cuatro puntos distribuidos en los cuatro cuadrantes.
+Eso iba a joder el cálculo en muchos sentidos y convertir todos los Estados Ideológicos en Polarización.
+Igual no afectaba porque ayer mientras miraba el gráfico eso estaba comentado.
+La segunda cosa es que la OpiMaxima obtenida en el armado de las distribuciones de Opiniones
+no consideraba el máximo absoluto, entonces podía resultar ser un valor menor al de
+la OpiMáxima que recibía el Mapa de Colores. Eso afectaría el armado de los bines y quizás
+podría terminar afectando el etiquetado, aunque lo dudo.
+
+Ahora voy a modificar el Graficos Var RE mientras se terminan de armar los gráficos y cosas.
+La idea es que voy a tener que armar gráficos de los datos Base de Erdos, Barabasi y Random.
+Con base me refiero a los que recorren TODO el espacio. Eso es porque esas regiones tienen
+el etiquetado viejo. Aunque para el resto de cosas no voy a necesitar rearmar los gráficos,
+esos ya deberían estar bien. Vamos a hacer la lista de gráficos a armar:
+
+Redes Estáticas:
+----------------
+.) Barabasi: Todos los de espacios de parámetros, los gráficos 2D y los de Opiniones.
+También los de Distribución de Opiniones. Para TODOS los GM.
+.) Erdos-Renyi: Todos los de espacios de parámetros, los gráficos 2D y los de Opiniones.
+También los de Distribución de Opiniones. Para TODOS los GM.
+.) Random Regulars: Todos los de espacios de parámetros, los gráficos 2D y los de Opiniones.
+También los de Distribución de Opiniones. Para TODOS los GM.
+
+(Para esto tengo que entrar a la carpeta DRE, de ahí los datos los extraigo de las carpetas
+de "Barabasi", "Erdos-Renyi" y "RandomRegulars". Fijarse si están todos los datos juntos
+en Algarve o si están en Oporto. Deberían de estar en Oporto si no recuerdo mal. También
+fijarse si se encuentran separados en carpetas sucesivas o todos juntos. Espero que 
+mandar a hacer esto no tarde o cueste demasiado. Estos gráficos se armarían todos
+con Graficos TdO RE.py y Graficos Var RE.py. Cambiarle el nombre a los archivos,
+por Dios).
+
+NCC:
+-----
+Lo mismo que antes, para las tres redes y los tres grados medios tengo que hacer todo.
+Justamente por eso estoy juntando todos los datos en Algarve. De nuevo, voy a tener
+que mandar los archivos Graficos TdO Re y Graficos Var RE para que levanten los datos
+de la carpeta NCC/{RED}. De paso, estos datos SÍ están separados por GM en carpetas,
+así que tener eso en cuenta.
+
+Quizás separe los gráficos según GM. Eso me va a ayudar a que se haga mejor el gráfico 
+
+
+Redes:
+------
+Tengo que rearmar los gráficos donde se ven graficadas las redes de Erdos-Renyi,
+Libre de Escala y Random Regulars usando las recomendaciones que me dieron
+Pablo y Sebas. Era eso de cambiar el GM a 4 y reducir el tamaño de la red creo.
+Ah y también que los nodos tengan un tamaño proporcional a su grado. Revisar
+cómo hacer eso.
+
+Distribución de grado para Actividad en tres tiempos distintos:
+---------------------------------------------------------------
+Para esto tengo que usar los datos de Matriz de Adyacencia que me armé
+con el código que crea redes de Actividad y en base a eso ver que la
+distribución de actividad varía con la integración de la red. Eso debería
+ir en la parte de Propiedades topológicas de la red de Actividad.
+
+Extras:
+-------
+
+Esto es hacer algunos gráficos extras donde junte otros gráficos o me encargue de hacer
+algún detalle específico. Por ejemplo, algún gráfico de Trayectoria debería hacer pronto.
+
+
+Sigo retocando el criterio de Etiquetado. Como estoy teniendo estados de Region de Transición
+cruzando la línea de alfa crítico, muy por encima, mejor ser menos exigente con el estado
+de Consenso y Polarización. Decidí entonces que ahora el Consenso sea si el pico del
+cero está un 15% por arriba del alfa crítico, mientras que si el Pico de cero está
+un 15% por debajo del menor de los otros dos, entonces es Polarización.
+Si esto no se cumple, es que el pico de cero está suficientemente cerca de
+los otros dos, ya sea por arriba, por abajo o en el medio, como para que sea
+una región de Transición.
+
+Nota para después: Corregir la parte de Redes de Actividad para incluir el parámetro Eta.
+Creo que no lo anoté en ningún lado, así que lo menciono, los datos de la red de actividad
+que se va armando varias veces tienen N=1000, m=5, epsilon=0,001, gamma=2,8 y se rearma
+unas 500 veces. Pensándolo, creo que la idea es que justamente puedo graficar las distribuciones
+de grado de estas redes y compararlo con la distribución de actividad evaluada en lo que muestra
+el paper, y eso debería dar bien. Debería. Dios, no va a salir más esto.
+
+ATENTO: Cuando mandes el archivo de Graficos TdO RE.py para hacer lo de los K, fijate que 
+vas a tener que modificar el tema del grado medio al generar la lista de nomrbes, 
+o reinterpretar el grado medio como K.
+
+Ya pasé los datos a Algarve, está TODO lo que es datos de NCC en Algarve. ¿Los datos base están en
+Algarve o en Oporto?
+
+----------------------------------------------------------------------------------------
+
+03/11/2021
+
+En Algarve logré calcular las imágenes de los datos de NCC. Dios quiera que eso
+esté bien. Aunque técnicamente después voy a tener que mandar a armar más datos con
+eso. Lo que no pude hacer es armar los gráficos de Opiniones, al parecer eso
+generó algunos problemas. Voy a dejar eso para después, no sé porqué eso tira
+un error en los datos de GM=8.
+
+Ahora en oporto se están armando todos los datos del caso general, que espero termine
+bien. Tengo lo mismo de que los Gráficos de Opinión no los pude hacer. Después
+tengo que mandar a hacer lo de los gráficos con K, pero para eso con tener los gráficos
+de Distribución de Opiniones estoy hecho.
+
+Los gráficos de NCC se ven muy bien, queda ajustar algunos detalles como cambiar
+el nombre de Barabassi por Libre de Escala, ajustar el enmarque del gráfico
+y alguna otra boludez. Para Barabassi en GM=4 y GM=16 tengo que tomar un poco
+más de estadística.
+
+- Hacer los gráficos mejores, sin espacio en blanco y sin carteles. Atento para poder
+distinguirlos bien.
+- Hacer el etiquetado a mano. Para eso va a venir bien el escribir sobre los csv.
+En los generales veré cómo lo paso, pero la idea será la misma. Una vez hecho el gráfico
+en las pcs de la facultad, me tengo que pasar el csv a la pc y levantar eso para hacer
+los gráficos acá, eso se puede hacer fácil y rápido.
+- Los dos tipos de gráficos de Dinámica en Regiones le coparon a Pablo, así que tengo que
+subir los dos. La idea es mostrar tres gráficos, uno de Consenso, uno de Polarización
+y uno de Ideológico.
+- Los gráficos de NCC y demás fijate que los tenés que corregir para sacarle el espacio
+en blanco que queda molesto
+- Hacer simplemente el gráfico de distribución de grado para la red de Actividad
+Acumulada
+
+---------------------------------------------------------------------------------------
+
+05/11/2021
+
+Al final no lo anoté, pero hablamos con Pablo al final de empezar a armar algo sobre
+gráficos de Actividad, porque ya estamos en Noviembre y no quiero que los largos
+tiempos de cálculo me generen problemas. Igual, problemas ya tengo. Y también está 
+la tesis. Lo primero es armar una red de actividad que se vaya acumulando. Así que
+tengo que modificar el programa para que no destroce la red, sino que vaya agregando
+enlaces con el tiempo. Al ir creciendo continuamente la red, uno esperaría que eventualmente
+no queden agentes inconexos y se empiece a parecer a una red de Barabasi. Eso determina
+que tarde o temprano el criterio de corte usual debería funcionar. Vamos a probar eso.
+
+Lo que hay en src es el programa de DinaReg, el que armó los datos para la sección
+de Dinámica en distintas regiones. Ese código ya lo puedo guardar, los datos
+armados parecen ya estar completos. Algo que tengo que mandar a hacer en estos días
+es unos gráficos sobre Baumann en Algarve así completo los gráficos de GM=4 y GM=16.
+Cuestión que los datos NCC están en Algarve y los datos generales y los de K en Oporto,
+a no olvidarse eso.
+
+Cuestión que paso eso a Programas y después tengo que copiar los archivos de Actual,
+si no me equivoco, y con eso empezar a hacer los cambios en el código para que la 
+red de actividad se vaya acumulando. Antes de pasarlo a las pcs, obvio que lo 
+voy a probar que funque.
+
+Por lo que vi, el código no necesita retoques serios en la parte del armado de la
+red, simplemente tiene que NO desarmar la red de Actividad. Después va a estar
+simplemente agrandándose constantemente. Lo que sí va a necesitar retoques
+es la parte del Criterio de Corte. Como ahora está laburando un tiempo fijo,
+todo lo del criterio de Corte se fue y tengo que volver a anotarlo.
+
+---------------------------------------------------------------------------------------
+
+06/11/2021
+
+Mandé a correr en Algarve 10 hilos para rellenar datos de GM=16 para Barabasi.
+
+Estoy armando el código para correr el armado de los datos de una red de actividad
+que se va acumulando. La parte de que la red se vaya acumulando está más que hecha,
+el problema ahora es lograr ajustar esto para que tenga el Criterio de Corte otra
+vez.
+
+Los conflictos que estoy viendo surgen con el tema de organizar los while que revisan
+que el Criterio de Corte se aplique y ahora estoy viendo un problema con los
+Testigos. Temas de definir el tamaño del vector.
+
+En apariencia ya está resuelto el tema de la implementación del criterio de Corte
+
+Bien, ya lo probé y el programa está corriendo, pareciera que no está teniendo problemas.
+Igual, lo probé primero con Alfa=0, que es lo mismo a que no exista una red. Ahora
+lo voy a probar con Alfa=0,5 y CosDelta=0,5. Para Alfa=0 el sistema tardó 6 segundos 
+en converger a un estado final. Veamos qué pasa ahora.
+
+Mientras esto termina de correr, quiero aclarar que los datos de los Testigos se anotaron
+perfecto. Vale aclarar entonces que ahora los datos de los testigos van anotados en columnas
+y NO en filas como antes. Siguen siendo cinco testigos. No creo que más testigos valga la pena.
+
+------------------------------------------------------------------------------------------
+
+07/11/2021
+
+Armé los gráficos de Tópicos en función del tiempo para los Testigos en el caso de la red
+que se acumular en el tiempo. En ese caso el sistema no está logrando converger porque 
+como la red va continuamente creciendo, los valores a los que tienden los agentes se hacen
+cada vez más grandes. Habrá que pensar en algo más para ver cómo resolver esto.
+
+Mientras me voy a poner a rehacer todos los gráficos importantes así ya el lunes o
+martes puedo subirlos para ir cerrando los capítulos 2 y 3 de la tesis.
+Arranquemos por los gráficos del estado general, después por los de K y 
+terminemos con los de la distribución de grado de la red que se acumula. Los gráficos
+de NCC los voy a terminar después así le doy tiempo a terminarse a lo que está calculando de
+Baumann para grado 16.
+
+Ya mandé a correr el armado de los gráficos para el caso general y para los K. Ahora me falta
+el armado de la distribución de grado para la matriz de Adyacencia.
+
+Tardé más de lo que debía, pero ya puse a correr el programa que arma los gráficos de la
+distribución de grado de las redes de Actividad que se acumulan. La verdad que estoy
+siendo un poco confuso con los nombres, pero confío en que todo se logra entender por
+la forma en que armo los archivos y los datos que guardo.
+
+------------------------------------------------------------------------------------------
+
+08/11/2021
+
+Hoy tengo que tener preparadas todas las imágenes para ya subirlas mañana. Vayamos descargando
+las generales, las de K y las de ActividadAcumulada. Esto último es de los datos hechos
+de una red que se rearma constantemente y luego con Python se construye la red de
+Adyacencia correspondiente.
+
+Las imágenes de Distribución de Grado de la red Acumulada tienen ese problema de que como
+estoy graficando en forma logarítmica la distribución, los valores que son cero se ven
+feos. Por eso voy a saltearme esos puntos al graficarlo. Para eso uso propiedades de arrays
+de numpy. Básicamente pido graficar los valores de Histo[Histo > 0].
+
+Los gráficos de Entropía no parecen diferenciar a la región de consenso de la región de
+Polarización Descorrelacionada y eso me extraña. Lo que estaba mal era la Clasificación
+de Cuadrantes. Voy a tener que resubir el archivo de GraficosRE.py
+
+Los gráficos de Kvariable se ven muy raros. Mejor le pido una región más pequeña para
+armar las Distribuciones. Ya le achique la ventana a 16 gráficos y sortee los Alfas.
+Espero que la cosa ahora vaya mejor
+
+Corregí el tema del ancho que se ve en el alfa teórico, cambié para que se armen sólo
+algunos gráficos de Hist2D y no TODOS, le saqué la palabra teórico al cartelito.
+
+Ya mandé todo a correr. Queda mandar a correr los datos de NCC, pero para eso necesito
+que se terminen los cálculos de Barabasi. Tengo que revisar que en ese caso el archivo de
+GraficosRE.py esté bien. Podría bajarme el de Oporto, cambiarle las carpetas de guardado
+de los gráficos y listo.
+
+Para ir ganando tiempo, a los datos de NCC los mandé a correr e hice que ignoraran la
+red de Barabasi. Después en el peor de los casos puedo hacer que grafiquen eso solo
+y listo.
+
+Los gráficos generales, los de K, los de la ActividadAcumulada y los de NCC para Erdos-Renyi
+y Random Regulars ya se terminaron. Ahora voy a bajar las carpetas Imagenes de Oporto
+y Algarve, así como las carpetas Programas. Las Carpetas Programas las quiero para poder
+tener los csv con los datos de los gráficos de Estado Final en el espacio de parámetros.
+
+Cosas para Corregir:
+---------------------
+
+.) En las de Actividad Acumulada, hacé directamente las líneas. Si haces Líneas con puntos
+te delatas que borraste algunos puntos. De paso, creo que lo mejor sería poner las tres
+curvas en un sólo gráfico. Digo, me parece lo mejor.
+.) Los gráficos de K técnicamente tienen algunos detalles, pero podemos ignorarlos, no
+es importante, total yo armaré el gráfico aparte.
+.) Los gráficos de Distribución de Opinión de Erdos-Renyi y demás podrían tener algunos
+gráficos extra porque parece que justo no se llega a ver la parte importante de lo que
+se quiere graficar. También sino puedo modificar para que la selección de los alfas sea
+más manual en vez de pedir que se automatice. Creo que eso va a ser mejor.
+.) Todavía tengo que laburar los gráficos de Estados finales para etiquetar manualmente.
+
+.) Los gráficos de NCC estaban todos mal porque estaba levantando como opiniones los datos
+de VarProm.
+
+Si no me equivoco, el trabajar con los csv es un tema de asegurarme de que se levanten bien.
+Hecho eso, armar el gráfico es una boludez, total es recorrer el array ZZ. Si no me equivoco
+tengo el cómo levantarlo en una de las versiones iniciales de gráficos de TdO.
+
+-----------------------------------------------------------------------------------------------
+
+19/11/2021
+
+Estoy pensando que al gráfico de la distribución de grado de la Actividad Acumulada podría
+agregarle un grid y de ahí ver que tal. También falta agregarle la leyenda, diría yo.
+
+Ok, definitivamente algo raro tienen los datos de K, vamos a revisarlos un segundo y en el
+peor de los casos poner a hacer algunas cuentas a Oporto para tener esos datos, porque
+sino no se explica lo que está pasando ahí. Pareciera que hay alfas que faltan y no se
+explica bien el porqué. Pareciera que en algún momento maté los datos de K, como que
+estaban corriendo y sin pensarlo corté el programa sin querer. Así que ahora lo
+mandé a correr de nuevo, armando incluso unos datos extra específicamente
+para K=1. Ya en unas horas eso debería estar y ya debería poder mandar a correr el
+armado de los datos de K.
+
+Ya modifiqué el armado del gráfico de la distribución de grado de la Actividad Acumulada,
+cuando se terminen de armar los datos de K, ya puedo mandar a hacer eso. Ahora puedo empezar
+a revisar el tema de los archivos csv para manualmente corregir las etiquetas.
+
+Mientras se están armando los gráficos NCC de Barabasi. Claramente se van a armar mal, hay
+algo que no está resultando y ahora no veo qué es. Bueno, cuando se terminen los gráficos
+de Barabasi vuelvo a mandar todo junto y veo qué pasa con eso. Los mandé a que se
+rearmen a los datos de NCC. Confío en que esta vez estén bien. Sino, me voy a tener
+que agarrar la cabeza. 
+
+Efectivamente estoy teniendo una crisis interesante. Claramente no llego. No quiero aceptarlo
+en voz alta para que Pablo no crea que me dejo estar, pero obviamente no llego. Los datos
+de NCC NO se están graficando bien. No sé porqué. Encima pareciera que se grafican los datos
+de Barabasi en Erdos-Renyi y los de RandomRegulars en Barabasi. No comprendo qué carajos
+está pasando ahí. Ya no creo terminar eso hoy, me concentraré en otras cosas y para la próxima
+semana veré de tenerlo resuelto, si Dios acompaña. Mentira, Dios nunca acompaña, acá esto
+es a cara de perro.
+
+¿Tengo los gráficos que necesito?
+.) Tengo los de Cuantiles, Entropía, Promedios, Distribución de Opiniones y Hist2D de los
+generales.
+.) Tengo que preparar mejor los de RegDinámica.
+.) Tengo que armar los de K en Oporto y bajarlos para armarme el de Alfa crítico en función
+de K.
+.) Tengo que armar el de alfa crítico en función de GM. Para eso voy a usar una vez que
+tenga terminado lo de los CSV.
+.) Tengo que rehacer el de Actividad Acumulada en Oporto. Hagamos los datos en gráficos
+separados. Para eso voy a tener que volver a separar los datos en los archivos. Hagamos
+eso rápido ahora.
+.) Hay que rehacer los gráficos de Distribución de Grado para los distintos tipos de
+Redes, haciendo que en puntos se vean los datos empíricos y en línea continua los
+datos teóricos.
+.) Hay que rearmar los gráficos de las redes de forma de que se vean más lindas
+como dijeron Pablo y Sebas.
+.) También tengo que armar una imagen simple sobre ángulo entre tópicos para que se entienda
+mejor el concepto. Esto es lo de menos, dejarlo para el final.
+
+Suerte para poder terminar todo esto hoy.
+
+-) En Barabasi GM=4 en los datos generales se ve bastante mal, no sé porqué. Mirar si los datos
+tiene algo.
+
+Voy a ir anotando en orden los archivos csv de gráficos de Fases que revisé:
+-) Barabasi: 4*, 8, 12, 16
+-) Erdos-Renyi: 4, 8, 12, 16
+-) RandomRegulars: 4, 8, 12, 16
+
+Por lo que veo, el archivo que grafica los estados Finales ya está armado, debería correctamente
+levantar los archivos csv y de ahí empezar el laburo. Ahora tengo que subir todo junto a Oporto
+y rogar fuerte. Bueno, parece que está funcando. Voy a aprovechar para instalar Pandas en Algarve.
+
+De paso, debería también empezar a ver el tema de los demás gráficos.
+Estuve mirando el coso de Conjunto Direcciones como para ver si estaba levantando datos de cualquier
+lugar. Por lo visto está levantando bien, no sé cuál puede ser el error con eso. Nada puede
+ser así de sencillo con esto. O el fracaso soy yo, ni idea.
+
+Entre cosas, lo que sí conseguí es hacer correctamente el etiquetado manual, por lo que eso es
+una victoria. Wooo. Bueno, vamos a ver si puedo descubrir porqué no se arman los datos de K
+como deberían. Y de paso corregir los csv por si se me escapó algún numero en alguno.
+Ya corregí los csv. Esto se siente como que hice mucho laburo que después me van a criticar como
+malo.
+
+Ya descubrí porque el programa no hacía lo que tenía que hacer al calcular los datos de K.
+El problema es que estaba cambiando el programa al Instanciarlo y eso hacía que todos
+los archivos fueran a parar a una carpeta equivocada. Para solucionarlo voy a cambiar
+el archivo main de manera de que el K sea un input y el gradomedio es 8 siempre y listo.
+Por tanto voy a cambiar el Instanciar2.sh y el Metainstanciacion respectivamente.
+La cosa es que rápidamente entonces vuelvo a mandar esto a correr y esta vez no 
+va a haber problemas.
+
+--------------------------------------------------------------------------
+
+10/11/2021
+
+-) Etiquetar manualmente la región de transición entre Polarización Descorrelacionada
+y Consenso.
+-) Revisar los datos de GM=4 para ver si efectivamente hay una mayor dispersión en
+los datos a partir del alfa crítico. Probar normalizarlo
+-) Implementar que la red de actividad se acumule hasta ser conexa. En ese caso
+cortar la acumulación y dejar que el sistema converja y listo.
+-) Mencionar estas charlas sobre cosas probadas y porqué la red de actividad en
+crudo no converge. Que te quedan agentes marginados que no logran converger.
+Que vimos que los agentes en diversas situaciones caían al cero.
+-) Para el cuarto capítulo agregar una sección que sea de charlar qué es lo
+que pasa siguiendo los parámetros de Baumann. SPOILER: No convergen.
+Hablar sobre red renovándose periódicamente y mostrar lo observado.
+Referenciar directamente el paper de Baumann
+-) En la última parte agregar una sección de lo obtenido, si es que resulta,
+de el caso de la red que acumula hasta que se hace conexa. 
+
+-----------------------------------------------------------------------------------
+
+13/11/2021
+
+Mandé en Oporto a correr los datos para el caso general de nuevo. La idea es que se
+rearmen los archivos csv para poder volver a reescribir los datos de manera de armar
+una región de transición entre Polarización Descorrelacionada y Estado Ideológico. Para
+eso necesito los datos armados de nuevo porque ya esa parte le escribí encima y ya
+no sé cómo estaba. De paso, la idea sería mirar el archivo y que esté pintado de violeta
+la región que está en el medio de lo que es claramente Ideológico y lo que es claramente
+Polarización.
+
+Encontré dos grandes errores. Por un lado la OpiMaxima se estaba calculando a partir de 
+los datos de VarProm, no de las opiniones. Eso afectaba en la generación de las 
+Distribuciones de Opinión y en los gráficos de Histogramas2D. Por otro lado, los valores
+de alfa no se recorrían en orden, sino que se revisaban de manera totalmente aleatoria,
+lo cual seguro se debe a cómo el os levantaba los datos en la carpeta de NCC. Ahora está
+coorriendo y pareciera que todo estuviera bien.
+
+Lo siguiente entonces es armar el programa de C dónde hagamos lo que charlamos con Pablo
+sobre que el programa arme las redes de Actividad Acumulándose hasta lograr que la red
+sea conexa. En caso de que la red sea conexa, lo que debe hacer el programa es continuar
+evolucionando con una red fija y vemos a qué llega.
+
+-------------------------------------------------------------------------------------
+
+14/11/2021
+
+Al final ayer no pude hacer el programa en C para correr el caso de las redes
+de actividad que crecen hasta volverse conexas. Por tanto lo voy a construir ahora
+ese programa trabajando encima del main actual. Aunque ya que estamos voy a guardar
+los datos de ese main aparte por si acaso.
+
+Los datos de NCC y general ya deberían estar completos en las pcs de Algarve
+y Oporto, pero bajaré esas imágenes más tarde.
+
+Ya que voy a hacer esto de armar redes hasta que se vuelvan conexas, me parece una idea
+copada guardarme el grado final de cada uno de los agentes, como para tener ese dato
+por si me interesa después.
+
+La red converge, lo cual ya es ganancia. Deberíamos empezar a hacer algo de análisis
+con estos datos para ver que está funcando bien. Hagamos una primera tira de datos
+para cosdelta=0, barriendo alfa entre 0 y 1 de a 0,1.
+
+Hecho esto, tengo tres grandes trabajos:
+1) Subir imágenes a la tesis.
+2) Revisar qué pasa con los datos de amplitud de tiempo de simulación y porqué
+dan raros.
+3) Redefinir las regiones de transición para la zona entre polarización e ideológico
+cosa de que no parezca un Koh-i-Nor el gráfico de Estados Finales.
+4) Dios no quiera, tener que seguir revisando qué cosa mal pasa en los archivos de
+NCC.
+
+Empecemos a descargar las imágenes de NCC y demás y de ahí arrancamos.
+Ya descargué las imágenes, se ven bárbaras. Ahora sólo tengo que hacerle algunos
+ajustes finos a los gráficos y ponerme a trabajar sobre los csv. Eso va a tomar
+un tiempo, no lo subestimes.
+
+Hice los ajustes finos de los gráficos de NCC, ahora deberían quedar lindos sin
+los cartelitos. Creo que mantienen los títulos, pero eso es una boludez.
+El problema de los gráficos de Distribución era que la lista de Fila estaba
+mal armada.
+
+Ahora en Algarve está corriendo el archivo para armar los gráficos en NCC. Eso
+va a estar listo para mañana. Lo que me falta es bajar los datos de GM=4
+para los datos generales de Barabasi, Erdos-Renyi y Random Regulars.
+
+Estoy haciendo una carpeta llamada Anomalia para descargar los datos de redes Estáticas
+de GM=4. La idea es poder bajarme los datos que tienen GM=4 nomás y revisar el tema
+de si la amplitud en los tiempos de simulación tienen tanta varianza como el gráfico
+muestra o si es un artefacto de la forma en que lo estoy midiendo. Cuestión que
+esto lo voy a bajar mañana porque borrar los archivos que no quiero bajar toma un rato.
+
+--------------------------------------------------------------------------------------------
+
+16/11/2021
+
+Tengo tres cosas importantes para hacer para el miércoles.
+
+1) Subir imágenes a la tesis
+2) Revisar los csv de los Estados finales, tanto del general como NCC.
+3) Ver qué pasa con la Anomalía en GM=4. Pablo decía de Normalizar a ver qué ocurría.
+4) No va a llegar el tiempo, pero revisar los datos de ActividadConexa.
+
+Voy a hacer como antes e ir anotando los CSV que modifico, así no me los olvido.
+Arranquemos por los generales. Para estos primero voy a copiar los datos de la
+región de transición de los EFEPOporto a los archivos que bajé de OportoCSV.
+Después veré la parte de marcar region de transición en la zona de transición
+entre Polarización e Ideológico.
+------------------------------
+
+Barabasi: 4, 8, 12, 16
+Erdos-Renyi: 4, 8, 12, 16
+Random-Regulars: 4, 8, 12, 16
+
+Ahora que tengo esto, voy a reeemplazar los datos en EFEPOporto con los de
+OportoCSV y empezar a definir la región de transición entre Polarización e
+Ideológico. Para eso voy a definir que hay transición si hay alternancia
+entre estos dos estados en una columna. Y en la misma columna, si hay una
+zona de alternancia y luego una región con estado definido, tomaré 1 estado
+de la zona definida como borde de la región de transición.
+Es decir, imaginando que la siguiente secuencia sea una columna, la definición
+de región de transición será: 11211221222 -> 33333333322.
+Por otro lado, las "regiones definidas" sólo pueden existir en los extremos de la
+columna, y todo el resto de la columna en el medio es transición, no importa si
+tres o cuatro puntos seguidos son iguales.
+----------------------------------
+
+Barabasi: 4, 8, 12, 16
+Erdos-Renyi: 4, 8, 12, 16
+Random Regulars: 4, 8, 12, 16
+
+Listo con los datos generales, debería ahora dedicarme a revisar los datos de NCC.
+En principio se supone que ahí esté todo mucho más definido y más claro. Espero.
+
+Mandé a correr de nuevo los datos en NCC. Básicamente hice esto para poder observar gráficos
+de Hist2D. Creo que no habia más objeto que ese al mandar a correr esto de nuevo.
+
+Ahora sí, revisar NCC. Dios nos ayude. Mañana tengo que ver que es lo urgente y después
+organizarme plazos para resolver esto.
+-------------------------------------------------
+Barabasi: 12, 
+
+
+
+Che, hay que mencionar el detalle que los gráficos de grado medio 4 de Barabasi
+están saliendo mal, tanto en el caso general como en el caso de NCC. Esto charlarlo.
+Se puede ver de agregar datos a esto, pero habría que barrer más por arriba Y por abajo.
+Quizás la idea sea más por el arriba que por el abajo.
+
+Pareciera que los grados medios 4 y 8 no se llegan a ver bien. Esto tiene que ver
+con que la curva es más pronunciada para estos grados que para grado medio
+12 y 16, así que la región recorrida no se ve tan bien. Charlar esto con Pablo
+mañana y proponerle mostrar los gráficos de Gm=12 y 16. Hacer simplemente la mención
+de que se muestran esos gráficos porque al ser más achatadas las curvas entran mejor
+en las regiones que se consideraron para los datos.
+
+--------------------------------------------------------------------------
+
+17/11/2021
+
+Tengo 4 cosas para hacer hoy.
+1) Llevar los csv que armé del caso general a Oporto y armar los gráficos.
+2) Hacer el análsis sobre los datos de ActividadConexa y plantearle a Pablo
+que un análisis fino variando alfa de a 0,05 y Cdelta de a 0,05 tomaría
+2 días. También se puede ser más fino en alfa en la región de transición.
+Son 2 días suponiendo 60 simulaciones por punto de ensamble. Todo esto
+porque lo que actualmente tengo me tomó 2 horas en hacerse.
+3) Plantear el dilema de NCC sobre los gráficos de Gm=4 y quizás los
+de Gm=8. Es esta cuestión de que al ser la curva más empinada, el tamaño
+de la región considerada no cubre del todo bien las regiones de transición
+porque no logran estar perfectamente contenidas. Se puede intentar rellenar
+estas regiones agrandando los alfas considerados, pero como esto suele tomar
+de cinco a ocho días el completar los datos, me parece importante decidir si
+vale la pena hacerlo. Quizás lo mejor es mandar a hacerlo pero trabajar con lo
+que se tiene.
+4) Cargar los gráficos en la tesis. Separar los que voy a usar de los que no.
+
+Punto 1 y 2 hechos. Armemos una serie de gráficos para mostrarles a Pablo y Sebas.
+Lo último supongo que puedo en parte hacerlo después de comer.
+
+
+Vamos a tener que decidir claramente qué hacer. Si vamos a hacer un análisis de los
+estados a partir de los Hist2D voy a tener entonces que armarme gráficos compuestos,
+como los de Distribución de Opiniones, así puedo hacer esto más rápido.
+
+Podemos definir Consenso los cuadrados de 2x2 en el centro, Ideológico las diagonales
+perfectas o casi (por si sobre una diagonal aparece un cuadrado), Polarización las
+4 puntas y todo lo demás que sea Transición. 
+
+-) Es importante mencionar que con los parámetros de Baumann y con los criterios establecidos
+no logramos establecer una forma de que las redes convergen. Por eso con el objetivo de buscarle
+una forma es que planteamos este método de que la red se acumule y luego sea 
+-) Para el GM=4 de Barabasi revisar si el sistema está convergido o no. Eso lo podría hacer mirando
+los valores de VarProm. Realmente es raro que el sistema caiga tanto al Consenso. En el peor caso
+eso es de lo último que mirar.
+
+---------------------------------------------------------------------------------------------
+
+19/11/2021
+
+Bueno, pasaron dos días de la última vez que hice algo de la Tesis. Hoy es viernes.
+Mi intención es que mañana estén terminados los capítulos 2 y 3. O por lo menos
+que sólo falten los gráficos de NCC. El resto tiene que estar subido y resuelto.
+Puedo hoy empezar a subir archivos, ver lo que tengo y lo que falta y ya con eso
+mañana dedicarme al aburrido trabajo de etiquetado manual. Para eso es importante
+tener ya hechos los gráficos de Hist2D.
+
+Entonces mientras hoy preparo los gráficos que voy a subir a la tesis y los preparo
+correctamente, me voy a ir encargando de que se preparen los gráficos de Hist2D,
+los de Distribución de Opiniones y que se vayan armando en alguna de las pcs
+los datos de la red de actividad que crece y corta en algún punto.
+
+Entonces, tareas:
+1) Preparar el código de Actividad Conexa y subirlo.
+2) Preparar el código para armar los datos de Hist2D y subirlo y mandar
+a correr eso en General y en NCC. (Es decir Oporto y Algarve.)
+3) Empezar a subir gráficos. Así van a surgir los gráficos que me faltan hacer
+y ya con eso veré que otra cosa me queda por hacer.
+4) En algún momento subir las cosas a Github.
+
+Al código de src ya le agregué el nuevo criterio de corte, es decir que compare
+el estado actual del sistema con un estado 20 pasos previos. Por otro lado también
+le agregué que el cálculo de la distancia entre vectores sea a partir de considerar
+la no ortogonalidad del espacio de tópicos. Esto cambia el cálculo porque introduce
+un término en el cual aparece el coseno(delta) y el producto de las diferencias
+de las opiniones. Esto tiene sentido porque en el caso de opiniones ortogonales
+se recupera el resultado de la distancia como la suma de las diferencias al cuadrado.
+
+Lo mandé a correr y en principio esto funca. Ahora diría de dejarlo y preocuparme por 
+lo otro. Si funciona bien, ya mañana lo mando y listo. Total, apuro realmente no tengo.
+Y cuando lo suba voy a tener que armar la carpeta, cambiar el nombre de la carpeta
+de src a una tipo "Red estática" y así para no borrar ese main y demás. También
+voy a tener que modificar el alfa y el Cdelta para que recorra las regiones
+buscadas y que el barrido sea correcto. En ese sentido tengo que planear la región
+de barrido correctamente para no cagarla.
+
+Sobre el punto 2, tengo que bajar los archivos de GraficosRE.py, tanto el de 
+Algarve como el de Oporto, modificarlos respectivamente y luego subirlos de nuevo.
+
+Ya hice los cambios de manera de que se me armen conjuntos de gráficos que contengan
+30 gráficos. Todo quiera que esto funque bien. Lo subí a Oporto y lo mandé a correr.
+Ahora queda ver si resulta o si se manda cagadas. Quizás no me entere hoy de si funciona,
+porque del resultado me voy a enterar cuando vea los gráficos.
+Todavía queda la gran consulta de qué carajos hacer con los datos de GM=4 de Barabasi.
+Eso tiene un problema en algún lado, hay que revisar qué pasó.
+
+El archivo que está corriendo y armando los gráficos de conjuntos de Hist2D se llama
+GraficosRE2.py. No me animé a borrar el GraficosRE.py original. De paso, los resultados
+los mando a una salidageneral2.out. Tuvo un problema con el tema de que las columnas
+no estaban bien y con que tenía un problema con el colocar los legend de los Histogramas.
+Le cambié eso por unos annotate, confío en que ahora funcione. Ahora debería hacer lo
+mismo con los de NCC
+
+En NCC lo mandé a correr, pero al no pensarlo bien borré el archivo de GraficosRE.py que estaba
+antes. Ahora tengo un poco de miedo, pero bueno. Confío en que funque bien,
+ahora sólo me queda mañana arrancar a poner los gráficos en la tesis y terminar todo
+lo posible de eso.
+
+----------------------------------------------------------------------------------------------
+
+20/11/2021
+
+Lo que mandé a correr anoche tuvo problemas, boludeces de que el código no estaba bien o estaba
+levantando datos equivocados. Ahora confío en que la cosa funciona bien. Lo mandé 12:40, así que 
+para las 14 debe estar casi hecho.
+
+Por otro lado ya razoné porqué para GM=4 el gráfico de Barabassi no está saliendo bien, es un
+tema de que el bineado es muy grueso en la distribución de Opiniones, necesito considerar un bineado
+más fino. Estoy pensando si hacer un bineado más fino en los histogramas 2D. Quizás lo haga también
+a eso como para tener todos los bineados igual y que se vea mejor. De paso, ahora tomé los bines
+con números impares cosa de tener un bin central en el (0,0), cosa de no tener un cuadrado de cuatro
+bines sino uno solo en el centro. Después deberé revisar cómo quedaron los gráficos y de ahí
+decidir si hacer algunos gráficos extra de Hist2D, creo que eso seguro, ver cómo cambiar
+el binado de los hist2D y luego hacer el etiquetado manual de los gráficos de Estados Finales.
+
+Ahora sí, puedo dar por terminado el capítulo 2, el de Redes. Queda que lo vean Pablo y Sebas,
+le encuentren 500 errores y me hunda en mi propia miseria. Corchazo de fin de año, ya te siento.
+
+Bien, los gráficos de conjuntos de Hist2D están funcionando bien. Ahora lo voy a mandar una vez
+más para aumentar el tamaño de la letra y correr los carteles de manera de que no me tapen los 
+cuadraditos de los de Random Regulars. Para el resto, puedo empezar a etiquetar gráficos de NCC.
+
+Los de Oporto no salieron todavía porque a la letra White le faltaba una w. Ya los mandé,
+y si salen bien ya puedo empezar a etiquetar eso manualmente.
+
+Ya mañana lo que puedo hacer es por la mañana dedicarme a estas cosas y por la tarde mandar
+a correr lo de Redes de Actividad en oporto o Algarve, donde no esté laburando Ale. De ahí
+hago un barrido fino y roguemos que salga todo bien ahora. De paso, podría mandar a correr
+el programa de python en mi pc para ver que esos datos converjan bien y de todo tranca.
+
+Por lo que tengo anotado de antes, armar los datos de ActividadConexa me tomó 2 horas.
+Ahora, eso fue para recorrer 11 alfas, 1 Cdelta y 15 Simulaciones por punto de Ensamble.
+La idea ahora sería recorrer el espacio entre alfa 0 y 0,5. La región entre 0 y 0,1
+debería recorrerla en detalle, mientras que lo que va entre 0,1 y 0,5 puedo hacer un
+barrido más fino. Si me moviera con alfa de a 0,005 me tomarían 21 alfas ir desde 0 hasta 0,1.
+Luego podría hacer alfa de a 0,02 entre 0,1 y 0,5, lo cual tomaría otros 20. En total 40
+alfas. Eso es casi 4 veces la cantidad de alfas que antes, por lo que debería tomar
+8 horas hacer eso para 15 simulaciones. Supongamos que por estadística quiero 60 simulaciones,
+eso implicaría el cuádruple de tiempo, es decir 32 horas. Si ahora me muevo en Cdelta de
+a 0,05 entre -0,5 y 1, eso implica multiplicar por 31, lo cual serían 992 horas. Eso divido
+por 10 me quedarían 99 horas, que significan 4 días. Me resulta mucho. Veamos si lo puedo
+reducir a día y medio.
+
+Primero, supongo que podría en principio, como para tener datos, recorrer Cdelta entre
+-0,5 y 0,5. Luego, podría recorrerlo de a 0,1 y listo. Si necesito más datos después los
+agrego en la región de transición, tipo entre -0,2 y 0,2. Eso haría que las 32 horas se tengan
+que multiplicar por 11, obteniendo 350 horas totales. Que dividido por 10 me darían 35 horas.
+Si además reduzco la estadística a 40 simulaciones, eso me daría bárbaro, apenas más que 24
+horas. Con eso puedo mandarlo a correr el domingo y ya el lunes tengo los datos, cosa de que
+después el lunes lo mando a correr de nuevo y ya voy recorriendo las regiones que quedaron 
+a para rellenar, pero tengo con qué trabajar. Hagamos eso
+
+.) Alfa: [0;0,1] me muevo de a 0,005
+.) Alfa: [0,1;0,5] me muevo de a 0,02
+.) Cdelta: [-0,5;0,5] me muevo de a 0,1
+.) Simulaciones: 40
+
+------------------------------------------------------------------------------------------------
+
+21/11/2021
+
+Para no pisarme con Ale, voy a mandar a correr los datos en Oporto usando unos 15 hilos.
+Tené cuidado de que si vas a barrer con distintos grosores, entonces no cambies el archivo
+main hasta haber terminado con los grosores anteriores o vas a hacer un quilombo.
+
+En Oporto mandé a correr los datos para recorrer la zona entre 0 y 0,1. El Cdelta lo
+recorro entre -0,5 y 0,5. No estoy recorriendo la parte de Alfa entre 0,1 y 0,5 porque
+eso requeriría que modifique el archivo de main y si hago eso, se reescribiría el Opiniones.e.
+Eso me armaría quilombos con los datos que se estén armando, así que esperaré a que esto esté
+terminado. No tiene pinta de que vaya a tardar mucho.
+
+Mientras esto se resuelve, es hora de armar los etiquetados manuales. Me bajo los datos
+de Oporto y arranco. Aunque antes de eso, voy a ir a Oporto, modificar el binneado de
+los datos de Barabasi y ver si con eso el gráfico queda mejor.
+
+Cambié el binneado para que sea int(OpiMaxima)*2. Eso me garantiza que es un número par y que
+entonces el tamaño de los bines es aproximadamente 1. Confío en que eso alcanza para que
+el binneado sea el correcto y se ajuste de manera acorde a todos los gráficos. Entonces
+podré mandarlo para ER y RR y correr todo junto. Finalmente mandé a correr todo junto.
+Después la idea sería comparar lo obtenido con lo que obtuve de antes y ver si el cambio
+del binneado respeta lo de antes y mejora lo Barabassi.
+
+El cambio de binneado sirvió, ahora el general de Barabassi dió bien. Ahora tengo que ponerme
+con el Etiquetado manual. Al final para el etiquetado NO estoy usando lo de los gráficos de Hist2D.
+No veo nada que me facilite el tomar decisión.
+
+Oporto:
+--------------------
+.) Barabasi: 4, 8, 12, 16
+.) Erdos-Renyi: 4, 8, 12, 16
+.) Random Regulars: 4, 8, 12, 16
+
+
+Mientras estoy haciendo el etiquetado manual, sólo por probar, voy a mandar a hacer los gráficos
+de ConjuntoHist2D con el mismo Binneado que el que usé para las Distribuciones de Opiniones
+y sin Density=True, a ver si así es más evidente lo que ocurre. Ojalá que si.
+
+-----------------------------------------------------------------------------------------------
+
+22/11/2021
+
+Ya se armaron todos los datos de Actividad Conexa que mandé a correr antes. Voy a aprovechar
+y no modificar el Alfa y voy a recorrer la región de Cdelta que falta entre 0,5 y 1. Esto debería
+tardar la mitad del tiempo de lo que tardó lo otro.
+
+Por otro lado, voy a mandar a hacer de nuevo los gráficos de Distribución de Algarve usando
+el nuevo Binneado. De paso aproveché y también cambié el binneado de los Hist2D. No sé si
+va a ser para mejor, pero no pierdo nada en hacerlo.
+
+Ya terminé el etiquetado manual de los datos generales. Ahora me queda el etiquetado de los datos
+de NCC. Después mandaré todo junto a resolverse.
+
+Por lo que hablamos con Pablo, la exploración en GM=4 y GM=8 fue una pérdida de tiempo, puse la lupa
+en el lugar equivocado y lo hice mal. Así que voy a descartar esos datos y sólo armar el estudio
+en detalle de GM=12 y GM=16 para el NCC.
+
+Los gráficos revisados de NCC son:
+.) Barabasi: 12, 16
+.) Erdos-Renyi: 12, 16
+.) Random Regulars: 12, 16
+
+------------------------------------------------------------------------------------------------------
+
+23/11/2021
+
+Ya anoche terminé con el etiquetado manual, así que ahora tengo que armar los gráficos del
+capítulo 3. Entonces lo que tengo que hacer es:
+
+.) Subir los csv a Oporto y Algarve.
+.) Mandar a correr más datos para Actividad Conexa
+.) Armar los gráficos de Estados finales.
+.) Cancelar la parte del guardado de los csv en los archivos de GraficosRE.py.
+.) Hacer lo de que se armen los datos de Varianza normalizando todos los valores.
+(Eso debería ser sencillo)
+.) Preparar los gráficos de alfa crítico en función del grado medio y de K.
+Ir subiendo gráficos, ver que tengan el tamaño y la fuente correctos.
+
+Ya subí los datos a Oporto y Algarve. En Oporto estoy mandando a correr EstadosFinales.py.
+Por otro lado, para seguir armando datos de ActividadConexa cambié el número que divide alfa
+para que sea 50 en vez de 200. De esta manera voy a avanzar de a 0,2 en alfa. La idea
+es armar el resto de valores que faltan entre 0,1 y 0,5. Ahora sí los datos están
+calculándose para actividadConexa entre 0,1 y 0,5 con Cdelta entre -0,5 y 1.
+Estoy usando 10 hilos para esto. Confío en que para hoy a la noche está, total son 2
+alfas a pesar de ser 15 Cdeltas. Con esto ya tendría todos los datos que necesito. 
+Si voy a calcular algo más, tengo que tener en cuenta de que no me joda lo que
+ya tengo. Se me ocurre hacer un barrido más fino en Cdelta entre -0,2 y 0,2.
+Podría en ese caso arrancar con una estadística de 20 simulaciones y después cualquier
+cosa ir aumentándolo.
+
+Quizás haya algún gráfico al cual hacerle un último ajuste, pero en principio los gráficos
+de Estados Finales ya están. No sé si estoy 100% convencido, pero bueno, es lo que es. Hay
+que ir cerrando.
+
+Ahora lo que debería hacer es ver si normalizando los datos de los tiempos de Simulación
+se me acomodan los gráficos de Amplitud de Tiempo de Simulación. Ya mandé a correr esto en
+Oporto, veamos si se soluciona. Con eso, ya sólo me queda preparar los gráficos de Alfacrítico
+y tengo terminado lo que me anoté para la mañana. Buenísimo.
+
+Ahora sí, puedo empezar a cargar gráficos a la tesis. Por otro lado, NO olvidarme de que NO mandé
+a rearmar los gráficos de Tiempo de Simulación de NCC. Pero eso puede esperar a que los gráficos
+hechos en Oporto se recarguen, eso me dará la idea de si están bien o no al normalizarlos.
+
+Hablemos en serio, para mañana lo que tengo que hacer es subir todos los gráficos que tengo,
+ir organizando los resultados y cosas, revisar el problema de los Cuantiles y armar los gráficos
+de Dina Reg. No es tanto, quizás el jueves esté terminado esto.
+
+--------------------------------------------------------------------------------------------
+
+24/11/2021
+
+En Oporto ya se terminó el cálculo de la ActividadConexa, así que para tener a la pc haciendo algo,
+es que voy a mandarlo a calcular hasta 60 iteraciones en vez de 40. Porque si quiero completar los Cdelta intermedios,
+eso me va a tener el código medio parado hasta el viernes, y esa idea no me gusta.
+
+
+Cosas charladas con Pablo y Seba:
+.) No poner descripciones en los captions individuales de los gráficos,
+sino hacerlo en los captions generales.
+.) Al final quedan los gráficos de Hist2D. Además, ponerlos todos en una sola fila.
+Sacar los de Gráficos de Opiniones.
+.) En la parte de Implementación Numérica agregar el gráfico de alfa crítico
+en función de grado medio, y también ver de armar ese mismo gráfico para red de Erdos-Renyi.
+Podría armar eso en un sólo gráfico, una sola fila.
+.) Revisar que los criterios estén claros, yo diría que la parte de transición no está bien
+definida.
+.) Agregar los análisis a cada uno de los gráficos.
+.) Indicar cláramente que los etiquetados manuales son una cosa y que los otros
+parámetros definidos son formas más automáticas de caracterizar las distintas regiones.
+Eso va al empezar a hablar de los Promedios y demás temas.
+.) Cambiar el nombre de Amplitud por dispersión de los tiempos de Simulación.
+.) Revisar el tema de que para grado medio 4 da muy mal la dispersión. Empezar revisando
+el tema de si los tiempos de convergencia para un punto en grado 4 es tan distinto
+a como se ve para los demás grados. Luego ver de normalizar por la dispersión media.
+Pablo dice que quizás el problema es que tenemos dispersiones absolutas grandes
+y relativas pequeñas.
+.) Completar lo de las Dinámicas en las distintas Regiones.
+
+En el capítulo 4 agregar: Sección de redes generales adaptativas,
+Sección de lo que hicimos con baumann pero no funcionó
+Sección de lo que hicimos con Redes Conexas.
+
+Ya se calcularon todos los datos de iteraciones entre 41 y 60 para la región de alfa
+entre 0,1 y 0,5. Así que para equiparar, voy a mandar a correr los datos entre 0 y 0,1
+de alfa y entre -0,5 y 1 en Cdelta, cosa de que todo tenga 60 simulaciones.
+Confío en que esto estará terminado para mañana y ya mañana me puedo poner a estudiar
+en detalle estos datos.
+
+Vamos a ver de analizar los datos de la anomalía para ver por qué da mal.
+Ya armé el código para ir analizando el tema de los gráficos de Variación
+Promedio. Vamos a ver si efectivamente en los alfas altos esto está teniendo
+problemas.
+
+Ok, el plan para mañana es este. Armar gráficos de 6x6 como los de Distribución de
+Opiniones. Después probarlo en mi pc. Si funca, mandarlo a Oporto a correr.
+Mientras esto se resuelve, hacer lo de DinaReg. Resuelto eso, ir completando
+los detalles del capítulo 3. Entre mañana y el viernes tiene que estar terminado.

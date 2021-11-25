@@ -1,30 +1,33 @@
 
 
+
+# La idea de este archivo es recopilar TODO el trabajo realizado en los archivos
+# Graficador ER2, Caracterización Transición y TablaTdO. Admito que no estoy seguro
+# de que sea una gran idea, porque al final del día es MUCHAS cuentas, y si están
+# todas en un solo archivo no voy a poder frenar el archivo. Me encargaré de armar
+# este código de forma de separar de forma muy clara las partes de cada archivo
+# cosa que se pueda comentar fácilmente qué cosas hacer y qué cosas no.
+
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
-#from scipy.optimize import minimize
-#from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
-#import random
 import time
-import pandas as pd
 import math
-#import csv
 import os
 
-t0=time.time()
-###########################################################
-###########################################################
+# Importo todas las librerías que voy a usar en el programa. Estas son las que
+# uso en los tres programas, por lo que no debería necesitar nada más.
 
-# Esta celda define funciones y carga librerías.
-# También sirve para levantar el nombre de los archivos, por lo que cada vez que armes
-# nuevos archivos tenés que volver a correrla para volver a registrar los nuevos nombres
+#--------------------------------------------------------------------------------
 
-############################################################
-############################################################
+# Voy a definir TODAS las funciones que voy a usar, total definirlas no roba
+# tiempo o proceso al programa.
 
-def scan(cant,lista):
+
+# Esto printea una cantidad de valores cant de un objeto iterable que paso
+# en la parte de lista.
+def scan(lista,cant=10):
     i=0
     for x in lista:
         print(x)
@@ -32,11 +35,16 @@ def scan(cant,lista):
         if i>cant:
             break
             
+        
+# Esto va al final de un código, simplemente printea cuánto tiempo pasó desde la última
+# vez que escribí el inicio del cronómetro t0=time.time()
 def Tiempo():
     t1=time.time()
     print("Esto tardó {} segundos".format(t1-t0))
 
 
+# Esta es la función que uso por excelencia para levantar datos de archivos. Lo
+# bueno es que lee archivos de forma general, no necesita que sean csv o cosas así
 def ldata(archive):
         f = open(archive)
         data = []
@@ -46,38 +54,17 @@ def ldata(archive):
             data.append(col)
         return data 
 
-
-# En esta celda lo que voy a hacer es armar los gráficos de Trayectorias de Opiniones (TdO)
-# para las simulaciones hechas con N=100 y N=1000 agentes, con dt = 0,1. Esas simulaciones están
-# hechas sobre redes estáticas Erdós Renyi con grado medio 8, con CritCorte = 10^(-8) o 10^(-6).
-# Lo importante es que tengo 40 simulaciones hechas para cada valor de Alfa y Delta y mi intención
-# es graficar los datos de esas 40 simulaciones en un sólo gráfico.
-
-# Después de eso la idea es tomar todos estos datos y empezar a armar el gráfico del comportamiento
-# del sistema en el espacio de fases en función de alfa y delta.
-
-t0=time.time()
-
-T=2 # Tengo que definir el número de tópicos en algún lado, lo hago ahora porque más adelante no tiene lugar
-
-#--------------------------------------------------------------------------------------
-
-# Defino primero mi función de AlfaC
-
-def AlfaC(x):
+    
+# Esta función calcula el valor del Alfa crítico que grafico en los mapas de colores
+# A diferencia de lo que tenía antes, voy a tener que introducir al GM como una variable
+def AlfaC(x,GM):
     T = 2 # Número de tópicos
-    GM = 8 # Grado medio
     K = 1 # Influencia social
     if(x>0):
         alfa = (T-1)/((GM*K)*(T-1+x))
     else:
         alfa = (T-1)/((GM*K)*(T-1-x))
     return alfa
-
-# Ya probé la función y ahora sí calcula perfecto. Hubo un pequeño
-# error al principio.
-
-#------------------------------------------------------------------
 
 
 # Voy a definir una función para usar en esta celda, que me permite asignar
@@ -115,8 +102,7 @@ def Indice_Color(vector,Divisiones):
             return (D+1)%Divisiones # En este caso el ángulo se encuentra entre ((D+1)*Delta-Delta/2,(D+1)*Delta+Delta/2]
     else:
         return 0;
-    
-#----------------------------------------------------------------------------------------------
+
 
 # Voy a definir una función que tome un estado del sistema y a partir de las opiniones
 # de los agentes pueda determianr si el sistema se encuentra en un estado de Consenso,
@@ -131,34 +117,119 @@ def Indice_Color(vector,Divisiones):
 # Finalmente, si algunos de estos productos me dan positivos y otros negativos,
 # entonces estoy en Polarización Descorrelacionada.
 
-def EstadoFinal(Array):
+def EstadoFinal(Array,Histo,Bins):
+    
+    Topicos = 2
+
+    # Primero identifico los tres posibles picos
+    
+    Nbins = len(Bins) # Esto es la cantidad de bins totales en los que dividí mi distribución
+    
+    Pcero = Histo[int((Nbins-1)/2)] # Esto es cuánto mide el pico en cero
+    
+    DistNegativa = Histo[0:int((Nbins-1)/2)] # Este es la distribución de las opiniones negativas
+    Pmenos = max(DistNegativa) # Esto es la altura del pico de Distribución negativa
+    
+    DistPositiva = Histo[int((Nbins-1)/2)+1::] # Este es la distribución de las opiniones positivas
+    Pmas = max(DistPositiva) # Esto es la altura del pico de Distribución positiva
     
     
-    # Primero veo el caso de que hayan tendido a cero
+    ###########################################################################
     
-    ArrayAbs = np.absolute(Array)
-    if max(ArrayAbs)<0.01:
+    # Ahora que tengo los picos, puedo empezar a definir el tema de los estados
+    #finales. Arranco por el Consenso
+    
+    if Pcero == max(Pcero,Pmas,Pmenos):   #Pcero*0.85 > Pmax:  (Esto es la versión con umbral)
         return "Consenso"
     
-    #----------------------------------------------------------
-    # Ahora veamos los otros dos casos. Primero voy a armar
-    # un array que tenga las opiniones del tópico 1, y otro
-    # con las opiniones del tópico 2.
+    ###########################################################################
     
-    ArrayT1 = Array[0::2]
-    ArrayT2 = Array[1::2]    
-    ArrayProd = np.sign(np.multiply(ArrayT1,ArrayT2))
+    # Ahora veamos el caso de región de transición. Este estado
+    # Lo caracterizo porque el sistema tiene un pico central y picos por fuera
+    # que no son definitorios del estado
     
-    if -1 in ArrayProd:
-        return "Polarizacion"
-    else:
-        return "Ideologico"
+#    Pmediano = min(Pmas,Pmenos)
+    
+#    if Pmaximo*0.7 < Pcero < Pmaximo*1.3 and Pmaximo*0.7 < Pmas < Pmaximo*1.3 and Pmaximo*0.7 < Pmenos < Pmaximo*1.3 :
+#        return "RegionTrans"
+    
+    ###########################################################################
+    
+#    indicemenos = np.where(DistNegativa == Pmenos)[0][0]
+#    indicemas = np.where(DistPositiva == Pmas)[0][0]
+    
+    if Pcero == min(Pcero,Pmas,Pmenos):  #and Pcero < Pmediano*0.85: (Esto es de la versión umbral)
+        
+        # Filtro los agentes que se hayan desviado apenas, cosa
+        # de que el criterio final se decida con los agentes que se polarizaron
+        # correctamente y no los que terminaron en cualquier lugar cerca del
+        # cero.
+        ArrayT1 = Array[0::2]
+        ArrayT2 = Array[1::2]
+        Maximo = max(np.absolute(Array))
+        
+        OpinionesFiltradas = np.zeros(len(Array))
+        
+        for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
+            if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
+                OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+        
+        # Ahora veamos los otros dos casos. Primero voy a armar
+        # un array que tenga las opiniones del tópico 1, y otro
+        # con las opiniones del tópico 2.
+        
+        ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+        
+        Cant1 = np.count_nonzero(ArrayCuad == 1)
+        Cant2 = np.count_nonzero(ArrayCuad == 2)
+        Cant3 = np.count_nonzero(ArrayCuad == 3)
+        Cant4 = np.count_nonzero(ArrayCuad == 4)
+        
+        if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
+            return "Ideologico"
+        elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
+            return "Ideologico"
+        else:
+            return "Polarizacion"
+    
+    return "RegionTrans"
 
-# Lo probé con algunos vectores de prueba y parece funcar bárbaro. Habrá que probar
-# más en detalle. Se me ocurre usar esto para que los gráficos estén etiquetados y
-# mirar si en alguno se equivoca.
 
-#-----------------------------------------------------------------------------------------------
+# Voy a definir una función que tome un array con opiniones del sistema y me 
+# diga en qué cuadrante se encuentran cada una de estas coordenadas. Luego a
+# la salida me devuelve un array con el cual me voy a armar un histograma
+
+def ClasificacionCuadrantes(Array):
+    
+    # Primero tomo el array y con sign reviso si sus variables son positivas o negativas.
+    # Luego, creo el array Resultado que es lo que voy a returnear.
+    # Lo siguiente es crear el array SwitchDic, que va a funcionar como un Switch para los
+    # casos que voy a considerar.
+    
+    Resultado = np.zeros(int(len(Array)/2))
+    SwitchDic = dict()
+    
+    # Defino todos los casos posibles
+    
+    SwitchDic[(1,1)] = 1
+    SwitchDic[(-1,1)] = 2
+    SwitchDic[(-1,-1)] = 3
+    SwitchDic[(1,-1)] = 4
+
+    
+    # Repaso los elementos en Signos para identificar los cuadrantes de mis objetos.
+    
+    for x1,x2,indice in zip(Array[0::2],Array[1::2],np.arange(len(Array[0::2]))):
+        Absolutos = np.abs(np.array([x1,x2]))
+        if max(Absolutos)<0.5:
+            Resultado[indice] = 0
+        else:
+            Signos = np.sign(np.array([x1,x2]))
+            Resultado[indice] = SwitchDic[(Signos[0],Signos[1])]
+  
+    return Resultado
+
+
 
 # Acá lo que voy a hacer es preparar los colores que voy a usar para definir los puntos finales
 # de las trayectorias de las opiniones
@@ -169,110 +240,179 @@ color=cm.rainbow(np.linspace(0,1,Divisiones))
 
 # Lo que hice acá es definir una ¿lista? que tiene en cada casillero los datos que definen un color.
 # Tiene diferenciados 144 colores, es decir que tengo un color para cada región de 2.5 grados. Estas regiones
-# las voy a distribuir centrándolas en en cada ángulo que cada color representa. Por lo tanto,
+# las voy a distribuir centrándolas en cada ángulo que cada color representa. Por lo tanto,
 # Los vectores que tengan ángulo entre -1.25º y 1.25º tienen el primer color. Los que tengan entre
 # 1.25º y 3.75º tienen el segundo color. Y así. Por tanto yo tengo que hallar una fórmula que para
 # cada ángulo le asigne el casillero que le corresponde en el vector de color. Luego, cuando grafique
 # el punto, para el color le agrego un input que sea: c = color[n]
-    
 
 
-#--------------------------------------------------------------------------------------
 
-CarpCheck=[[root,files] for root,dirs,files in os.walk("./ER2")]
+# Estas son todas las funciones que voy a necesitar. Lo último no es una función,
+# es la lista de colores que necesitaba para usar la función Indice_Color.
+# Ahora voy a definir la parte que se encarga de levantar los nombre y el path
+# de los archivos.
 
-# El comentario anterior era considerando que no le daba la dirección correcta
-# de la carpeta con mi información al os.walk. Esta vez le estoy pasando la 
-# dirección exacta, así que no es necesario hacer tanto quilombo para separar
-# los nombres de los archivos. El elemento en la posición x[0] es el nombre de la carpeta
+t0 = time.time()
 
-for x in CarpCheck:
-    # dada = x[0].split("\\")
-    Archivos_Datos = [nombre for nombre in x[1]]
-    Archivos_Datos.insert(0,x[0])
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
 
-# Con esto tengo los nombres de todos los archivos en la carpeta de Cambios dt
-# Archivos_Datos tiene en la primer coordenada el principio de la dirección
-# de la carpeta, y el resto de elementos son los archivos en la carpeta.
-# Entonces si quiero buscar el objeto voy a tener que usar:
-# Archivos_Datos[0]/Archivos_Datos[1]
-
-
-#-------------------------------------------------------------------------------------------
-# En sí no planeo armar muchas listas de datos, pero la cosa es que los valores de Alfa
-# y dt utilizados varían y me gustaría armar dos conjuntos que me guarden estos valores
-# para después poder iterar en estos, ya que voy a estar haciendo varios gráficos a partir
-# de mis archivos. Voy a necesitar entonces dos conjuntos, uno para Alfa y otro para dt.
-
-# Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Iter=$"
-
-Conjunto_Alfa = []
-Conjunto_Cdelta = []
-Conjunto_N = []
-
-for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-    alfa = float(nombre.split("_")[2].split("=")[1])
-    Cdelta = float(nombre.split("_")[3].split("=")[1])
-    N = int(nombre.split("_")[4].split("=")[1])
-    if alfa not in Conjunto_Alfa:
-        Conjunto_Alfa.append(alfa)
-    if Cdelta not in Conjunto_Cdelta:
-        Conjunto_Cdelta.append(Cdelta)
-    if N not in Conjunto_N:
-        Conjunto_N.append(N)
-
-Conjunto_Alfa.sort()
-Conjunto_Cdelta.sort()
-Conjunto_N.sort()
-
-
-# Bien, esto ya me arma el conjunto de Alfas, Cdelta y N correctamente y ordenados
-# Ahora podemos pasar a lo importante de esta celda
-
-#--------------------------------------------------------------------------------------------
-
-# Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
-# a un cierto N, Alfa y Cdelta. Me armo primero el superdiccionario, que es el diccionario,
-# que contiene diccionarios, que llevan a diccionario que llevan a las listas de los nombres
-# de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa
-# y el Cdelta respectivos. Entonces la lista se accede sabiendo el Alfa, Cdelta y N
-# correspondiente de antemano.
+T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
+# pero no tenía dónde más definirlo
 
 SuperDiccionario = dict()
 
-for AGENTES in Conjunto_N:
-    SuperDiccionario[AGENTES] = dict()
-    for ALFA in Conjunto_Alfa:
-        for CDELTA in Conjunto_Cdelta:
+for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
+
+    # Este parámetro llamado Subdividido es algo que defino yo a mano para definir si estoy leyendo una 
+    # carpeta donde los archivos de datos están divididos en 4 carpetas, o si están todos mezclados en
+    # la carpeta. Empecé a hacer esto de dividirlos porque Pablo me dijo que era necesario.
+    Subdividido = False
+    
+    # Primero levanto datos de los nombres de los archivos de mis redes. Para eso es importante notar
+    # que mis archivos ahora van a empezar a tener cuatro carpetas donde los valores de GM estén
+    # diferenciados. Para eso necesita que el programa distinga cuántas carpetas hay en la carpeta
+    # principal y que me arme la lista de archivos dentro de cada carpeta. Voy a armar un segundo código
+    # pensado en levantar los archivos de las carpetas que tienen los archivos separados en 4 carpetas
+    # según GM. Luego activo el código en función de la carpeta de la cual voy a levantar datos.
+    
+    # CÓDIGO PARA LEVANTAR DATOS DE UNA CARPETA SUBDIVIDIDA EN 4 CARPETAS SEGÚN EL GM DE LOS ARCHIVOS.
+    
+    if Subdividido == True:
+    
+        CarpCheck=[[root,dirs,files] for root,dirs,files in os.walk("../NCC/{}".format(REDES))]
+        
+        # En este caso lo mejor sería armar un diccionario en el cual guardaré los nombres
+        # de los archivos y usaré el GM como índice. Para eso primero tengo que tomar el
+        # nombre de la carpeta en la que se encuentra y de ahí extraer el número del GM.
+        # El nombre es del estilo "../$Carpeta$/$Red$\\GM=$$". Entonces si no me equivoco,
+        # puedo simplemente hacerle un split("=") y con eso ya saco el GM.
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        Diccionario_Datos = dict()
+        for indice in range(len(CarpCheck[0][1])):
+            Gm = int(CarpCheck[0][1][indice].split("=")[1])
+            if len(CarpCheck[indice+1][2]) > 0:
+                Diccionario_Datos[Gm] = [nombre for nombre in CarpCheck[indice+1][2]]
+                Diccionario_Datos[Gm].insert(0,CarpCheck[indice+1][0])
+                
+        
+        
+        # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
+        # Archivos_Datos tiene en la primer coordenada el principio de la dirección
+        # de la carpeta, y el resto de elementos son los archivos en la carpeta.
+        
+        #---------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = []
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for gradom in Diccionario_Datos.keys():
+            Archivos_Datos = Diccionario_Datos[gradom]
+            Gm = gradom
+            Conjunto_Direcciones.append(Archivos_Datos[0])
             for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
                 alfa = float(nombre.split("_")[2].split("=")[1])
                 Cdelta = float(nombre.split("_")[3].split("=")[1])
                 N = int(nombre.split("_")[4].split("=")[1])
-                if N==AGENTES and alfa==ALFA and Cdelta==CDELTA:
-                    if alfa not in SuperDiccionario[AGENTES].keys():
-                        SuperDiccionario[AGENTES][ALFA] = dict()
-                    if Cdelta not in SuperDiccionario[AGENTES][ALFA].keys():
-                        SuperDiccionario[AGENTES][ALFA][CDELTA] = []
-                    else:
-                        break
-                
-            
+                if N not in SuperDiccionario[REDES].keys():
+                    SuperDiccionario[REDES][N] = dict()
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Gm not in SuperDiccionario[REDES][N].keys():
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                else:
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
 
-for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-    alfa = float(nombre.split("_")[2].split("=")[1])
-    Cdelta = float(nombre.split("_")[3].split("=")[1])
-    N = int(nombre.split("_")[4].split("=")[1])
-    SuperDiccionario[N][alfa][Cdelta].append(nombre)
+
+
+        Conjunto_Direcciones.sort(key = lambda direccion: int(direccion.split("=")[1]))
+        
+        
+        
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+        # No organizo el Conjunto_Gm para que vaya en el mismo orden que el Conjunto_Direcciones
+        
+        #-------------------------------------------------------------------------------------------------------
+
     
-# Ya mejoré el armado del SuperDiccionario de manera de que me cada N tenga los Alfa y cada
-# Alfa tenga los Cdelta correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
-# de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
-# Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
-# armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
-# definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
-# iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
+    else:    
+        # CÓDIGO PARA LEVANTAR ARCHIVOS DE UNA CARPETA CON TODOS LOS ARCHIVOS MEZCLADOS
+        
+        CarpCheck=[[root,files] for root,dirs,files in os.walk("./EFEPOporto/{}".format(REDES))]
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        for x in CarpCheck:
+            # dada = x[0].split("\\")
+            Archivos_Datos = [nombre for nombre in x[1]]
+            Archivos_Datos.insert(0,x[0])
+            
+        
     
-#--------------------------------------------------------------------------------------------
+        #-------------------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = [Archivos_Datos[0]]
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+            alfa = float(nombre.split("_")[2].split("=")[1])
+            Cdelta = float(nombre.split("_")[3].split("=")[1])
+            N = int(nombre.split("_")[4].split("=")[1])
+            Gm = int(nombre.split("_")[5].split("=")[1])
+            if N not in SuperDiccionario[REDES].keys():
+                SuperDiccionario[REDES][N] = dict()
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Gm not in SuperDiccionario[REDES][N].keys():
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            else:
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
+
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+        #--------------------------------------------------------------------------------------------
+    
+    print("Levanté los datos sin problemas")
+    
+    # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
+    # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
+    # las keys de mi SuperDiccionario.
+    
     
 # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
 # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
@@ -307,12 +447,12 @@ for AGENTES in [1000]:
     
     # Levanto los datos del csv usando el pandas y luego paso los datos al ZZ
     
-#    DF = pd.read_csv("Grafico Fases N={}.csv".format(AGENTES),delimiter = ",",header = None)
-#    
-#    if DF.shape == ZZ.shape:
-#        for fila in range(ZZ.shape[0]):
-#            for columna in range(ZZ.shape[1]):
-#                ZZ[fila,columna] = DF.iloc[fila,columna]
+    DF = pd.read_csv("Grafico Fases N={}.csv".format(AGENTES),delimiter = ",",header = None)
+    
+    if DF.shape == ZZ.shape:
+        for fila in range(ZZ.shape[0]):
+            for columna in range(ZZ.shape[1]):
+                ZZ[fila,columna] = DF.iloc[fila,columna]
 #    else:
 #        print("Hubo problemas con el ZZ.")
         

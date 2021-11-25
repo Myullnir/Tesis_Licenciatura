@@ -34,6 +34,7 @@ int main(int argc, char *argv[]){
 		// ps_red->s_Tred = NULL;
 		sprintf(ps_red->s_Tred,"%s",argv[2]);
 		
+		
 		// Parámetros de mi modelo. Esto va desde número de agentes hasta el paso temporal de integración.
 		ps_datos->i_N = strtol(argv[1],NULL,10); // Cantidad de agentes en el modelo
 		ps_datos->i_T = 2;  //strtol(argv[1],NULL,10); Antes de hacer esto, arranquemos con número fijo   // Cantidad de temas sobre los que opinar
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]){
 		double* ap_OpinionesPrevias[ps_datos->i_pasosprevios];
 		
 		for(register int i_i=0; i_i<ps_datos->i_pasosprevios; i_i++){
-			ap_OpinionesPrevias[i_i] = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(int));
+			ap_OpinionesPrevias[i_i] = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double));
 			*ap_OpinionesPrevias[i_i] = ps_datos->i_N;
 			*(ap_OpinionesPrevias[i_i]+1) = ps_datos->i_T;
 			for(register int i_j=0; i_j<ps_datos->i_T*ps_datos->i_N;i_j++) *(ap_OpinionesPrevias[i_i]+i_j+2) = 0;
@@ -72,7 +73,8 @@ int main(int argc, char *argv[]){
 		ps_red->pd_PreOpi = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		ps_red->pd_Diferencia = (double*) malloc((2+ps_datos->i_T*ps_datos->i_N)*sizeof(double)); // Paso previo del sistema antes de iterar.
 		
-		// Voy a abrir tres archivos. Uno para anotar la evolución de opiniones.
+		// Voy a abrir cuatrio archivos. Uno para anotar la evolución de opiniones.
+		// El segundo es donde voy a guardar la evolución del sistema paso a paso para un cierto grupo de agentes.
 		// El otro es del que voy a levantar mi matriz de Adyacencia
 		// El tercero es para levantar los datos de la Tabla_Valores_TANH
 		char s_archivo1[355];
@@ -81,10 +83,22 @@ int main(int argc, char *argv[]){
 		// llevando en el nombre de los archivos, pero supongo que podría pensar en el futuro para pasar eso a un archivo separado
 		// que guarde junto a los archivos. Cuestión que esto hace que no sea necesario el usar el archivo de Bash Mover.sh
 		// Hay tres if porque cada uno corresponde a cada tipo de red en particular.
-		if(strcmp("Barabasi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/Barabasi/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
-		if(strcmp("ErdosRenyi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/ERZoom/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
-		if(strcmp("RandomR",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/Random Regulars/Datos_Opiniones_alfa=%.2f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("Barabasi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/DinaReg/Barabasi/Datos_Opiniones_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("ErdosRenyi",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/DinaReg/Erdos-Renyi/Datos_Opiniones_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("RandomR",argv[2])==0) sprintf(s_archivo1,"../Programas Python/DRE/DinaReg/RandomRegulars/Datos_Opiniones_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
 		FILE *pa_archivo1=fopen(s_archivo1,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
+		
+		
+		char s_archivo2[355];
+		// Estas líneas son gigantescamente largas porque tienen anotado todo el path para el lugar donde se van a guardar los archivos,
+		// y además lo archivos tienen que tener registro de bastantes datos importantes de la red. Ese registro por ahora lo vengo
+		// llevando en el nombre de los archivos, pero supongo que podría pensar en el futuro para pasar eso a un archivo separado
+		// que guarde junto a los archivos. Cuestión que esto hace que no sea necesario el usar el archivo de Bash Mover.sh
+		// Hay tres if porque cada uno corresponde a cada tipo de red en particular.
+		if(strcmp("Barabasi",argv[2])==0) sprintf(s_archivo2,"../Programas Python/DRE/DinaReg/Barabasi/Evolucion_Sistema_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("ErdosRenyi",argv[2])==0) sprintf(s_archivo2,"../Programas Python/DRE/DinaReg/Erdos-Renyi/Evolucion_Sistema_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		if(strcmp("RandomR",argv[2])==0) sprintf(s_archivo2,"../Programas Python/DRE/DinaReg/RandomRegulars/Evolucion_Sistema_alfa=%.3f_Cdelta=%.2f_N=%d_Gm=%d_ID=%d_Iter=%d",ps_datos->f_alfa,ps_datos->f_Cosangulo,ps_datos->i_N,ps_datos->i_Gradomedio,ps_datos->i_ID,i_iteracion);
+		FILE *pa_archivo2=fopen(s_archivo2,"w"); // Con esto abro mi archivo y dirijo el puntero a él.
 		
 		// Esto me va a levantar mi matriz de Adyacencia. Armé tres ifs para los casos dependiendo del tipo de red que vaya a usar.
 		char s_Mady[255];
@@ -178,6 +192,10 @@ int main(int argc, char *argv[]){
 	Escribir_d(ps_red->pd_Opi,pa_archivo1);
 	fprintf(pa_archivo1, "\tVariacion Promedio\n");
 	
+	// Acá guardo los datos de las opiniones del sistema.
+	// fprintf(pa_archivo2,"\tOpiniones de los agentes\n");
+	// Escribir_d(ps_red->pd_Opi,pa_archivo2);
+	
 	//############################################################################################################
 	
 	// Esto es una "Termalización" del sistema. Dejo pasar i_IndiceOpiPasado iteraciones para guardarlas en mi lista de arrays y de
@@ -189,6 +207,7 @@ int main(int argc, char *argv[]){
 		for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 		Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
 		for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) *(ap_OpinionesPrevias[i_IndiceOpiPasado]+i_j+2) = ps_red->pd_Opi[i_j+2];
+		// Escribir_d(ps_red->pd_Opi,pa_archivo2);
 		i_IndiceOpiPasado++;
 	}
 	
@@ -205,11 +224,12 @@ int main(int argc, char *argv[]){
 		do{
 			for(register int i_j=0; i_j<ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// Escribir_d(ps_red->pd_Opi,pa_archivo2);
 			i_IndiceOpiPasado++;
 			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
-			Delta_Vec_d(ps_red->pd_Opi,ap_OpinionesPrevias[i_IndiceOpiPasado%i_pasosprevios],ps_red->pd_Diferencia); // Veo la diferencia entre 20 pasos anteriores y el actual en las opiniones
+			Delta_Vec_d(ps_red->pd_Opi,ap_OpinionesPrevias[i_IndiceOpiPasado%ps_datos->i_pasosprevios],ps_red->pd_Diferencia); // Veo la diferencia entre 20 pasos anteriores y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
-			for(register int i_p=0; i_p<ps_datos->i_N*ps_datos->i_T; i_p++) *(ap_OpinionesPrevias[i_IndiceOpiPasado%i_pasosprevios]+i_p+2) = ps_red->pd_Opi[i_p+2];
+			for(register int i_p=0; i_p<ps_datos->i_N*ps_datos->i_T; i_p++) *(ap_OpinionesPrevias[i_IndiceOpiPasado%ps_datos->i_pasosprevios]+i_p+2) = ps_red->pd_Opi[i_p+2];
 			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
 		}
 		while(ps_red->d_Varprom > ps_datos->d_CritCorte);
@@ -218,10 +238,12 @@ int main(int argc, char *argv[]){
 		while(i_contador < ps_datos->i_Itextra && ps_red->d_Varprom <= ps_datos->d_CritCorte ){
 			for(register int i_j=0; i_j < ps_datos->i_N*ps_datos->i_T; i_j++) ps_red->pd_PreOpi[i_j+2] = ps_red->pd_Opi[i_j+2];
 			Iteracion(ps_red,ps_datos,ps_tab,pf_EcDin);
+			// Escribir_d(ps_red->pd_Opi,pa_archivo2);
 			i_IndiceOpiPasado++;
 			// Escribir_d(ps_red->pd_Opi,pa_archivo1); // Matriz de Opinión
-			Delta_Vec_d(ps_red->pd_Opi,ap_OpinionesPrevias[i_IndiceOpiPasado%i_pasosprevios],ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
+			Delta_Vec_d(ps_red->pd_Opi,ap_OpinionesPrevias[i_IndiceOpiPasado%ps_datos->i_pasosprevios],ps_red->pd_Diferencia); // Veo la diferencia entre el paso previo y el actual en las opiniones
 			ps_red->d_Varprom = Norma_d(ps_red->pd_Diferencia)/ps_datos->d_NormDif; // Calculo la suma de las diferencias al cuadrado y la normalizo.
+			for(register int i_p=0; i_p<ps_datos->i_N*ps_datos->i_T; i_p++) *(ap_OpinionesPrevias[i_IndiceOpiPasado%ps_datos->i_pasosprevios]+i_p+2) = ps_red->pd_Opi[i_p+2];
 			fprintf(pa_archivo1, "\t%lf",ps_red->d_Varprom);
 			i_contador +=1;
 		}
@@ -242,7 +264,7 @@ int main(int argc, char *argv[]){
 	Final:
 	
 	// Libero los espacios dedicados a mis vectores y cierro mis archivos
-	for(register int i_i=0; i_i<i_pasosprevios; i_i++) free(ap_OpinionesPrevias[i_i]);
+	for(register int i_i=0; i_i<ps_datos->i_pasosprevios; i_i++) free(ap_OpinionesPrevias[i_i]);
 	free(ps_red->pd_Ang);
 	free(ps_red->pi_Ady);
 	free(ps_red->pd_Opi);
@@ -253,6 +275,7 @@ int main(int argc, char *argv[]){
 	free(ps_red);
 	free(ps_datos);
 	fclose(pa_archivo1);
+	fclose(pa_archivo2);
 	
 	// Finalmente imprimo el tiempo que tarde en ejecutar todo el programa
 	time(&tt_fin);

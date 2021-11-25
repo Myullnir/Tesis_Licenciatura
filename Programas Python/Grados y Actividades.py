@@ -254,7 +254,7 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
 
-Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra"]
+Carpetas = ["AcRedes"]
 #SelCarpeta = 1
 for SelCarpeta in range(1,len(Carpetas)):
     
@@ -356,7 +356,7 @@ for SelCarpeta in range(1,len(Carpetas)):
     # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
     # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
     # las keys de mi SuperDiccionario.
-        
+    
     # Armo el array de Actividades Totales aca porque voy a guardar el registro
     # de TODAS las actividades sorteadas, total esas actividades se arman usando
     # los mismos parámetros, de manera independiente del alfa y Cdelta
@@ -379,76 +379,75 @@ for SelCarpeta in range(1,len(Carpetas)):
         
         for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
             
-            CDELTA = 0
-            icdelta = 0
             
-    #        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+            for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
             
             #-----------------------------------------------------------------------------------
             
             # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
             # que voy a necesitar para después
             
-            #-------------------------------------------------------------------------------------
-            for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
-                if nombre.split("_")[1] == "Actividades":
-    
-                    #--------------------------------------------------------------------------------------------
-                
-                    # Levanto los datos del archivo original y separo los datos en tres listas.
-                    # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
-                
-                    Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
-                    for fila,posicion in zip (Datos,np.arange(len(Datos))):
-                        if fila[1] == "Agentes Activados":
-                            inicio_registro = posicion+1
-                        if fila[1] == "Grado medio":
-                            fin_registro = posicion
+                #-------------------------------------------------------------------------------------
+                for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
+                    if nombre.split("_")[1] == "Actividades":
+        
+                        #--------------------------------------------------------------------------------------------
                     
-                
-                    # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
-                    # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                    Actividades = np.array([float(x) for x in Datos[1][1::]])
+                        # Levanto los datos del archivo original y separo los datos en tres listas.
+                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
                     
-                    Activacion = np.zeros((fin_registro-inicio_registro,1000))                
-                    for fila in range(inicio_registro,fin_registro):
-                        Activacion[fila-inicio_registro] = [int(x) for x in Datos[fila][1::]]
+                        Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
+                        for fila,posicion in zip (Datos,np.arange(len(Datos))):
+                            if fila[1] == "Agentes Activados":
+                                inicio_registro = posicion+1
+                            if fila[1] == "Grado medio":
+                                fin_registro = posicion
+                        
                     
-                    Km = np.array([float(x) for x in Datos[fin_registro+1][1::]])
-                
-                    #----------------------------------------------------------------------------------------------
-                    
-                    # Voy a armarme mi array de valores de Actividades con el cual luego me construiré mi histograma.
-                    
-                    ActividadesTotales = np.concatenate((ActividadesTotales,Actividades), axis=None)
-                    
-                    # Esto me va a dejar un vector gigante con TODAS las actividades que lancé en TODAS
-                    # las simulaciones. Luego con esto me voy a armar al final del programa un histograma.
-                    
-                    #-----------------------------------------------------------------------------------------------
-                    
-                    # Voy a guardar los registros de los agentes que se activaron en una lista de listas.
-                    # La idea es que voy a armar ciertos rangos de valores de actividad
-                    # de manera de conseguir un poco de estadística ya que mis redes se arman sólo
-                    # 30 veces, y 30 no me sirve para mucha estadística. Entonces la idea es que los registros
-                    # de actividades de todos los agentes en un cierto rango se guarden en una lista de manera
-                    # de luego ir promediando esos valores y poder además tomar los datos de TODAS las simulaciones
-                    # realizadas.
-                    
-                    paso = Xactivacion[1]-Xactivacion[0]
-                    for agente in range(AGENTES):
-                        Registro[math.floor((Actividades[agente]-epsilon)/paso)].append(Activacion[::,agente])
-                    
-                    # Esto debería armarme mi listas de registro correctamente.
-                    
-                    #--------------------------------------------------------------------------------------------------
-                    
-                    # Voy a juntar los valores del grado medio de la red de actividad para después hacer una
-                    # distribución con eso.
-                    
-                    KMTotal = np.concatenate((KMTotal,Km),axis=None)
-                    
-                    #--------------------------------------------------------------------------------------------------
+                        # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
+                        # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
+                        
+                        Actividades = np.array([float(x) for x in Datos[1][1::]])
+                        
+                        Activacion = np.zeros((fin_registro-inicio_registro,1000))                
+                        for fila in range(inicio_registro,fin_registro):
+                            Activacion[fila-inicio_registro] = [int(x) for x in Datos[fila][1::]]
+                        
+                        Km = np.array([float(x) for x in Datos[fin_registro+1][1::]])
+                        
+                        #----------------------------------------------------------------------------------------------
+                        
+                        # Voy a armarme mi array de valores de Actividades con el cual luego me construiré mi histograma.
+                        
+                        ActividadesTotales = np.concatenate((ActividadesTotales,Actividades), axis=None)
+                        
+                        # Esto me va a dejar un vector gigante con TODAS las actividades que lancé en TODAS
+                        # las simulaciones. Luego con esto me voy a armar al final del programa un histograma.
+                        
+                        #-----------------------------------------------------------------------------------------------
+                        
+                        # Voy a guardar los registros de los agentes que se activaron en una lista de listas.
+                        # La idea es que voy a armar ciertos rangos de valores de actividad
+                        # de manera de conseguir un poco de estadística ya que mis redes se arman sólo
+                        # 30 veces, y 30 no me sirve para mucha estadística. Entonces la idea es que los registros
+                        # de actividades de todos los agentes en un cierto rango se guarden en una lista de manera
+                        # de luego ir promediando esos valores y poder además tomar los datos de TODAS las simulaciones
+                        # realizadas.
+                        
+                        paso = Xactivacion[1]-Xactivacion[0]
+                        for agente in range(AGENTES):
+                            Registro[math.floor((Actividades[agente]-epsilon)/paso)].append(Activacion[::,agente])
+                        
+                        # Esto debería armarme mi listas de registro correctamente.
+                        
+                        #--------------------------------------------------------------------------------------------------
+                        
+                        # Voy a juntar los valores del grado medio de la red de actividad para después hacer una
+                        # distribución con eso.
+                        
+                        KMTotal = np.concatenate((KMTotal,Km),axis=None)
+                        
+                        #--------------------------------------------------------------------------------------------------
                     
                     
                     

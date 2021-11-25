@@ -266,3 +266,45 @@ pongo a prueba el código de redes estáticas con nuevo criterio de Corte.
 Entonces para aclarar, este código en vez de rearmar la red de actividad cada un número
 discreto de tiempo, rearma la red en cada iteración. Además, para tener una buena
 cantidad de iteraciones es que le pido que rearme la red 5000 veces.
+
+-------------------------------------------------------------------------------------
+
+18/10/2021
+
+En la carpeta "Revisión NCC" está el código que se encarga de armar los datos de Redes estáticas
+que usé para comprobar que el NCC no estuviera del todo errado. Si no recuerdo mal, la idea 
+era mirar un poco por arriba que los datos estuvieran correctamente recorriendo la región 
+donde el sistema pasaba por consenso/polarización/ideológico. La triple frontera.
+
+Los parámetros son básicamente los mismos que los usados en Redes Estáticas NCC,
+la diferencia es que recorro menos alfas y me muevo en Cosdelta=0. Todo para poder
+ver rápido lo que ocurre.
+
+-------------------------------------------------------------------------------------
+
+03/11/2021
+
+La carpeta Actividad Acumulada tiene el programa que arma la red de Actividad
+varias veces y guarda los datos de la matriz de Adyacencia cosa de poder armar la
+red de Actividad Acumulada. Por ahora el archivo arma redes de actividades siguiendo
+los parámetros de la red usada en el paper de Actividad, es decir N=5000, m=5,
+epsilon=0,001, gamma=2,8 y el eta implícito. (Quizás no es tan fiel al paper
+de actividad) La red de Actividad se rearma 500 veces.
+
+--------------------------------------------------------------------------------------
+
+14/11/2021
+
+La carpeta Red Acumulada tiene el programa con el cual tenías una red que en cada
+tiempo discreto se recalculaba la red acumulándose con la anterior. El objetivo
+de esto era combatir la esparsidad de la red de Actividad y ver si con este
+cambio al mecanismo de Baumann el sistema lograba converger a algún resultado.
+ Lo que se observó es que el sistema en este caso tampoco lograba converger a
+un resultado, entendiendo por converger a que cumpliera con el criterio de Corte
+planteado. El sistema como siempre tiene N=1000, K=3, 2 tópicos, dt=0.01,
+gamma=2.1, beta=3, m=10, epsilon=0.01, criterio de corte=0.0005 e iteraciones
+extra = 15.
+ Además lo último que probamos con este programa es que la red se recreara cada
+5 tiempos discretos en vez de cada uno, pero eso tampoco logró resolver el problema.
+
+

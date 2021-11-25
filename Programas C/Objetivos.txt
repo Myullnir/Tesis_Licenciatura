@@ -37,44 +37,13 @@ Bajar los 4 papers que cita Baumann y leerlos
 ¿Cómo cambiarían las ecuaciones del modelo si intentara introducir efecto Backfire?
 
 
-
-Para la semana que viene:
-Problemas de Redes Estáticas:
------------------------------
-7) Revisar algún punto particular de la varianza para ver cuantos outliers surgen
-8) Ver de reemplazar la varianza por distancia entre cuartiles de tiempo de
-simulación.
-
-Problemas de Redes de Actividad:
---------------------------------
-16) Intentar meter la homofilia en las redes estáticas de forma que los agentes
-conectados tengan una probabilidad de interactuar en base a que tan parecidos son
-en sus opiniones.
-
 20) Graficar Correlación de tópicos en función de Alfa
 
-23) Empezar a armar presentación de Tesis, arrancar con tema de Redes Estáticas.
-El armado, los datos, los criterios usados para estudiarlos. La idea es ir dejando
-explicitados los criterios de cómo están definidos y por tanto cómo definimos las
-transiciones.
-24) Probar de pasar los datos a un plot radial.
+
 25) Mandar a correr en la Red de Actividad la idea de hacer la red más densa.
-26) Armar un zip separando las redes según grado medio
 
 
 Para la tesis:
-27) En introducción inspirarme en lo que pone Baumann y lo que es la introducción del
-plan de trabajo.
-28) Antes del tema de Redes estáticas podría ir un capítulo de explicación del modelo
-de Baumann.
-29) También se podría poner un capítulo describiendo las propiedades de las redes estáticas
-
-
-31) Puse algo sobre gráficos de distribución de grado en la tesis.
-32) Ver de hacer un barrido con otro criterio en zona de transición
-de manera de que el programa corra por más tiempo.
-34) Pensar en armar algunos gráficos de la trayectoria de las opiniones.
-35) 
 
 
 ---------------------------------------------------------------------------------------------
@@ -119,7 +88,7 @@ PARA MANDAR A CORRER UN PROGRAMA EN EL BACKGROUND:
 nohup COMANDO &
 
 PARA CREAR UN AMBIENTE DE PYTHON QUE PERMITA CORRER EN LA MÁQUINA
-virtualenv -p /usr/bim/python3 environment
+virtualenv -p /usr/bin/python3 environment
 
 PARA ACTIVAR EL AMBIENTE DE PYTHON
 source environment/bin/activate
@@ -140,7 +109,8 @@ pip ...
 
 
 
-ID procesos:
+ID procesos: 783558 (Python en Algarve con los NCC)
+ (Python en Oporto con los generales)
 
 
 

@@ -121,44 +121,82 @@ def Indice_Color(vector,Divisiones):
 # Finalmente, si algunos de estos productos me dan positivos y otros negativos,
 # entonces estoy en Polarización Descorrelacionada.
 
-def EstadoFinal(Array):
+def EstadoFinal(Array,Histo,Bins):
     
-    Topicos = 2    
-    # Primero veo el caso de que hayan tendido a cero
+    Topicos = 2
+
+    # Primero identifico los tres posibles picos
     
-    ArrayAbs = np.absolute(Array)
-    Cant0 = np.count_nonzero(ArrayAbs < 1)
-    if Cant0/len(Array) > (1/9):
+    Nbins = len(Bins) # Esto es la cantidad de bins totales en los que dividí mi distribución
+    
+    Pcero = Histo[int((Nbins-1)/2)] # Esto es cuánto mide el pico en cero
+    
+    DistNegativa = Histo[0:int((Nbins-1)/2)] # Este es la distribución de las opiniones negativas
+    Pmenos = max(DistNegativa) # Esto es la altura del pico de Distribución negativa
+    
+    DistPositiva = Histo[int((Nbins-1)/2)+1::] # Este es la distribución de las opiniones positivas
+    Pmas = max(DistPositiva) # Esto es la altura del pico de Distribución positiva
+    
+    
+    ###########################################################################
+    
+    # Ahora que tengo los picos, puedo empezar a definir el tema de los estados
+    #finales. Arranco por el Consenso
+    
+    if Pcero == max(Pcero,Pmas,Pmenos):   #Pcero*0.85 > Pmax:  (Esto es la versión con umbral)
         return "Consenso"
     
-    #----------------------------------------------------------
-    # Ahora veamos los otros dos casos. Primero voy a armar
-    # un array que tenga las opiniones del tópico 1, y otro
-    # con las opiniones del tópico 2.
+    ###########################################################################
     
-    ArrayT1 = Array[0::2]
-    ArrayT2 = Array[1::2]
-    Maximo = max(ArrayAbs)
+    # Ahora veamos el caso de región de transición. Este estado
+    # Lo caracterizo porque el sistema tiene un pico central y picos por fuera
+    # que no son definitorios del estado
     
-    OpinionesFiltradas = np.zeros(len(Array))
+#    Pmediano = min(Pmas,Pmenos)
     
-    for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
-        if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
-            OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+#    if Pmaximo*0.7 < Pcero < Pmaximo*1.3 and Pmaximo*0.7 < Pmas < Pmaximo*1.3 and Pmaximo*0.7 < Pmenos < Pmaximo*1.3 :
+#        return "RegionTrans"
     
-    ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+    ###########################################################################
     
-    Cant1 = np.count_nonzero(ArrayCuad == 1)
-    Cant2 = np.count_nonzero(ArrayCuad == 2)
-    Cant3 = np.count_nonzero(ArrayCuad == 3)
-    Cant4 = np.count_nonzero(ArrayCuad == 4)
+#    indicemenos = np.where(DistNegativa == Pmenos)[0][0]
+#    indicemas = np.where(DistPositiva == Pmas)[0][0]
     
-    if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
-        return "Ideologico"
-    elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
-        return "Ideologico"
-    else:
-        return "Polarizacion"
+    if Pcero == min(Pcero,Pmas,Pmenos):  #and Pcero < Pmediano*0.85: (Esto es de la versión umbral)
+        
+        # Filtro los agentes que se hayan desviado apenas, cosa
+        # de que el criterio final se decida con los agentes que se polarizaron
+        # correctamente y no los que terminaron en cualquier lugar cerca del
+        # cero.
+        ArrayT1 = Array[0::2]
+        ArrayT2 = Array[1::2]
+        Maximo = max(np.absolute(Array))
+        
+        OpinionesFiltradas = np.zeros(len(Array))
+        
+        for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
+            if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
+                OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+        
+        # Ahora veamos los otros dos casos. Primero voy a armar
+        # un array que tenga las opiniones del tópico 1, y otro
+        # con las opiniones del tópico 2.
+        
+        ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+        
+        Cant1 = np.count_nonzero(ArrayCuad == 1)
+        Cant2 = np.count_nonzero(ArrayCuad == 2)
+        Cant3 = np.count_nonzero(ArrayCuad == 3)
+        Cant4 = np.count_nonzero(ArrayCuad == 4)
+        
+        if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
+            return "Ideologico"
+        elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
+            return "Ideologico"
+        else:
+            return "Polarizacion"
+    
+    return "RegionTrans"
 
 
 # Voy a definir una función que tome un array con opiniones del sistema y me 
@@ -229,97 +267,171 @@ T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
 
 SuperDiccionario = dict()
 
-for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
+for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
 
-
-    # Primero levanto datos de la carpeta de la red REDES
+    # Este parámetro llamado Subdividido es algo que defino yo a mano para definir si estoy leyendo una 
+    # carpeta donde los archivos de datos están divididos en 4 carpetas, o si están todos mezclados en
+    # la carpeta. Empecé a hacer esto de dividirlos porque Pablo me dijo que era necesario.
+    Subdividido = True
     
-    CarpCheck=[[root,files] for root,dirs,files in os.walk("../{}".format(REDES))]
+    # Primero levanto datos de los nombres de los archivos de mis redes. Para eso es importante notar
+    # que mis archivos ahora van a empezar a tener cuatro carpetas donde los valores de GM estén
+    # diferenciados. Para eso necesita que el programa distinga cuántas carpetas hay en la carpeta
+    # principal y que me arme la lista de archivos dentro de cada carpeta. Voy a armar un segundo código
+    # pensado en levantar los archivos de las carpetas que tienen los archivos separados en 4 carpetas
+    # según GM. Luego activo el código en función de la carpeta de la cual voy a levantar datos.
     
-    # El elemento en la posición x[0] es el nombre de la carpeta
+    # CÓDIGO PARA LEVANTAR DATOS DE UNA CARPETA SUBDIVIDIDA EN 4 CARPETAS SEGÚN EL GM DE LOS ARCHIVOS.
     
-    for x in CarpCheck:
-        # dada = x[0].split("\\")
-        Archivos_Datos = [nombre for nombre in x[1]]
-        Archivos_Datos.insert(0,x[0])
+    if Subdividido == True:
     
-    # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
-    # Archivos_Datos tiene en la primer coordenada el principio de la dirección
-    # de la carpeta, y el resto de elementos son los archivos en la carpeta.
-    
-    #---------------------------------------------------------------------------------------------
-    
-    # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
-    
-    Conjunto_Alfa = []
-    Conjunto_Cdelta = []
-    Conjunto_N = []
-    Conjunto_Gm = []
-    
-    SuperDiccionario[REDES] = dict()
-    
-    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-        alfa = float(nombre.split("_")[2].split("=")[1])
-        Cdelta = float(nombre.split("_")[3].split("=")[1])
-        N = int(nombre.split("_")[4].split("=")[1])
-        Gm = int(nombre.split("_")[5].split("=")[1])
-        if alfa not in Conjunto_Alfa:
-            Conjunto_Alfa.append(alfa)
-        if Cdelta not in Conjunto_Cdelta:
-            Conjunto_Cdelta.append(Cdelta)
-        if N not in Conjunto_N:
-            Conjunto_N.append(N)
-        if Gm not in Conjunto_Gm:
-            Conjunto_Gm.append(Gm)
-        if N not in SuperDiccionario[REDES].keys():
-            SuperDiccionario[REDES][N] = dict()
-            SuperDiccionario[REDES][N][Gm] = dict()
-            SuperDiccionario[REDES][N][Gm][alfa] = dict()
-            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
-        elif Gm not in SuperDiccionario[REDES][N].keys():
-            SuperDiccionario[REDES][N][Gm] = dict()
-            SuperDiccionario[REDES][N][Gm][alfa] = dict()
-            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
-        elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
-            SuperDiccionario[REDES][N][Gm][alfa] = dict()
-            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
-        elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
-            SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
-        else:
-            SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
+        CarpCheck=[[root,dirs,files] for root,dirs,files in os.walk("../NCC/{}".format(REDES))]
         
-            
-            
-    
-    Conjunto_Alfa.sort()
-    Conjunto_Cdelta.sort()
-    Conjunto_N.sort()
-    Conjunto_Gm.sort()
-    
-    # Le hice una modificación a esta parte del código, ahora esto trabaja
-    # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
-    # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
-    # es mucho más rápido.
+        # En este caso lo mejor sería armar un diccionario en el cual guardaré los nombres
+        # de los archivos y usaré el GM como índice. Para eso primero tengo que tomar el
+        # nombre de la carpeta en la que se encuentra y de ahí extraer el número del GM.
+        # El nombre es del estilo "../$Carpeta$/$Red$\\GM=$$". Entonces si no me equivoco,
+        # puedo simplemente hacerle un split("=") y con eso ya saco el GM.
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        Diccionario_Datos = dict()
+        for indice in range(len(CarpCheck[0][1])):
+            Gm = int(CarpCheck[0][1][indice].split("=")[1])
+            if len(CarpCheck[indice+1][2]) > 0:
+                Diccionario_Datos[Gm] = [nombre for nombre in CarpCheck[indice+1][2]]
+                Diccionario_Datos[Gm].insert(0,CarpCheck[indice+1][0])
+                
+        
+        
+        # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
+        # Archivos_Datos tiene en la primer coordenada el principio de la dirección
+        # de la carpeta, y el resto de elementos son los archivos en la carpeta.
+        
+        #---------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = []
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for gradom in Diccionario_Datos.keys():
+            Archivos_Datos = Diccionario_Datos[gradom]
+            Gm = gradom
+            Conjunto_Direcciones.append(Archivos_Datos[0])
+            for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+                alfa = float(nombre.split("_")[2].split("=")[1])
+                Cdelta = float(nombre.split("_")[3].split("=")[1])
+                N = int(nombre.split("_")[4].split("=")[1])
+                if N not in SuperDiccionario[REDES].keys():
+                    SuperDiccionario[REDES][N] = dict()
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Gm not in SuperDiccionario[REDES][N].keys():
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                else:
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
 
-    #--------------------------------------------------------------------------------------------
 
+
+        Conjunto_Direcciones.sort(key = lambda direccion: int(direccion.split("=")[1]))
+        
+        
+        
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+        # No organizo el Conjunto_Gm para que vaya en el mismo orden que el Conjunto_Direcciones
+        
+        #-------------------------------------------------------------------------------------------------------
+
+    
+    else:    
+        # CÓDIGO PARA LEVANTAR ARCHIVOS DE UNA CARPETA CON TODOS LOS ARCHIVOS MEZCLADOS
+        
+        CarpCheck=[[root,files] for root,dirs,files in os.walk("../NCC/{}".format(REDES))]
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        for x in CarpCheck:
+            # dada = x[0].split("\\")
+            Archivos_Datos = [nombre for nombre in x[1]]
+            Archivos_Datos.insert(0,x[0])
+            
+        
+    
+        #-------------------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = [Archivos_Datos[0]]
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+            alfa = float(nombre.split("_")[2].split("=")[1])
+            Cdelta = float(nombre.split("_")[3].split("=")[1])
+            N = int(nombre.split("_")[4].split("=")[1])
+            Gm = int(nombre.split("_")[5].split("=")[1])
+            if N not in SuperDiccionario[REDES].keys():
+                SuperDiccionario[REDES][N] = dict()
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Gm not in SuperDiccionario[REDES][N].keys():
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            else:
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
+
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+        #--------------------------------------------------------------------------------------------
+    
+    
     # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
     # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
     # las keys de mi SuperDiccionario.
+
+    
     
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
+        Conjunto_Gm.sort()
 
-        for GM in Conjunto_Gm:
-            
-            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
-        
-            Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
+        for GM,igm in zip(Conjunto_Gm,np.arange(len(Conjunto_Gm))):
             
             # Primero me armo los grid para el gráfico de las fases. Para eso
             # primero tengo que armarme un array y con el np.meshgrid armarme 
             # los grids del pcolormesh.
+            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
+            Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
+            
+            Conjunto_Cdelta.sort()
+            
 
             Conjunto_Alfa.reverse() # Lo invierto para que me quede el uno arriba y no abajo
             
@@ -335,7 +447,44 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
             # Con esto ya tengo armados los grids de XX,YY y de paso me armo el grid
             # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
             # los datos que ya guardé de antes. Para eso es el módulo siguiente
+            
+            #-------------------------------------------------------------------------------------
 
+            # Voy a primero hacer algo de revisar el máximo valor de opinión cosa de ya tener
+            # ese dato a la hora de hacer los gráficos
+            
+            OpiMaxima = 0
+
+            for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
+                
+                for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+                    
+                    for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
+    
+                        #--------------------------------------------------------------------------------------------
+                    
+                        # Levanto los datos del archivo original y separo los datos en tres listas.
+                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                    
+                        # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
+                        
+                        if Subdividido == True:
+                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
+                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
+                            
+                        else:
+                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
+                            Datos = ldata("../{}/{}".format(Conjunto_Direcciones[0],nombre))
+                        
+                        # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
+                        # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá
+                        
+                        Opi = np.absolute(np.array([float(x) for x in Datos[5][1::]]))
+                        
+                        OpiMaxima = max(max(Opi),OpiMaxima)
+                        
+                        #-----------------------------------------------------------------------------------------------
+                        
             
             #---------------------------------------------------------------------------------------------
 
@@ -343,9 +492,9 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
             
             for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
                 
-                XVAR = Conjunto_Cdelta
-                YVAR1 = []
-                YVAR2 = []
+#                XVAR = Conjunto_Cdelta
+#                YVAR1 = []
+#                YVAR2 = []
                 
                 for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
             
@@ -364,13 +513,24 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                         # Levanto los datos del archivo original y separo los datos en tres listas.
                         # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
                     
-                        Datos = ldata("../{}/{}".format(REDES,nombre))
-                    
+                        # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
+                        
+                        if Subdividido == True:
+                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
+                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
+                            
+                        else:
+                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
+                            Datos = ldata("../{}/{}".format(Conjunto_Direcciones[0],nombre))
+                        
                         # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
                         # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                        Var = np.array([float(x) for x in Datos[1][1::]])
                         
-                        Opi = np.array([float(x) for x in Datos[3][1::]])
+                        Opi0 = np.array([float(x) for x in Datos[1][1::]])
+                        
+                        Var = np.array([float(x) for x in Datos[3][1::]])
+                        
+                        Opi = np.array([float(x) for x in Datos[5][1::]])
                         
                         #-----------------------------------------------------------------------------------------------
                     
@@ -431,11 +591,43 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
     #                    plt.close("Trayectoria Opiniones")
                         
                         #------------------------------------------------------------------------------------------------
-                    """
+                        
+                    
                     # Defino cuáles iteraciones del total voy a graficar
                     Graficar = np.random.choice(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]),1,False)
                     
                     
+                    #-----------------------------------------------------------------------------------------------------
+                    
+                    # Voy a armar los gráficos de histograma 2D acá. Para esto tengo que tomar todas las opiniones
+                    # de un dado alfa y Cdelta, pasarlo como dos arrays a la función y eso me lo grafica, super simple
+                    
+                    # Pongo unos valores en la zona máxima para que el gráfico aparezca siempre lleno y del mismo tamaño.
+                    
+                    OpiExtremos = np.array([OpiMaxima,OpiMaxima,-OpiMaxima,OpiMaxima,OpiMaxima,-OpiMaxima,-OpiMaxima,-OpiMaxima])
+                    Opiniones2D = np.concatenate((OpinionesFinales,OpiExtremos), axis=None)
+                    
+                    
+                    plt.rcParams.update({'font.size': 18})
+                    plt.figure("Histograma2D",figsize=(20,15))
+                    
+                    plt.hist2d(Opiniones2D[0::2],Opiniones2D[1::2],bins=(80,80),cmap=plt.cm.Reds)
+#                        plt.xlim(-2*GM,2*GM)
+#                        plt.ylim(-2*GM,2*GM)
+                    if REDES == "Barabasi":
+                        plt.annotate("Red: Libre de Escala", xy=(0.6,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    if REDES == "RandomRegulars":
+                        plt.annotate("Red: Random Regular", xy=(0.6,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    else:
+                        plt.annotate("Red: {}".format(REDES), xy=(0.6,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    plt.annotate(r"$\alpha$={},cos($\delta$)={},<k>={}".format(ALFA,CDELTA,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    plt.xlabel(r"$x^1$")
+                    plt.ylabel(r"$x^2$")
+                    plt.colorbar()
+                    plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Hist2D_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}.png".format(REDES,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+                    plt.close("Histograma2D")
+                    
+
                     #-----------------------------------------------------------------------------------------------------
                     
                     # Armo el gráfico de las opiniones de los agentes
@@ -458,35 +650,44 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                     #                bottom=False,
                     #                labelleft=False,
                     #                labelbottom=False)
-                    plt.xlabel("Tópico 1")
-                    plt.ylabel("Tópico 2")
-                    plt.xlim(-2*GM,2*GM)
-                    plt.ylim(-2*GM,2*GM)
+                    plt.xlabel(r"$x^1$")
+                    plt.ylabel(r"$x^2$")
+                    plt.xlim(-OpiMaxima,OpiMaxima)
+                    plt.ylim(-OpiMaxima,OpiMaxima)
         #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
         ##                    plt.xlim((xmin,xmax))
         ##                    plt.ylim((ymin,ymax))
-                    plt.annotate("{}".format(EstadoFinal(OpinionesFinales)), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                    plt.annotate("{}".format(EstadoFinal(OpinionesFinales)), xy=(0.45,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
                     plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}.png".format(REDES,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+                    plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}.png".format(REDES,GM,ALFA,CDELTA,AGENTES),bbox_inches = "tight")
                     plt.close("Grafico Opiniones")
                     
-                    #----------------------------------------------------------------------------------------------
                     
+                    #----------------------------------------------------------------------------------------------
+
                     # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
                     # opiniones finales
                     
                     # Voy a agregar un paso extra en esto porque el sistema está teniendo problemas en clasificar algunos casos límite
-                    EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
+                    EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2),("RegionTrans",3)] # EC es Estados y colores. Tiene tuplas con los colores asociados
                     
-                    ResultadoEF = EstadoFinal(OpinionesFinales)
-                            
+                    Bordes = np.round(np.linspace(-OpiMaxima,OpiMaxima,52),3)
+                    Bins = (Bordes[1::]+Bordes[0:len(Bordes)-1])/2
+                    
+                    Histo,nada = np.histogram(OpinionesFinales,bins=Bordes)
+                    
+                    
+                    ResultadoEF = EstadoFinal(OpinionesFinales,Histo,Bins)
+                    
                     # Esto es ya lo mismo que antes, dependiendo de ResultadoEF es el número que va en la matriz ZZ
                     
                     for estado in EC:
                         if ResultadoEF == estado[0]:
                             ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = estado[1]
-                    """     
+                    
+
                     #-----------------------------------------------------------------------------------------------
+                    """
                     
                     # Acá voy a ir juntando los datos para hacer el gráfico de Varianza de las opiniones de cada tópico en función
                     # del Cosdelta. La idea es que para cada Cos(delta) guardo el valor de la varianza de todas las opiniones
@@ -497,8 +698,8 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                     
                     #-----------------------------------------------------------------------------------------------
                     
-                # Una vez que tengo todos los datos de las varianzas de las opinones de los tópicos guardados
-                # hago lso gráficos correspondientes.
+                # Una vez que tengo todos los datos de las varianzas de las opiniones de los tópicos guardados
+                # hago los gráficos correspondientes.
                 
                 plt.rcParams.update({'font.size': 18})
                 plt.figure("Varianza Opiniones",figsize=(20,15))
@@ -506,15 +707,17 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                 plt.plot(XVAR,YVAR2,"-o",linewidth=4,markersize=8, label="Tópico 1")
                 plt.xlabel(r"$Cos(\delta)$")
                 plt.ylabel(r"$\sigma_{(opiniones)}$")
+                plt.ylim(0,180)
                 plt.title(r"Varianza de las opiniones, con $\alpha$={}".format(ALFA))
                 plt.legend()
                 plt.grid()
-                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Varianza_opiniones_alfa={:.3f}_N={}.png".format(REDES,GM,ALFA,AGENTES),bbox_inches = "tight")
+                plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Varianza_opiniones_alfa={:.3f}_N={}.png".format(REDES,GM,ALFA,AGENTES),bbox_inches = "tight")
                 plt.close("Varianza Opiniones")
-                    
-            #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            """
             
+            """
+            #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            
+
             # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
             
             # Armo mi colormap. Para eso armo una lista con los colores que voy a usar,
@@ -526,9 +729,9 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
             # Luego le mando ese colormap al pcolormesh y listo.
             
             
-            colors = [(0, 0.7, 0), (0, 0.3, 1), (1, 0.3, 0)]  #  R -> G -> B 
+            colors = [(0, 0.7, 0), (0, 0.3, 1), (1, 0.3, 0),(0.8, 0, 0.8)] #,(0,0,0)]  #  R -> G -> B -> Viol -> N
             cmap_name = 'Mi_lista'
-            ColMap = LinearSegmentedColormap.from_list(cmap_name, colors, N=3)
+            ColMap = LinearSegmentedColormap.from_list(cmap_name, colors, N=4)
             
             # Defino los parámetros usuales de mi gráfico
             
@@ -540,30 +743,20 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
             
             # Grafico la línea del Alfa Crítico teórico
             
-            Xa = np.arange(-0.55,1.05,0.01)
+            Xa = np.arange(min(Conjunto_Cdelta),max(Conjunto_Cdelta),0.002)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "black",linewidth = 5, label = r"$\alpha_c$ teórico")
             plt.annotate("N={}_Gm={}_Red={}".format(AGENTES,GM,REDES), xy=(0.35,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            
-            # Armo el gráfico del Alfa Crítico experimental
-            
-            Xb = Conjunto_Cdelta
-            Yb = []
-            
-            for columna in range(ZZ.shape[1]):
-                for fila in range(ZZ.shape[0]-1):
-                    if ZZ[fila,columna]!=0 and ZZ[fila+1,columna]==0:
-                        Yb.append((YY[fila,columna]+YY[fila+1,columna])/2)
-                        break
-                        
-            plt.plot(Xb,Yb,"--",color = "yellow",linewidth = 4, label = r"$\alpha_c$ experimental")
             
             # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
             
             plt.legend()
             plt.pcolormesh(XX,YY,ZZ,shading="nearest", cmap = ColMap)
-            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Estados finales EP.png".format(REDES,GM), bbox_inches = "tight")
+            
+            plt.ylim(min(Conjunto_Alfa)-0.0005,max(Conjunto_Alfa)+0.0005)
+            plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Estados finales EP.png".format(REDES,GM), bbox_inches = "tight")
             plt.close("Espacio parametros")
+
 
             #---------------------------------------------------------------------------------------------------
             
@@ -571,19 +764,20 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
             # quiero volver a correr todo de una
             
             np.savetxt("Grafico Fases Red={}_N={}_GM=_{}.csv".format(REDES,AGENTES,GM), ZZ, delimiter = ",")
-            """
+
             # -------------------------------------------------------------------------------------------------
+        
             
-            for TOPICO in [0]:
+            for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
             
+                # Defino los alfas que voy a usar en el gráfico de Distribución de Opiniones
+                
                 plt.rcParams.update({'font.size': 18})
                 
                 fig = plt.figure("Distribucion Opiniones",figsize=(64,36))
                 
                 gs = fig.add_gridspec(4,4,hspace=0,wspace=0)
                 axs = gs.subplots(sharex=True, sharey=True)
-                
-                # Defino los alfas que voy a usar en el gráfico de Distribución de Opiniones
                 
                 Alfas_Dist = [Conjunto_Alfa[int(indice*math.floor(len(Conjunto_Alfa)/16))] for indice in range(0,16)]
                 
@@ -592,38 +786,40 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                 
                 
                 for ALFA,filas,columnas in zip(Alfas_Dist,Filas,Columnas):
-                
-                    CDELTA = 0
-                    icdelta = 0
                     
                     OpinionesFinales = np.array([])
-                    
-            #        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
-        
+    
                     #-------------------------------------------------------------------------------------
                     for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
-                        if nombre.split("_")[1] == "Opiniones":
+#                        if nombre.split("_")[1] == "Opiniones":
                 
-                            #--------------------------------------------------------------------------------------------
+                        #--------------------------------------------------------------------------------------------
+                    
+                        # Levanto los datos del archivo original y separo los datos en tres listas.
+                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                    
+                        if Subdividido == True:
+                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
+                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
+                            
+                        else:
+                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
+                            Datos = ldata("../{}/{}".format(Conjunto_Direcciones[0],nombre))
                         
-                            # Levanto los datos del archivo original y separo los datos en tres listas.
-                            # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                        # Array con los valores de opiniones finales del sistema
                         
-                            Datos = ldata("{}/{}".format(Archivos_Datos[0],nombre))
-                            
-                            # Array con los valores de opiniones finales del sistema
-                            Opi = np.array([float(x) for x in Datos[3][1::]])
-                            
-                            #-------------------------------------------------------------------------------------------------
-                            
-                            # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
-                            # para después sobre esos datos determinar el estado final del sistema
-                            
-                            OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
-                            
-                            # Con esto me armo el array de estados finales de mi sistema
-                            
-                
+                        Opi = np.array([float(x) for x in Datos[5][1::]])
+                        
+                        #-------------------------------------------------------------------------------------------------
+                        
+                        # Ahora lo que voy a hacer es tomar el estado final del sistema y guardarlo en un array
+                        # para después sobre esos datos determinar el estado final del sistema
+                        
+                        OpinionesFinales = np.concatenate((OpinionesFinales,Opi), axis=None)
+                        
+                        # Con esto me armo el array de estados finales de mi sistema
+                        
+            
                 # -------------------------------------------------------------------------------------------------
                     
                     # Acá voy a armar los gráficos de las proyecciones de las opiniones de los agentes. Para eso simplemente
@@ -631,35 +827,49 @@ for REDES in ["Erdos-Renyi"]:  #["ERZoom"]
                     # con np.histogram y luego graficar eso como líneas.
                     
                     
+                    Bordes = np.round(np.linspace(-OpiMaxima,OpiMaxima,52),3)
+                    Bins = (Bordes[1::]+Bordes[0:len(Bordes)-1])/2
+                    
+                    Histo,nada = np.histogram(OpinionesFinales,bins=Bordes)
+                    
+                    ResultadoEF = EstadoFinal(OpinionesFinales,Histo,Bins)
+                    
+                    
                     # Armo los histogramas correspondientes
-                    Histo,Bins = np.histogram(OpinionesFinales[TOPICO::2],bins=70)
+                    Histo,nada = np.histogram(OpinionesFinales,bins=Bordes,density=True)
+                    
+                    # Defino el tema de los colores
+                    if ResultadoEF == "Consenso":
+                        color = "green"
+                    elif ResultadoEF == "Polarizacion":
+                        color = "blue"
+                    elif ResultadoEF == "Ideologico":
+                        color = "red"
+                    elif ResultadoEF == "RegionTrans":
+                        color = "purple"
+                    
                     
                     # Ahora grafico las curvas de distribución de ambas opiniones
-                    axs[filas,columnas].plot((Bins[0:len(Bins)-1]+Bins[1::])/2,Histo,"-o",linewidth = 4,markersize = 8, label="Alfa = {}".format(ALFA))
+                    axs[filas,columnas].plot(Bins,Histo,"-o",color = color,linewidth = 4,markersize = 8, label="Alfa = {}".format(ALFA))
                     axs[filas,columnas].legend()
                     axs[filas,columnas].grid()
                 
                 
                 
-#                for ax in axs.flat:
-#                    ax.label_outer()
-#                plt.xlabel("Opinion")
-#                plt.ylabel("Cuentas")
-#                plt.xlim(-15,30)
-#                plt.title(r"Datos {}, Distribucion Topico {}, Cos($\delta$)=0, <k>={}, $\alpha_C$={}".format(REDES,TOPICO,GM,AlfaC(0,GM)))
-#                plt.legend()
-#                plt.grid()
+    #                for ax in axs.flat:
+    #                    ax.label_outer()
+    #                plt.xlabel("Opinion")
+    #                plt.ylabel("Cuentas")
+    #                plt.xlim(-OpiMaxima,OpiMaxima)
+    #                plt.title(r"Datos {}, Cos($\delta$)=0, <k>={}, $\alpha_C$={}".format(REDES,GM,AlfaC(0,GM)))
+    #                plt.legend()
+    #                plt.grid()
                 
-                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Distribucion_opiniones_T={}_Cdelta={:.1f}_N={}_GM={}.png".format(REDES,GM,TOPICO,CDELTA,AGENTES,GM),bbox_inches = "tight")
-#                plt.show()
+                plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Distribucion_opiniones_Cdelta={:.2f}_N={}_GM={}.png".format(REDES,GM,CDELTA,AGENTES,GM),bbox_inches = "tight")
+    #                plt.show()
                 plt.close("Distribucion Opiniones")
                 
                 #--------------------------------------------------------------------------------------------------------
-
-
-
-
-
 
 
 Tiempo()

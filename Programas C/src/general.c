@@ -16,7 +16,7 @@ double Random(){
 // Esta función me da un valor tomado de una distribución gaussiana con valor medio mu y desviación sigma
 double Gaussiana(float f_mu, float f_sigma){
 	// Defino mis variables iniciales
-	int i_n=10;
+	int i_n=100;
 	double d_z=0;
 	
 	// Genero el número que voy a obtener de mi Gaussiana.
@@ -198,7 +198,7 @@ int Escribir_i(int *pi_vec, FILE *pa_archivo){
 }
 
 // Esta función me mide el tamao del grupo al cual pertenece el nodo inicial: i_inicial
-int Tamao_Comunidad(int *pi_adyacencia, int i_inicial){
+int Tamano_Comunidad(int *pi_adyacencia, int i_inicial){
 	// Defino la variable del tamao del grupo, el número de filas de la matriz de Adyacencia, el número de agentes
 	// restantes por visitar; y los inicializo
 	int i_tamao, i_F, i_restantes;

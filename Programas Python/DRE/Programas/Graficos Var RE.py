@@ -114,27 +114,67 @@ def Indice_Color(vector,Divisiones):
 # Finalmente, si algunos de estos productos me dan positivos y otros negativos,
 # entonces estoy en Polarización Descorrelacionada.
 
-def EstadoFinal(Array):
-        
-    # Primero veo el caso de que hayan tendido a cero
+def EstadoFinal(Array,Histo,Bins):
     
-    ArrayAbs = np.absolute(Array)
-    if max(ArrayAbs)<0.01:
+
+    # Primero identifico los tres posibles picos
+    
+    Nbins = len(Bins) # Esto es la cantidad de bins totales en los que dividí mi distribución
+    
+    Pcero = Histo[int((Nbins-1)/2)] # Esto es cuánto mide el pico en cero
+    
+    DistNegativa = Histo[0:int((Nbins-1)/2)] # Este es la distribución de las opiniones negativas
+    Pmenos = max(DistNegativa) # Esto es la altura del pico de Distribución negativa
+    
+    DistPositiva = Histo[int((Nbins-1)/2)+1::] # Este es la distribución de las opiniones positivas
+    Pmas = max(DistPositiva) # Esto es la altura del pico de Distribución positiva
+    
+    ###########################################################################
+    
+    # Ahora que tengo los picos, puedo empezar a definir el tema de los estados
+    #finales. Arranco por el Consenso
+    
+    if Pcero > 1.1*Pmenos and Pcero > 1.1*Pmas:
         return "Consenso"
     
-    #----------------------------------------------------------
-    # Ahora veamos los otros dos casos. Primero voy a armar
-    # un array que tenga las opiniones del tópico 1, y otro
-    # con las opiniones del tópico 2.
+    ###########################################################################
     
-    ArrayT1 = Array[0::2]
-    ArrayT2 = Array[1::2]    
-    ArrayProd = np.sign(np.multiply(ArrayT1,ArrayT2))
+    # Ahora veamos el caso de región de transición. Este estado
+    # Lo caracterizo porque el sistema tiene un pico central y picos por fuera
+    # que son comparables.
     
-    if -1 in ArrayProd:
-        return "Polarizacion"
-    else:
-        return "Ideologico"
+    Pmaximo = max(Pcero,Pmas,Pmenos)
+    
+    if Pmaximo*0.9 < Pcero < Pmaximo*1.1 and Pmaximo*0.9 < Pmas < Pmaximo*1.1 and Pmaximo*0.9 < Pmenos < Pmaximo*1.1 :
+        return "RegionTrans"
+    
+    ###########################################################################
+    
+#    indicemenos = np.where(DistNegativa == Pmenos)[0][0]
+#    indicemas = np.where(DistPositiva == Pmas)[0][0]
+    
+    if Pcero == min(Pcero,Pmas,Pmenos) and Pcero < Pmaximo*0.9:
+        
+        # Ahora veamos los otros dos casos. Primero voy a armar
+        # un array que tenga las opiniones del tópico 1, y otro
+        # con las opiniones del tópico 2.
+        
+        ArrayCuad = ClasificacionCuadrantes(Array)
+        
+        Cant1 = np.count_nonzero(ArrayCuad == 1)
+        Cant2 = np.count_nonzero(ArrayCuad == 2)
+        Cant3 = np.count_nonzero(ArrayCuad == 3)
+        Cant4 = np.count_nonzero(ArrayCuad == 4)
+        
+        if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
+            return "Ideologico"
+        elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
+            return "Ideologico"
+        else:
+            return "Polarizacion"
+    
+    return "NoDefinido"
+
 
 
 # Voy a definir una función que tome un array con opiniones del sistema y me 
@@ -201,121 +241,171 @@ t0 = time.time()
 #-------------------------------------------------------------------------------------
 SuperDiccionario = dict()
 
+T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
+# pero no tenía dónde más definirlo
+
 for REDES in ["Erdos-Renyi"]:
 
 
-    # Primero levanto datos de la carpeta de la red REDES
+    # Este parámetro llamado Subdividido es algo que defino yo a mano para definir si estoy leyendo una 
+    # carpeta donde los archivos de datos están divididos en 4 carpetas, o si están todos mezclados en
+    # la carpeta. Empecé a hacer esto de dividirlos porque Pablo me dijo que era necesario.
+    Subdividido = True
     
-    CarpCheck=[[root,files] for root,dirs,files in os.walk("../{}".format(REDES))]
+    # Primero levanto datos de los nombres de los archivos de mis redes. Para eso es importante notar
+    # que mis archivos ahora van a empezar a tener cuatro carpetas donde los valores de GM estén
+    # diferenciados. Para eso necesita que el programa distinga cuántas carpetas hay en la carpeta
+    # principal y que me arme la lista de archivos dentro de cada carpeta. Voy a armar un segundo código
+    # pensado en levantar los archivos de las carpetas que tienen los archivos separados en 4 carpetas
+    # según GM. Luego activo el código en función de la carpeta de la cual voy a levantar datos.
     
-    # El elemento en la posición x[0] es el nombre de la carpeta
+    # CÓDIGO PARA LEVANTAR DATOS DE UNA CARPETA SUBDIVIDIDA EN 4 CARPETAS SEGÚN EL GM DE LOS ARCHIVOS.
     
-    for x in CarpCheck:
-        # dada = x[0].split("\\")
-        Archivos_Datos = [nombre for nombre in x[1]]
-        Archivos_Datos.insert(0,x[0])
+    if Subdividido == True:
     
-    # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
-    # Archivos_Datos tiene en la primer coordenada el principio de la dirección
-    # de la carpeta, y el resto de elementos son los archivos en la carpeta.
-    
-    #---------------------------------------------------------------------------------------------
-    
-    # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
-    
-    Conjunto_Alfa = []
-    Conjunto_Cdelta = []
-    Conjunto_N = []
-    Conjunto_Gm = []
-    
-    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-        alfa = float(nombre.split("_")[2].split("=")[1])
-        Cdelta = float(nombre.split("_")[3].split("=")[1])
-        N = int(nombre.split("_")[4].split("=")[1])
-        Gm = int(nombre.split("_")[5].split("=")[1])
-        if alfa not in Conjunto_Alfa:
-            Conjunto_Alfa.append(alfa)
-        if Cdelta not in Conjunto_Cdelta:
-            Conjunto_Cdelta.append(Cdelta)
-        if N not in Conjunto_N:
-            Conjunto_N.append(N)
-        if Gm not in Conjunto_Gm:
-            Conjunto_Gm.append(Gm)
-    
-    Conjunto_Alfa.sort()
-    Conjunto_Cdelta.sort()
-    Conjunto_N.sort()
-    Conjunto_Gm.sort()
-    
-    # Bien, esto ya me arma el conjunto de Alfas, Cdelta, N y Gm correctamente y ordenados
-    # Ahora podemos pasar a lo importante de esta celda
-    
-    #--------------------------------------------------------------------------------------------
-    
-    # Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
-    # a un cierto N, Alfa, Cdelta y Gm. Me armo primero el superdiccionario, que es el diccionario,
-    # que contiene diccionarios, que llevan a diccionarios que lleva a diccionarios
-    # que lleva a diccionarios que llevan a las listas de los nombres
-    # de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa,
-    # el Cdelta, el tipo de red y el Gm respectivos. 
-    # Entonces la lista se accede sabiendo el Alfa, Cdelta y N correspondiente de antemano.
-    
-    SuperDiccionario[REDES] = dict()
-    
-    for AGENTES in Conjunto_N:
-        SuperDiccionario[REDES][AGENTES] = dict()
-        for ALFA in Conjunto_Alfa:
-            for CDELTA in Conjunto_Cdelta:
-                for GM in Conjunto_Gm:
-                    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-                        alfa = float(nombre.split("_")[2].split("=")[1])
-                        Cdelta = float(nombre.split("_")[3].split("=")[1])
-                        N = int(nombre.split("_")[4].split("=")[1])
-                        gm = int(nombre.split("_")[5].split("=")[1])
-                        if N==AGENTES and alfa==ALFA and Cdelta==CDELTA and gm==GM:
-                            if gm not in SuperDiccionario[REDES][AGENTES].keys():
-                                SuperDiccionario[REDES][AGENTES][GM] = dict()
-                            if alfa not in SuperDiccionario[REDES][AGENTES][GM].keys():
-                                SuperDiccionario[REDES][AGENTES][GM][ALFA] = dict()
-                            if Cdelta not in SuperDiccionario[REDES][AGENTES][GM][ALFA].keys():
-                                SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA] = []
-                            else:
-                                break
-                    
-                
-    
-    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-        alfa = float(nombre.split("_")[2].split("=")[1])
-        Cdelta = float(nombre.split("_")[3].split("=")[1])
-        N = int(nombre.split("_")[4].split("=")[1])
-        gm = int(nombre.split("_")[5].split("=")[1])
-        SuperDiccionario[REDES][N][gm][alfa][Cdelta].append(nombre)
+        CarpCheck=[[root,dirs,files] for root,dirs,files in os.walk("../NCC/{}".format(REDES))]
         
-    # Ya mejoré el armado del SuperDiccionario de manera de que cada N tenga los Alfa y cada
-    # Alfa tenga los Cdelta y cada Cdelta tenga los GM correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
-    # de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
-    # Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
-    # armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
-    # definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
-    # iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
+        # En este caso lo mejor sería armar un diccionario en el cual guardaré los nombres
+        # de los archivos y usaré el GM como índice. Para eso primero tengo que tomar el
+        # nombre de la carpeta en la que se encuentra y de ahí extraer el número del GM.
+        # El nombre es del estilo "../$Carpeta$/$Red$\\GM=$$". Entonces si no me equivoco,
+        # puedo simplemente hacerle un split("=") y con eso ya saco el GM.
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        Diccionario_Datos = dict()
+        for indice in range(len(CarpCheck[0][1])):
+            Gm = int(CarpCheck[0][1][indice].split("=")[1])
+            if len(CarpCheck[indice+1][2]) > 0:
+                Diccionario_Datos[Gm] = [nombre for nombre in CarpCheck[indice+1][2]]
+                Diccionario_Datos[Gm].insert(0,CarpCheck[indice+1][0])
+                
+        
+        
+        # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
+        # Archivos_Datos tiene en la primer coordenada el principio de la dirección
+        # de la carpeta, y el resto de elementos son los archivos en la carpeta.
+        
+        #---------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = []
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for gradom in Diccionario_Datos.keys():
+            Archivos_Datos = Diccionario_Datos[gradom]
+            Gm = gradom
+            Conjunto_Direcciones.append(Archivos_Datos[0])
+            for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+                alfa = float(nombre.split("_")[2].split("=")[1])
+                Cdelta = float(nombre.split("_")[3].split("=")[1])
+                N = int(nombre.split("_")[4].split("=")[1])
+                if N not in SuperDiccionario[REDES].keys():
+                    SuperDiccionario[REDES][N] = dict()
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Gm not in SuperDiccionario[REDES][N].keys():
+                    SuperDiccionario[REDES][N][Gm] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+                else:
+                    SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
 
-#--------------------------------------------------------------------------------------------
-    
-    
-# Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
-# la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
-# las keys de mi SuperDiccionario.
 
-for REDES in ["Erdos-Renyi"]:    
+
+        Conjunto_Direcciones.sort(key = lambda direccion: int(direccion.split("=")[1]))
+        
+        
+        
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+        # No organizo el Conjunto_Gm para que vaya en el mismo orden que el Conjunto_Direcciones
+        
+        #-------------------------------------------------------------------------------------------------------
+
+    
+    else:    
+        # CÓDIGO PARA LEVANTAR ARCHIVOS DE UNA CARPETA CON TODOS LOS ARCHIVOS MEZCLADOS
+        
+        CarpCheck=[[root,files] for root,dirs,files in os.walk("../NCC/{}".format(REDES))]
+        
+        # El elemento en la posición x[0] es el nombre de la carpeta
+        
+        for x in CarpCheck:
+            # dada = x[0].split("\\")
+            Archivos_Datos = [nombre for nombre in x[1]]
+            Archivos_Datos.insert(0,x[0])
+            
+        
+    
+        #-------------------------------------------------------------------------------------------------------
+        
+        # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Gm=$_ID=$_Iter=$"
+        
+        Conjunto_Direcciones = [Archivos_Datos[0]]
+        
+        SuperDiccionario[REDES] = dict()
+        
+        for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+            alfa = float(nombre.split("_")[2].split("=")[1])
+            Cdelta = float(nombre.split("_")[3].split("=")[1])
+            N = int(nombre.split("_")[4].split("=")[1])
+            Gm = int(nombre.split("_")[5].split("=")[1])
+            if N not in SuperDiccionario[REDES].keys():
+                SuperDiccionario[REDES][N] = dict()
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Gm not in SuperDiccionario[REDES][N].keys():
+                SuperDiccionario[REDES][N][Gm] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif alfa not in SuperDiccionario[REDES][N][Gm].keys():
+                SuperDiccionario[REDES][N][Gm][alfa] = dict()
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            elif Cdelta not in SuperDiccionario[REDES][N][Gm][alfa].keys():
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta] = [nombre]
+            else:
+                SuperDiccionario[REDES][N][Gm][alfa][Cdelta].append(nombre)
+
+        
+        # Le hice una modificación a esta parte del código, ahora esto trabaja
+        # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+        # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+        # es mucho más rápido.
+        
+
+    #--------------------------------------------------------------------------------------------
+        
+        
+    # Empiezo iterando el N desde acá porque lo que voy a hacer es que al iniciar
+    # la iteración en N, defino mis Conjunto_Alfa y Conjunto_Cdelta en función de
+    # las keys de mi SuperDiccionario.
+
+
     for AGENTES in [1000]:
 
         Conjunto_Gm = list(SuperDiccionario[REDES][AGENTES].keys())
+        Conjunto_Gm.sort()
 
-        for GM in [12]:  #Conjunto_Gm:
+        for GM,igm in zip(Conjunto_Gm,np.arange(len(Conjunto_Gm))):
             
             Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
-        
             Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
+            
+            Conjunto_Cdelta.sort()
             
             # Primero me armo los grid para el gráfico de las fases. Para eso
             # primero tengo que armarme un array y con el np.meshgrid armarme 
@@ -360,6 +450,7 @@ for REDES in ["Erdos-Renyi"]:
                     # para cada combinación de Alfas y Cdelta
                     # Creo el array Maximos 
                     
+                    
                     TideSi = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
                     Promedios = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
 #                    plt.rcParams.update({'font.size': 18})
@@ -368,22 +459,31 @@ for REDES in ["Erdos-Renyi"]:
                     Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA])))
                     
                     #-------------------------------------------------------------------------------------
+                    
                     for nombre,numero in zip (SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA],np.arange(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))):
-
+    
                         #--------------------------------------------------------------------------------------------
                     
-                        # Levanto los datos del archivo original y separo los datos en tres listas.
-                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
-                    
-                        Datos = ldata("../{}/{}".format(REDES,nombre))
-                    
+                        # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
+                        
+                        if Subdividido == True:
+                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
+                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
+                            
+                        else:
+                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
+                            Datos = ldata("../{}/{}".format(Conjunto_Direcciones[0],nombre))
+                        
                         # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
                         # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                        Var = np.array([float(x) for x in Datos[1][1::]])
                         
-                        Opi = np.array([float(x) for x in Datos[3][1::]])
-                    
-                        #----------------------------------------------------------------------------------------------
+                        Opi0 = np.array([float(x) for x in Datos[1][1::]])
+                        
+                        Var = np.array([float(x) for x in Datos[3][1::]])
+                        
+                        Opi = np.array([float(x) for x in Datos[5][1::]])
+                        
+                        #-----------------------------------------------------------------------------------------------
                         """
                         # Para algunos valores de dt me ocurre que el sistema llega a valores de variación cero muy rápido.
                         # Eso en el gráfico de logaritmo lo único que hace es incluir muchos valores del eje x en los
@@ -560,13 +660,13 @@ for REDES in ["Erdos-Renyi"]:
             plt.figure("Cuantil TideSi",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
-            plt.title("Largo del Cuantil del Tiempo de Simulación en el espacio de parámetros")
+            plt.title("Amplitud del Tiempo de Simulación en el espacio de parámetros")
         
             # Grafico la línea del Alfa Crítico teórico
         
-            Xa = np.arange(-0.55,1.05,0.01)
+            Xa = np.arange(min(Conjunto_Cdelta),max(Conjunto_Cdelta),0.002)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "red",linewidth = 5, label = r"$\alpha_c$ teórico")
         
             # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
         
@@ -574,7 +674,7 @@ for REDES in ["Erdos-Renyi"]:
             plt.pcolormesh(XX,YY,ZZV,shading="nearest", cmap = "plasma")
             plt.colorbar()
             plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Cuantil EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Cuantil EP.png".format(REDES,GM), bbox_inches = "tight")
             plt.close("Cuantil TideSi")
         #     plt.show()
         
@@ -588,13 +688,13 @@ for REDES in ["Erdos-Renyi"]:
             plt.figure("Promedios EP",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
-            plt.title("Promedios de Opiniones en el espacio de parámetros")
+            plt.title("Promedios de Opiniones en el Espacio de Parámetros")
         #
         #    # Grafico la línea del Alfa Crítico teórico
         #
-            Xa = np.arange(-0.55,1.05,0.01)
+            Xa = np.arange(min(Conjunto_Cdelta)+0.1,max(Conjunto_Cdelta)-0.1,0.002)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "red",linewidth = 5, label = r"$\alpha_c$ teórico")
         #
         #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
         #
@@ -602,7 +702,7 @@ for REDES in ["Erdos-Renyi"]:
             plt.pcolormesh(XX,YY,ZZP,shading="nearest", cmap = "viridis")
             plt.colorbar()
             plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Promedios EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Promedios EP.png".format(REDES,GM), bbox_inches = "tight")
             plt.close("Promedios EP")
         #     plt.show()
         
@@ -616,13 +716,13 @@ for REDES in ["Erdos-Renyi"]:
             plt.figure("Entropia EP",figsize=(20,12))
             plt.xlabel(r"cos($\delta$)")
             plt.ylabel(r"$\alpha$")
-            plt.title("Entropía de distribuciones en el espacio de parámetros")
+            plt.title("Entropía de las Distribuciones en el Espacio de Parámetros")
         #
         #    # Grafico la línea del Alfa Crítico teórico
         
-            Xa = np.arange(-0.55,1.05,0.01)
+            Xa = np.arange(min(Conjunto_Cdelta)+0.1,max(Conjunto_Cdelta)-0.1,0.002)
             Ya = np.array([AlfaC(x,GM) for x in Xa])
-            plt.plot(Xa,Ya,"--",color = "white",linewidth = 4, label = r"$\alpha_c$ teórico")
+            plt.plot(Xa,Ya,"--",color = "red",linewidth = 4, label = r"$\alpha_c$ teórico")
         #
         #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colores creado por mi.
         #
@@ -630,7 +730,7 @@ for REDES in ["Erdos-Renyi"]:
             plt.pcolormesh(XX,YY,ZZE,shading="nearest", cmap = "viridis")
             plt.colorbar()
             plt.annotate("Red={}, Gm={}".format(REDES,GM), xy=(0.6,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-            plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Entropía EP.png".format(REDES,GM), bbox_inches = "tight")
+            plt.savefig("../../../Imagenes/Redes Estáticas/NCC/{}/GM={}/Entropía EP.png".format(REDES,GM), bbox_inches = "tight")
             plt.close("Entropia EP")
         #     plt.show()
         

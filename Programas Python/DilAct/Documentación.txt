@@ -103,3 +103,29 @@ con distribución gaussiana centrada en cero y varianza cuadrada de 2,5.
 Para estos datos no me guardé los datos de Actividades y grado Medio porque
 entiendo que ya habíamos visto que eso daba bien y no era necesario seguir
 registrándolo.
+
+.) Actividad Acumulada:
+------------------------
+En esta carpeta voy a guardar un archivo con los valores de la matriz de Adyacencia
+para una red de Actividad. La idea es levantar estos datos y con eso armar una
+red que se va acumulando en Python. Los parámetros usados para esto es m=5,
+N=1000, dt=0,01, epsilo=0,001, gamma=2,8 y rearmé la red 500 veces.
+
+.) AcRedes:
+------------
+En esta carpeta la idea es armar datos de redes de Actividad que se van
+acumulando a medida que evoluciona el proceso. Esto debería decantar
+en un sistema que converge a algo, a diferencia de la idea de usar
+una red que se arma y desarma constantemente.
+
+.) ActividadConexa:
+--------------------
+En esta carpeta se guardan los datos del trabajo de redes de Actividad que se acumulan
+hasta que la red se vuelve conexa. En ese punto la red deja de crecer y el sistema
+se deja evolucionar hasta alcanzar algún estado final. La idea es que si la red es conexa
+este modelo de Actividad debería terminar creando redes similares a las de Barabassi, por
+lo que como sabemos que esas redes convergen, estas deberían converger también.
+ Para este conjunto de datos estamos guardando no sólo las opiniones finales, sino también
+los datos de los agentes testigos y en los archivos de Datos Opinioens agregué al final
+una fila extra con datos de los grados de los agentes, de manera de tener eso como info
+extra del sistema.
