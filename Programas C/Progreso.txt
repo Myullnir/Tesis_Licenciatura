@@ -5575,7 +5575,7 @@ sino hacerlo en los captions generales.
 .) Al final quedan los gráficos de Hist2D. Además, ponerlos todos en una sola fila.
 Sacar los de Gráficos de Opiniones.
 .) En la parte de Implementación Numérica agregar el gráfico de alfa crítico
-en función de grado medio, y también ver de armar ese mismo gráfico para red de Erdos-Renyi.
+en función de grado medio, y también ver de armar ese mismo gráfico para red de Barabasi.
 Podría armar eso en un sólo gráfico, una sola fila.
 .) Revisar que los criterios estén claros, yo diría que la parte de transición no está bien
 definida.
@@ -5610,3 +5610,575 @@ Ok, el plan para mañana es este. Armar gráficos de 6x6 como los de Distribución 
 Opiniones. Después probarlo en mi pc. Si funca, mandarlo a Oporto a correr.
 Mientras esto se resuelve, hacer lo de DinaReg. Resuelto eso, ir completando
 los detalles del capítulo 3. Entre mañana y el viernes tiene que estar terminado.
+
+------------------------------------------------------------------------------------------
+
+25/11/2021
+
+Luego de muchos desvíos y cosas que me hicieron distraerme, ya mandé a correr
+en la pc de Oporto el archivo de gráficos de Variación promedio en función del tiempo. 
+La idea es ver si efectivamente estoy teniendo un tema de que los sistemas tienen
+problemas en su convergencia o si es un tema de un artefacto en las mediciones.
+La verdad, parece que es un tema de las mediciones, quizás pasa por la cuestión del
+criterio de corte usado.
+
+¿Tengo tiempo para rearmar estos datos? Si lo fuera a hacer, armaría un barrido en
+Alfa entre 0 y 0,5 y en Cdelta entre -0,5 y 0,5. Me movería en Alfa de a 0,025 y en
+Cdelta de a 0,05. Eso serían 20 pasos para el Alfa y 20 para el Cdelta, aprox.
+Luego le doy 40 iteraciones a cada punto de ensamble y listo. Lo otro extra 
+es que hay que asegurarse de que estén todas las condiciones igual que
+antes, K=1, dt=0,01 y así. De paso, obvio que esto sería para ver si con
+el NCC esto se corrige.
+
+Lo otro que tengo que hacer después es ir armando los gráficos de Dinámica en las
+Regiones.
+
+Estoy actualmente cambiando los mains en Oporto así mando a correr los datos
+de la red de Erdos-Renyi que recorre el espacio que mencioné antes. Eso me
+va a ayudar a probar si el problema de la Dispersión en los datos de Varianza
+está dado por que el cálculo no es muy robusto en la convergencia del sistema.
+Así que para dejar constancia, el que es exsrc tiene los datos que arman las redes
+de ActividadConexa, para lo cual yo considero que tengo datos suficientes.
+En cambio src tiene los datos que arman las redes generales estáticas.
+Para correr esos datos ya ajusté el Metainstanciación para que levante datos
+de Instanciar2.sh, en vez de Instanciar.sh. Si en el futuro quiero rellenar
+un poco más la región de ActividadConexa, ya sé que tengo que usar el
+Instanciar.sh y cambiar el exsrc a src.
+
+Mandé a correr esto de una forma absurdamente rara, son 15 hilos con un sólo
+Alfa, y 3 hilos con 2 alfas. Eso me da un total de 21 alfas, que es lo
+correcto porque justamente de 0 a 0,5 de a 0,025 son 21 pasos, contando el 0.
+Cuestión que con esto me robé 18 hilos. Para eso me robaba los 20, que miserable.
+
+Voy a hacer los gráficos de DinaReg. Para el caso de Consenso armé un gráfico de
+una sola iteración. Ahora tengo que ver de combinar iteraciones para el caso de 
+Polarización.
+
+Ya armé los gráficos de la Dinámica de las distintas regiones. Con esto,
+sólo queda ver el tema de los gráficos de Dispersión de los tiempos de Simulación
+y ya podemos definitivamente dar por terminado el capítulo 3 en lo que a armar
+gráficos respecta. Después queda el organizarlos, poner las descripciones y charlas
+correspondientes. Si me apuro, hoy podría arrancar con el análisis de los datos
+de Actividad Conexa.
+
+Si quisiera armar el gráfico de alfa crítico en función de grado medio para Barabasi
+tendría que armar algunos datos extra para GM= 4 y 8. Considerando que sólo tendría que
+hacer eso para Cdelta=0 y que sólo necesitaría entre 30 y 40 iteraciones, no parece
+tanto trabajo pedir eso. Supongo que puedo mandar a hacerlo, agregar los datos
+a los que ya tengo en Algarve, así complemento los datos de NCC y con eso me
+resuelvo ese gráfico. Hagamos eso.
+
+¿En qué regiones tengo que investigar? Voy a investigar 30 alfas por debajo. Para
+eso voy a recorrer lo siguiente:
+.) gm=4: [0,21;0,24]
+.) gm=8: [0,055:0,085]
+
+Eso lo voy a hacer para Cdelta=0 con 40 iteraciones. Ya lo mandé a correr con 10
+hilos en total. Esto debería estar terminado en unas 6 horas. De paso, le hice
+muchos cambios al código de EstadosFinales.py con el objetivo de que sólo arme las
+Distribuciones de Opiniones de Cdelta=0 que estoy preparando. Prestale atención
+porque eso tiene pinta de que va a tirar altos errores. Dios quiera que funque
+bien. Creo que para evitar errores también borraré los gráficos de Distribución
+de gm=4 y 8 cosa de que sea fácil encontrarlos y ver que el programa grafica bien.
+
+Para dejar en claro, tengo DOS problemas para cerrar. El primero es el de
+que los grados medios 4 dan muy mal en la dispersión. Para eso es que tengo
+en Oporto unos datos armándose en una carpeta llamada NuevaD. Esa carpeta contiene
+datos de sistemas evolucionados con el nuevo criterio de Corte que revisa 20
+pasos previos. El objetivo de eso sería ver si con un criterio de corte
+más robusto, los cálculos de la Variación Promedio y los tiempos de convergencia del
+sistema se estabilizan, haciendo que esa cosa fea de la dispersión que se ve en GM=4 desaparezca.
+
+El segundo problema es el de que estoy armándome el gráfico de alfa crítico
+en función del grado medio para la red de Barabasi y para eso quiero revisar los datos
+de NCC para que el armado del gráfico sea más correcto. El tema es que no tengo
+datos de la región de GM=4 y GM=8 en NCC, así que estoy armando datos nuevos
+en el Cdelta=0 y el objetivo sería poder armar un nuevo gráfico de Distribución
+de Opiniones con el cual poder determinar la región de transición en esos grados medios
+para la red de Barabasi.
+
+Normalizar por el valor de Dispersión media de correspondiente a cada punto de ensamble
+no resolvió el problema. Efectivamente parece que eso que estamos viendo realmente está ahí.
+
+Para mañana tengo que hacer primero 4 cosas:
+.) Corregir a Turquieto
+.) Mensaje a Lea
+.) Mensaje a Osdop
+.) Mensaje a Facultad por Toma de Decisiones.
+
+Para terminar el capítulo:
+.) Escribir lo que falta de Dispersión
+.) Escribir lo que falta de Entropía
+.) Escribir lo de Dinámica en las regiones
+.) Revisar lo de la dispersión en GM=4
+.) Armar el gráfico de alfa crítico vs grado medio para Barabasi
+
+Mandé los mails, corregí lo de Turquieto, escribí lo de la Dispersión, la entropía
+y lo de la Dinámica en las regiones. Ahora debería revisar los datos para
+hacer lo del alfa crítico vs grado medio de Barabasi y lo de la
+dispersión para GM=4
+
+Están armándose los gráficos de NuevaD en Oporto. Ahora a mandar a armar lo
+suyo en Algarve. Eso va a funcionar TAAAAAN mal. Bueno, sorpresa de nadie,
+algo salió mal. Lo raro es que dice que hay un error de Key al intentar ingresar
+al SuperDiccionario con -0,1. Eso sólo puede ser un Coseno Delta,
+pero no entiendo porqué entraría con Cdelta usando ese valor.
+Lo de Oporto se hizo, no tiró error. Veamos que tal.
+
+-------------------------------------------------------------------------------------------
+
+28/11/2021
+
+Lo de Algarve se hizo, pero los datos de GM=4 no barren la región en la cual la red
+de Barabasi pasan del Consenso a la Polarización. Por tanto, decidí mandar a correr
+una tira de datos un 0,03 alfa por debajo. Con eso ya debería tener suficiente y
+dar por finalizada esa parte de los datos. De paso, tengo que estar atento a que
+modifiqué el archivo que debería usar para las cuentas de Actividad Conexa técnicamente.
+Pero bueno, supongo que no será mucho problema eso.
+
+Por el otro, los datos de GM=4 de Dispersión dan un poco mejor, pero no es una locura de mejor.
+Ahora mismo mandé a hacer los gráficos de Variación Promedio en función del tiempo. Veamos
+que se observa en este caso.
+
+La situación entonces es que:
+.) Tengo los datos de Actividad Conexa y podría arrancar con armar el código para analizarlos.
+.) Los datos de GM=4 estoy sacando unos gráficos extra para mirarlos y después charlamos con
+Seba y Pablo al respecto.
+.) Para armar el gráfico de alfa crítico vs grado medio de Barabasi me faltan unos datos
+que se están armando en Algarve y ya puedo armar ese gráfico tranca.
+
+Efectivamente sigue estando esto, pero ahora está más controlado. Quizás, con una condición
+más exigente en el criterio de Convergencia la cosa de mejor. Charlarlo con Pablo y Sebas el lunes.
+Ahora mejor ponerme con el resto de cosas.
+
+Después de comer van a estar terminados los datos de Barabasi GM=4 para poder armar el gráfico de
+alfa crítico vs grado medio del sistema. Ahora lo mejor es arrancar a estudiar los datos de
+Actividad Conexa. Esos datos si no recuerdo mal los tengo en Oporto, y para analizarlos
+entonces mejor arrancar preparando la carpeta asociada y cosas.
+
+Los archivos de ActividadConexa se dividen en dos tipos. Los archivos: Datos_Opiniones
+y los archivos Datos_Testigos. Los Datos_Opiniones tienen los siguientes datos, en orden:
+.) Opinión Inicial
+.) Variación Promedio
+.) Opinión Final
+.) Grado de Agentes
+.) Actividad de Agentes
+.) Semilla
+
+En cambio los datos de Testigos tienen:
+.) Actividad de Agentes
+.) Evolución de las opiniones de un conjunto de 5 agentes.
+
+Sí, increíblemente me guardé la actividad en dos archivos distintos. Usando los datos de las Opiniones
+Finales puedo hacer todos los análisis igual que antes, Estados Finales, Entropía, Promedios, Dispersión.
+Los histogramas 2D también los puedo hacer para ciertos valores específicos de Alta y Cdelta.
+
+Algo que se me ocurre que podría hacer es armar un histograma del grado medio para ver qué tal da.
+Luego también podría armar como un histograma o una región de valores de alfa crítico para el sistema
+en función de los grados medios de cada red. Aunque esto último como análisis me resulta bastante complejo.
+Yo arrancaría por el tema de la distribución del grado de la red y ver si tiene una relación con la distribución
+de Actividad. Cosa que debería de paso. Es más en principio el paper dice que hay una clara relación.
+
+Quizás antes de pensar en los gráficos podría arrancar con la parte de escribir el capítulo
+y de ahí ir viendo qué gráficos voy a necesitar.
+
+Estoy mirando lo del gráfico de alfa crítico en función del grado medio, técnicamente tendría
+que también armar algunos datos extra de grado medio para Erdos-Renyi. Cuando se terminen los datos de Barabasi,
+veré cuáles tengo que armar de Erdos-Renyi y los mando a hacer así ya mañana puedo tener el gráfico hecho.
+Pero con el cambio de centrar las barras de error en el punto medio de la región de transición
+y remover el marcador del punto central del error me parece que el gráfico garpa más.
+
+En Erdos-Renyi voy a barrer para GM=4 [0,18;0,24]
+En GM= 8 voy a barrer [0,1;0,115]
+
+Lo de Barabasi ya casi termino, así que puedo ver de mandar a correr los datos para Erdos-Renyi, así
+completo esto totalmente.
+
+Ya estoy armando estos datos en Algarve utilizando 15 hilos. En unas horas, tipo diez
+de la noche esto debería estar terminado. También corregí el gráfico del grado medio en función
+de K. Aunque no guardé el gráfico, eso lo hago después.
+
+Arranquemos con el tema del cuarto capítulo. Mañana iré escribiendo en la tesis. La estoy esquivando
+fuerte. Lo que se me ocurrió con los datos es hacer lo siguiente:
+1) Los gráficos usuales de Estados Finales (a los cuales voy a tener que marcarles la región
+de transición), Entropía, Promedios y Dispersión.
+2) Histograma de Grados medios de la red. Que sería un histograma sobre TODAS las redes.
+Eso implica 24000 mediciones, lo cual da una medida razonable para la estadística.
+Aunque es un poco falso pretender que el grado medio sea totalmente independiente
+de los parámetros de la red, ya que el proceso de armado tiene un mecanismo de homofilia
+que vincula la dinámica del sistema con el armado de la red. Se me ocurre que podría
+hacer un mapa de colores del grado medio de las redes.
+x) Vincular el grado medio de las redes con el grado medio de la actividad y ver si hay alguna
+relación. Que debería haber. Aunque ahora que lo pienso, el grado medio de la actividad va a 
+ser prácticamente constante. Si lo pienso, esto no va a tener mucho para ver.
+
+Bueno, ahora no se me ocurre nada más que armar, así que a empezar a armar el código.
+Ya mañana hecho el código, arranco a escribir en la tesis.
+
+No anoté mucho de lo que hice, pero cargué los gráficos de alfa crítico en función de K,
+<k> de ER y <k> de Barabasi. También anoté la discusión sobre lo observado en los gráficos
+y que significa cada cosa del gráfico.
+
+Por otra parte, logré armar los gráficos de distribución de tiempos que me dijo Pablo sobre
+las redes para distintos grados medios y ciertos puntos del mapa de parámetros. Pareciera
+que la conclusión es que este método no sirve para grados medios bajos. Espero que
+la cosa esté yendo bien con Pablo.
+
+-------------------------------------------------------------------------------------------
+
+30/11/2021
+
+Vamos a armar el código para los grágicos de las redes de Actividad Conexa. Así puedo tener
+bastante para revisar y ya puedo ir completando el capítulo 4 de la tesis. Ojalá vaya todo bien.
+
+Ya armé la parte del código que arma los gráficos de Variación Promedio de las Opiniones como
+un conjunto. Le agregué la parte que arma los Histogramas 2D. Necesito ahora la parte que
+arma las Distribuciones de Opiniones. Bien, ahora hagamos los mapas de colores
+
+Me di cuenta que el hecho de tener los archivos testigo genera problemas a la hora
+de hacer el trabajo como lo venía haciendo hasta ahora, así que voy a incorporar la distinción
+entre archivos Testigo y Opiniones al SuperDiccionario. Ya hice la corrección para que el SuperDiccionario
+tenga la distinción entre archivos de Opiniones y de Testigos.
+
+Ahora sí, seguimos con el tema de los mapas de colores. Bueno, ya puse el código de los Mapas
+de Colores, haciendo que los datos se guarden en las carpetas correspondientes.
+Sin embargo, surge un pequeño problema del que me había olvidado. Tengo que definir un grado
+medio. Se me ocurre que para arrancar puedo usar como grado medio el grado promediado del
+sistema a lo largo de todas las simulaciones, todos los alfas y todos los Cdeltas. Después
+en el futuro se puede ver de afinar esto.
+
+Terminado el tema de los mapas de colores, por ahora, decidí además hacer un gráfico
+de la distribución de los grados medios de las redes a lo largo de todas las simulaciones
+para ver qué se ve. Esperemos que algo lindo.
+
+Mandé a correr el programa, por ahora todo bien. Esperemos que siga así.
+
+--------------------------------------------------------------------------------------------
+
+01/12/2021
+
+Mirando los resultados de los gráficos, pareciera que los gráficos dan más o menos. Igual bastante
+bien están dando. Las conclusiones que tengo de eso son lo siguiente:
+
+1) La curva del alfa crítico está tirada para abajo, porque al promediar todos los grados medios
+el valor de grado medio se tiró para arriba artificialmente, porque el valor del grado medio general
+pareciera estar entre 10 y 20. Eso significa la curva debería ir más arriba de lo que está.
+Esta disparidad entre la curva del alfa crítico y el gráfico diría que tiene que ver con que
+esta red tiene una mayor complicación para aplicar la aproximación de campo medio que Barabasi,
+porque en esta última red los agentes que ingresan a la red tienen mínimo grado m, donde m es
+la mitad del grado medio. En cambio, acá puede muy bien pasar que haya muchos agentes con grado
+1 o 2, mientras otros tienen grado cercano a 100 o 200. O incluso mucho más.
+
+2) El gráfico de Promedios y de Dispersión son difíciles de considerar ahora. El de Promedios
+acordate que tiende a K*<k> y como el grado medio varía, ya no es tan fácil que las redes
+tiendan a lo mismo. Lo interesante que estoy viendo de eso es que las redes tienden como valor
+máximo a 35. Y sabiendo que K=3, eso hace pensar que el grado medio promedio de las redes es
+entre 10 y 11. Por otro lado los de Dispersión se ven afectados por el hecho de que hay
+un ruido extra debido a que las redes toman tiempos distintos en converger y eso
+hace que hay disparidades en los tiempos de simulación dados por motivos externos a la
+dinámica misma del modelo.
+
+3) El gráfico de Dispersión extrañamente pareciera reconocer la región de transición entre 
+Polarización Descorrelacionada y Estado Ideológico. Debe ser una casualidad.
+Por su parte el gráfico de Entropía pareciera dar bastante bien, con una clara distinción
+de las regiones. Es el bueno el de Entropía.
+
+4) Hay algo raro con el gráfico de Estados Finales, porque en los gráficos de Distribución
+de Opiniones no se ve lo que se ve en ese gráfico, lo cual me da la pauta de que los estados
+finales se determinaron de formas distintas. Después cuando pueda re acceder a Oporto
+debo modificar eso. Seguro me faltó poner que la cantidad de Bines sea OpiMaxima*2.
+No parece que sea eso, la verdad no me doy cuenta de por qué se ve tan raro ese
+gráfico. Me gustaría revisar el csv que está en Oporto.
+
+5) También está el tema de que las Opiniones Máximas globales son demasiado grandes
+para el resto del sistema porque existe una red que alcanzó un valor de grado medio
+gigante y de ahí todo el sistema quedó encerrado en una pequeña región y no se distingue
+nada. Voy a necesitar considerar Opiniones Maximas más locales.
+
+----------------------------------------------------------------------------------------
+
+03/12/2021
+
+Intentando hacerle caso a Pablo, pasé los datos de Oporto a mi pc para ver si puedo graficar
+desde casa los datos. Por ahora, la pc me está diciendo bien gracias, no avanza en el 
+graficado. En Oporto esto toma 9 minutos aprox. En mi pc tomó 15 minuto el calcular la
+OpiMaxima, con lo cual hay 6 minutos en los que yo me descargo los datos de Oporto.
+Creo que resulta mejor trabajarlo en Oporto, sin duda.
+
+En Oporto tengo que hacer los siguientes cambios al código. (Es decir los hago en mi pc
+y después subo el archivo).
+.) Colocar el gráfico de distribución de grados medios en forma logarítimica y salteando los ceros.
+.) Armar OpiMaxima locales, a ver si eso simplifica un poco la cosa.
+.) Si eso no resulta, empezar a disminuir la región de observación
+y disminuir los bines. Incorporar quizás algún detalle sobre reducir los bines a OpiMaxima/2
+y verificar que eso sea par o hacerlo par.
+.) Un gráfico de grado medio de las redes en función de cos(delta)
+
+Primer punto listo. Las OpiMaxima ahora son re locales. Veamos si eso corrige un poco
+el tema. Igual quizás tenga que reducir un poco el tema. Bueno, ya que estamos, por alguna
+razón había hecho un gráfico de la distribución de opiniones en vez de un gráfico de la
+distribución de grados medios de las redes. Impresionante que no había notado eso.
+De paso, en la función AlfaC el valor de K no lo había actualizado. Seguía siendo
+1, pero en realidad para estas simulaciones lo cambié a 3.
+
+En un tema aparte, podría mandar a armar más datos para mejorar la estadística en algún
+momento, total, no es tanto quilombo eso. Tipo, el sábado a la noche lo mando y para el domingo
+ya lo tengo, lo mismo el domingo lo mando para el lunes y fue.
+
+Ya armé el gráfico de grado medio en función de cos(delta). Esperemos que funque.
+
+Las OpiMáxima locales tienen el problema de que en la región de Consenso son
+muy chicas y entonces si quiero hacer un binneado de eso me da vacío.
+Así que mejor empezar a repensar la cantidad de bines. Quizás lo puedo elegir
+como un número fijo y listo.
+
+------------------------------------------------------------------------------------------------
+
+04/12/2021
+
+Ya probé hacer los gráficos en mi pc. No rinde, Oporto los grafica en 9 minutos,
+en mi pc tardan media hora. No lo vale.
+
+Por un lado, corregí el hecho de que le tomaba valor absoluto a todos lso arrays, no
+me di cuenta de eso. Cuestión que al corregir eso, el gráfico de Entropía da hermoso.
+Tiene un problema de que en Cdelta=0 no reconoce bien el consenso, pero eso es porque
+la función de Clasificación de Cuadrantes estaba desactualizada, ahora la actualicé
+y debería dar bien.
+
+Por otro lado, el gráfico de Distribución de grados medios de las redes estaba mal
+porque me graficaba las Opiniones, no los grados medios. No sé porqué flashee y mandé mal
+el armado del gráfico.
+
+Agregué un armado de Opiniones Máximas locales, pero me parece que definir una opinión
+Máxima para cada punto de ensamble es contra producente porque hace que algunos gráficos
+se vean mal, como el de hist2D o el de Distribución de opiniones. Mejor definir una Opinión
+Máxima para cada Cdelta. Veamos que tal funca eso
+
+Cosas para cambiar viendo los gráficos:
+.) Tomar una OpiniónMaxima para cada Cdelta. Quizás para lograr que la OpiMaxima sea igual en
+las Distibuciones de Opiniones y en los Hist2D estaría bueno que esa OpiMaxima se tome considerando
+los primeros 30 alfas.
+.) La de Cuantiles queda en duda cuál es el problema.
+.) La de distribución de grados medios no necesita escala logarítmica en x
+.) Estados Finales debería solucionarse con un cambio de OpiMaxima.
+.) El gráfico de Grado medio vs Cdelta no da nada. Voy a armar una variable específica
+para intentar llevar un mejor recuento de estos datos.
+.) Agregar la curva de Alfa crítico con GM variable
+
+El primer punto ya está resuelto. El tercer punto está resuelto, el segundo por
+ahora queda en duda. El cuarto punto está en veremos. El quinto y el sexto
+están solucionados. Ahora queda mandarlo a probar.
+
+Bueno, el código funca. Pero no funca bien, así que hay que empezar a corregir.
+Los errores que tiene son los siguientes:
+
+.) La columna rara en Cuantiles y Entropía se corrigió, parece que es un tema de los
+datos locales.
+.) El gráfico de distribución de grados medios definitivamente necesita ser
+loglog, nada de log en y nomás.
+.) Sacarle el set_xlim a los gráficos de distribución de opiniones y ver que tal queda.
+.) La curva del alfa teórico se fue totalmente para arriba. Razonable si pensás
+en que es un promedio de Gradocd y eso tiene muchos ceros y un 12 al final, el 
+promedio cae a cero. Hay que revisar qué carajos pasa ahí
+.) La curva del alfa variable ni se me grafica, es una joda esto. ¿Puede ser
+que esté dando muy alto? Está dando muy alto. Porque está dividiendo por cero
+.) Aparecer un mensaje de error en un punto del cálculo que entiendo yo que 
+es antes de lo que debería. ¿Qué está pasando ahí?
+
+El primer punto es más una observación de algo que quedó pendiente de antes.
+El segundo punto está resuelto. El tercer punto también está resuelto.
+El cuarto punto también está resuelto. Al final dejé de flashar con armar
+más y más variables para guardarme los datos de los grados medios y retorné
+a guardarme todos los Grados Medios en Grados Totales. Eso parece
+funcionar y solucionar las cosas. Voy a ver si puedo sino armarlo como
+una matriz, con tantas filas como Cdeltas y tantas columnas como alfas
+por iteraciones. Eso podría organizar un poco más las cosas para que todo
+sea más claro.
+
+Los gráficos de Distribución de Opiniones siguen viéndose mal. El binneado es
+demasiado fino. ¿Y si uso un binneado fijo de 200? De paso, hacer
+gráficos logarítmicos en x, mala idea.
+
+Para dar un binneado más razonable voy a probar meter un if que se encargue
+de definir una cantidad fija de bines, 22, en el caso de que la distancia
+entre el máximo y el mínimos sea demasiado corta, razonablemente en los casos de Consenso.
+Si la distancia es suficientemente grande, le pido que me coloque OpiMaxima*2 bines,
+de manera de que haya un bin para cada unidad. Aunque pensándolo, necesito uno cada 3,
+si pongo un bin por cada unidad, entonces cmo la influencia social es 3 me van a
+estar quedando huecos entre picos, lo cual se ve feísimo. Voy a tener que corregir
+eso. También lo modifiqué para que no tenga que revisar quince veces el conjunto total
+de archivos sino que saque la OpiMaxima de las OpinionesFinales y use eso para determinar
+la región a binnear. Y también saqué el sharex de los gráficos de Distribución de Opiniones
+para permitir que haga zoom a las partes que necesitan zoom, y listo.
+Veamos si esto ahroa resulta.
+
+Por otro lado, el armado de la curva del alfa teórico y del alfa de grado medio variable
+da bárbaro. Los colores quizás no son los mejores, pero las curvas dan prácticamente
+una encima de la otra, lo cual es muy copado porque entonces tomar el Grado medio
+de TODAS las redes al final resultó una muy buena aproximación, lo cual es genial.
+
+Quizás en vez de armar dos curvas en los mapas de colores, podría armar una gráfico
+aparte con ambas para mostrar que son idénticas y luego graficar una sola en los
+mapas de colores. Pablo decía de también graficar la que usa Baumann, pero para eso
+tengo que considerar el grado medio que deberían tener estas redes según
+Baumann. Esto suena un poco complejo de hacer con los datos actuales, pero creo,
+creeeeeo que se podría. Igual charlarlo con Pablo y Sebas.
+
+Nos vamos acercando, ya casi quedan bien. Creo que le tengo que sacar el hspace
+y el wspace para ver los gráficos por separado y así darme cuenta de en qué regiones estoy graficando.
+También le puse que el gráfico en y se haga con forma logarítmica, así me permite ver mejor
+los picos y no me jode tanto el hecho de que los picos del consenso llegan muy alto.
+
+Algo para ver de hacer es hoy a la noche mandar a armar algunos datos extra, no te olvides
+de eso.
+
+Siguiendo con lo otro, la versión logarítmica en y no da lindo, mejor saco eso. Al final,
+sigue viéndose mal, porque la OpiMaxima es demasiado grande. La fuerte disparidad en los 
+grados de los agentes hace que sea dificil ubicar los picos. Creo que ya tengo pensado que hacer.
+Voy a primero tomar un tercio de los bines que estoy tomando, porque así me facilito que no queden
+huecos molestos. Segundo, voy a restringir la región buscando el valor promedio negativo y el valor
+promedio positivo, de forma de que eso me lleve directamente al pico. Los promedios espero
+yo que estén levemente por debajo de los picos, por lo que si los corro 30 en opiniones,
+los voy a observar.
+
+Bien, ya reorganicé las cosas de Metainstanciación y demás cosa de poder mandar a correr
+y armar los datos para alfa entre 0 y 0,1. La idea es aumentar las simulaciones por cada
+punto del ensamble a 100. Si hoy mando esto, mañana no voy a poder mandar a hacer gráficos
+hasta haber equiparado la cantidad de simulaciones por punto de ensamble en la región
+0,1 a 0,5.
+
+Ya casi está, queda unos pequeños ajustes y va a quedar bárbaro el gráfico de Distribuciones de
+Opiniones. Después le paso el mismo criterio al etiquetado, o quizás simplemente lo hago yo, y listo.
+
+---------------------------------------------------------------------------------------------------
+
+05/12/2021
+
+Mirando los gráficos de Distribución, quedaron casi perfectos. Me queda reducir un poco más el binneado
+para que se vean mejor. Para eso voy a dividir por 30 la OpiMaxima, en vez de por 10. Eso va a
+hacer que haya tres veces menos de bines, y entonces con eso ya debería quedar bien. Por otro lado,
+noté que algunos gráficos que claramente eran consenso quedaron relegados a Polarización. El motivo
+es que como estuve ajustando los valores de x e y a bordes que dependían del promedio de las opiniones,
+entonces la región no me quedaba centrada en cero y el pico que era del cero el sistema lo identificaba como
+un pico en una región positiva o negativa y asumía que era un caso de Polarización.
+
+Ya pasé la parte del código que hace todo este trabajo sobre las Opiniones Finales antes de armar el histograma
+a la sección que arma el mapa de colores de Estados Finales. Vamos a ver cómo queda ese gráfico con esto.
+Si pudiera conectarme a Oporto, ya lo resolvería. Entonces lo que me queda es subir el archivo de ActividadConexa.py
+También podría ver de corregir eso que dije de hacer que Grados Totales sea un array matriz
+con tantas filas como Cdeltas.
+
+----------------------------------------------------------------------------------------------------------
+
+06/12/2021
+
+Probé mandar el armado de las opiniones de Distribución dividiendo la OpiMaxima por 80 y 60.
+Dividiendo por 80 da feísimo. Dividiendo por 60 ya se ve raro. Se me ocurre que quizás si restringo
+la zona de observación a -60,60 y ahí divido todo en 40 bines, se debería ver mejor.
+Básicamente estoy teniendo un problema de que al ser muy grandes los bines, el cero me queda
+muy arriba porque recolecta valores entre -5 y 5 aprox. Y esos claramente no son gente
+que cae al cero, son posiblmente agentes con uno o dos enlaces, entonces la cosa no está dando
+clara. Hagamos la prueba que tal.
+
+---------------------------------------------------------------------------------------------------------
+
+07/12/2021
+
+Los gráficos se ven bastante mejor. No son perfectos todavía, pero bastante bien se observan.
+Ahora vamos a ahcer la charla con Sebas y Pablo, mostramos lo hecho y planeamos de acá al
+fin de semana lo que queda hacer, lo que hay que agregar y cosas.
+
+Hoy no hubo reunión, me comprometí a tener armada la región de transición para mañana,
+arranquemos eso y ya hoy continuemos con el capítulo 4.
+
+Vamos a hacer una última cosa, sobre los gráficos de Distribución de opiniones que es 
+poner un sharex y graficar todo entre -60 y 60. Y también vamos a reducir el espacio 
+entre gráficos, aunque no sé si es el hspace o el wspace. Probemos. Ahí lo mandé.
+Se ve bastante mejor. Y si ahora le diera un binneado un cachitín más fino, ¿qué
+pasaría? Y de paso, casi que podría tomar un sharey. Casi, mejor por ahora no.
+
+Ahora le cambié el binneado a 50 y lo mandé a correr. Ya tengo los gráficos,
+pero antes de bajarlos, voy a tomar el archivo de EstadosFinales.py y armarme
+el gráfico de Estados Finales con la región de Transición. Ya cancelé
+el guardado del csv por parte del archivo ActividadConexa.py.
+
+Al final mandé a correr en mi pc el programa de EstadosFinales. Ese código
+necesita tener el archivo csv en su misma carpeta y estar ubicado en la
+carpeta Programas Python.
+
+Por otro lado, los gráficos con 50 bordes para los binhnes no quedan bien
+dejalo en 40 y listo.
+
+----------------------------------------------------------------------------------------------------
+
+08/12/2021
+
+.) Sacar las curvas de alfa crítico armado con grado medio en función 
+de cos(delta)
+.) El capítulo 4 tiene que tener 3 secciones: Redes generales Adaptativas,
+Redes de Actividad y Redes Conexas.
+.) La parte de Dinámica en las distintas regiones va adentro de Resultados
+de redes de actividad Conexa.
+.) En la parte de Baumann mostramos que no da, agregamos la homofilia,
+nos preguntamos por qué no da y mostramos qué resultados nos muestran
+que la cosa no da. De ahí introducimos a la siguiente sección.
+.) Luego en la parte de Actividad Conexa contamos que usamos esta idea
+de redes conexas para no dejar que crezca hasta ser una red
+completa, comparar con el alfa crítico calculado según el valor medio
+de actividad y de ahí más o menos estamos. Mostrar los resultados
+de Dispersión y Promedios, pero no hacer mucho énfasis.
+
+Volví a retocar la Intro del capítulo 4, a ver si ahora sí me convence.
+Igual me parece que era importante mencionar que el trabajo del capítulo
+gira en torno al trabajo con dos redes, la de Actividades pelada y la de
+Actividad Conexa.
+
+Ya pasé el archivo de EstadosFinalesRA.py a Oporto, ahora con esto puedo armar
+el gráfico de Estados Finales en la pc de Oporto directamente.
+Ahora voy a corregir todos los gráficos para que no contengan la curva de
+alfa armada con los grados medios de cada Cdelta, porque la decisión
+final es que no valía la pena. Así además no voy introduciendo tantas nuevas
+definiciones ya cerca del final. Pero sí debería armar la curva que tiene el
+grado medio considerado según la teoría de redes de actividad. Eso tenemos que
+ver de calcularlo pronto. Es más, creo que es lo primero que tenemos que hacer.
+Primero saquemos la curva esa que ya no va, y después empezamos con lo otro.
+Bueno, la curva está sacada, queda hacer lo otro.
+
+--------------------------------------------------------------------------------
+
+10/12/2021
+
+Me bajé el archivo que estaba en Oporto sobre ActividadConexa.py para trabajar lo
+de la curva de alfa crítico calculada con el grado promedio estimado de las redes
+de Actividad. Ese programa ya tiene comentado la curva hecha con el grado que varía
+con el coseno(delta). Si tengo tiempo y resulta sencillo, voy a aprovechar para
+modificar el array de grados totales para que sea de NxM, donde N sea la cantidad
+de Cosenos(delta) considerados y M la cantidad de Alfas*cantidad de simulaciones.
+
+Agregué el Array TiemposTotales para tener los valores de la cantidad de iteraciones
+que cada sistema tarda en converger. También aproveché para mejorar el array de
+GradosTotales para que se comporte similar. En el armado es un poco más complejo,
+pero en el uso resulta un poco más sencillo.
+
+Ahora me falta armar un sujeto que guarde las actividades medias de todas las iteraciones
+así calculo la actividad promediada sobre todas las simulaciones.
+
+Vengo considerando bastante la idea de armar unos datos extra para esto y 
+revisar más fino la región. La respuesta es NO LO HAGAS. Va a ser una mala
+idea, dejalo estar.
+
+Ya agregué el array de Actividad, agregué el graficado de las curvas con el gradomedio
+teórico según datos de redes de actividad y lo subí a Oporto para mandarlo a correr.
+Puedo aprovechar ahora y subir los archivos a Github, eso sería una buena idea.
+
+----------------------------------------------------------------------------------
+
+11/12/2021
+
+Me falta corregir el código de EstadosFinalesRA.py para que incorpore el tema
+de la curva hecha con el valor teórico de grado medio de las redes. Listo, ya corregí
+eso y armé el gráfico de Estados Finales con las dos curvas, la de alfa crítico
+teórico con grado medio promediado sobre todas las redes y la de alfa crítico
+calculado con el valor de actividad media promediado sobre todas las redes.
+
+Ahora sí, a escribir la tesis.

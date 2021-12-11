@@ -261,7 +261,7 @@ T=2 # Defino acá el número de tópicos porque es algo que no cambia por ahora,
 
 SuperDiccionario = dict()
 
-for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
+for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
 
    # CÓDIGO PARA LEVANTAR ARCHIVOS DE UNA CARPETA CON TODOS LOS ARCHIVOS MEZCLADOS
     
@@ -317,6 +317,10 @@ for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
     # de Evolución Sistemas con los de Datos Opiniones.
     #--------------------------------------------------------------------------------------------
     
+    AlfaV = 0.5
+    CdeltaV = 0.5
+    
+
     for AGENTES in [1000]:
         for GM in [8]:
             Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
@@ -327,110 +331,182 @@ for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
                 Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][ALFA].keys())
                 Conjunto_Cdelta.sort()
                 for CDELTA in Conjunto_Cdelta:
-                    for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA][15::]:
-                        if nombre.split("_")[1] == "Sistema":
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
-                            
-                            Opi = Datos[1::] # Lista con los datos de las opiniones
-                            ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
-                            
-                            for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
-                                ArrayOpi[i] = fila[1::]
-                            # De esta manera tengo mi array que me guarda los datos de los
-                            # agentes a lo largo de la evolución del sistema.
-                            
-                            OpiMaxima = max(OpiMaxima,np.absolute(ArrayOpi).max())
-                            
-                            # Con esto me calculo la Opinión Máxima para hacerme el gráfico igual en todos los casos.
-                            
-                            #----------------------------------------------------------------
+                    if ALFA == AlfaV and CDELTA == CdeltaV:
+                        for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA][15::]:
+                            if nombre.split("_")[1] == "Sistema":
+                                Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
+                                
+                                Opi = Datos[1::] # Lista con los datos de las opiniones
+                                ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
+                                
+                                for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
+                                    ArrayOpi[i] = fila[1::]
+                                # De esta manera tengo mi array que me guarda los datos de los
+                                # agentes a lo largo de la evolución del sistema.
+                                
+                                OpiMaxima = max(OpiMaxima,np.absolute(ArrayOpi).max())
+                                
+                                # Con esto me calculo la Opinión Máxima para hacerme el gráfico igual en todos los casos.
+                                
+                                #----------------------------------------------------------------
+                                
+                                
+            # Abro el gráfico de las TdO
+            plt.rcParams.update({'font.size': 24})
+            plt.figure("Topico",figsize=(20,15))
+            plt.xlabel("Tiempo")
+            plt.ylabel(r"$x^1$")
+            plt.ylim(-OpiMaxima,OpiMaxima)
+            plt.grid()
+            
+            print("Arme el primero")
+            
+            # Abro el gráfico de los Tópicos vs Tiempo
+            plt.rcParams.update({'font.size': 24})
+            plt.figure("Trayectoria Opiniones",figsize=(20,15))
+            plt.xlabel(r"$x^1$")
+            plt.ylabel(r"$x^2$")
+            plt.xlim(-OpiMaxima,OpiMaxima)
+            plt.ylim(-OpiMaxima,OpiMaxima)
+            
+            print("Arme el segundo")
 
-                            
+            
             for ALFA in Conjunto_Alfa:
                 Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][ALFA].keys())
                 Conjunto_Cdelta.sort()
                 for CDELTA in Conjunto_Cdelta:
                     
-                    for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA][15::]:
-                        if nombre.split("_")[1] == "Sistema":
-                            
-                            repeticion = nombre.split("_")[7].split("=")[1]
-                            
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
-                            
-                            Opi = Datos[1::] # Lista con los datos de las opiniones
-                            ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
-                            
-                            for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
-                                ArrayOpi[i] = fila[1::]
-                            # De esta manera tengo mi array que me guarda los datos de los
-                            # agentes a lo largo de la evolución del sistema.
-                            
-                            #----------------------------------------------------------------
+                    if ALFA == AlfaV and CDELTA == CdeltaV:
                         
-                            # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
-                            # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
-                            # que estuve viendo en los archivos de Actividades
+                        for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
                             
-                            # Tengo que armar los promedios para graficarlos también
-                            
-                            Promedios = np.zeros(ArrayOpi.shape[0])
-                            
-                            for indice in range(ArrayOpi.shape[0]):
-                                Promedios[indice] = np.mean(ArrayOpi[indice][0::2]) # La cosa es promediar sólo la opinión del tópico 0
-                            
-                            plt.rcParams.update({'font.size': 18})
-                            plt.figure("Topico",figsize=(20,15))
-                            X = np.arange((len(Datos)-1))*0.01
-                            for sujeto in range(10):
-                                plt.plot(X,ArrayOpi[:,sujeto*50], label="T=0,agente={}".format(sujeto*50), color="gray", linewidth = 3)
-                            plt.plot(X,Promedios, label="Promedio de Opiniones", color="red", linewidth = 5)
-                            plt.xlabel("Tiempo")
-                            plt.ylabel(r"$x^1$")
-                            plt.ylim(-OpiMaxima,OpiMaxima)
-                            plt.grid()
-                            plt.legend()
-                            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                            plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}_iter={}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
-                            plt.close("Topico")
-                            
-                            #-----------------------------------------------------------------------------
-                            
-                            # Acá debería hacer el otro gráfico, el que me propuso Pablo. Para esto tengo que hacer los viejos y clásicos
-                            # TdO si no me equivoco. Eso no debería tardar mucho.
+                            if nombre.split("_")[1] == "Sistema":
+                                
+                                repeticion = int(nombre.split("_")[7].split("=")[1])
+                                if repeticion in [1,4]:
+                                
+                                    Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
+                                    
+                                    Opi = Datos[1::] # Lista con los datos de las opiniones
+                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
+                                    
+                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
+                                        ArrayOpi[i] = fila[1::]
+                                    # De esta manera tengo mi array que me guarda los datos de los
+                                    # agentes a lo largo de la evolución del sistema.
+                                    
+                                    #----------------------------------------------------------------
+                                
+                                    # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
+                                    # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
+                                    # que estuve viendo en los archivos de Actividades
+                                    
+                                    # Tengo que armar los promedios para graficarlos también
+                                                                        
+                                    plt.figure("Topico")
+                                    
+                                    X = np.arange((len(Datos)-1))*0.01
+                                    for sujeto in range(5):
+                                        plt.plot(X,ArrayOpi[:,sujeto*50], color="gray", linewidth = 3)
 
-                            plt.rcParams.update({'font.size': 18})
-                            plt.figure("Trayectoria Opiniones",figsize=(20,15))
+                                    #-----------------------------------------------------------------------------
+                                    
+                                    # Acá debería hacer el otro gráfico, el que me propuso Pablo. Para esto tengo que hacer los viejos y clásicos
+                                    # TdO si no me equivoco. Eso no debería tardar mucho.
+                                    
+                                    plt.figure("Trayectoria Opiniones")
+                                    
+                                    for sujeto in range(200):
+                                        plt.plot(ArrayOpi[:,0+2*sujeto],ArrayOpi[:,1+2*sujeto], color="gray",linewidth = 2, alpha=0.2)
+                                        
+        #                            for x1,x2 in zip(ArrayOpi[ArrayOpi.shape[0]-1][0::2],ArrayOpi[ArrayOpi.shape[0]-1][1::2]):
+        #                                indice = Indice_Color(np.array([x1,x2]),Divisiones)
+        #                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+                                        
+        #                            plt.legend()
+        
+        
+                        for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
                             
-                            for sujeto in range(100):
-                                plt.plot(ArrayOpi[:,0+2*sujeto*10],ArrayOpi[:,1+2*sujeto*10], color="gray",linewidth = 1, alpha=0.2)
+                            if nombre.split("_")[1] == "Sistema":
                                 
-                            Promedios0 = np.zeros(ArrayOpi.shape[0])
-                            Promedios1 = np.zeros(ArrayOpi.shape[0])
-                            
-                            for indice in range(ArrayOpi.shape[0]):
-                                Promedios0[indice] = np.mean(ArrayOpi[indice][0::2]) # Acá tomo el promedio de las opiniones en el tópico 0
-                                Promedios1[indice] = np.mean(ArrayOpi[indice][1::2]) # Acá tomo el promedio de las opiniones en el tópico 1
+                                repeticion = int(nombre.split("_")[7].split("=")[1])
+                                if repeticion in [1,4]:
                                 
-                            plt.plot(Promedios0,Promedios1, color="red",linewidth = 5, label = "Promedio del sistema" )
-                            
-                            
-#                            for x1,x2 in zip(ArrayOpi[ArrayOpi.shape[0]-1][0::2],ArrayOpi[ArrayOpi.shape[0]-1][1::2]):
-#                                indice = Indice_Color(np.array([x1,x2]),Divisiones)
-#                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+                                    Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
+                                    
+                                    Opi = Datos[1::] # Lista con los datos de las opiniones
+                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
+                                    
+                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
+                                        ArrayOpi[i] = fila[1::]
+                                    # De esta manera tengo mi array que me guarda los datos de los
+                                    # agentes a lo largo de la evolución del sistema.
+                                    
+                                    #----------------------------------------------------------------
                                 
-                            plt.xlabel(r"$x^1$")
-                            plt.ylabel(r"$x^2$")
-                            plt.xlim(-OpiMaxima,OpiMaxima)
-                            plt.ylim(-OpiMaxima,OpiMaxima)
-                            plt.legend()
-                            plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/TdO_alfa={:.3f}_Cdelta={:.2f}_iter={}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
-                            plt.close("Trayectoria Opiniones")
+                                    # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
+                                    # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
+                                    # que estuve viendo en los archivos de Actividades
+                                    
+                                    # Tengo que armar los promedios para graficarlos también
+                                    
+                                    Promedios = np.zeros(ArrayOpi.shape[0])
+                                    
+                                    for indice in range(ArrayOpi.shape[0]):
+                                        Promedios[indice] = np.mean(ArrayOpi[indice][0::2]) # La cosa es promediar sólo la opinión del tópico 0
+                                    
+                                    plt.figure("Topico")
+                                    
+                                    X = np.arange((len(Datos)-1))*0.01
+                                    plt.plot(X,Promedios, color="red", linewidth = 5)
+        #                            plt.legend()
+        #                            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+
+                                    #-----------------------------------------------------------------------------
+                                    
+                                    # Acá debería hacer el otro gráfico, el que me propuso Pablo. Para esto tengo que hacer los viejos y clásicos
+                                    # TdO si no me equivoco. Eso no debería tardar mucho.
+                                    
+                                    plt.figure("Trayectoria Opiniones")
+
+
+                                    Promedios0 = np.zeros(ArrayOpi.shape[0])
+                                    Promedios1 = np.zeros(ArrayOpi.shape[0])
+                                    
+                                    for indice in range(ArrayOpi.shape[0]):
+                                        Promedios0[indice] = np.mean(ArrayOpi[indice][0::2]) # Acá tomo el promedio de las opiniones en el tópico 0
+                                        Promedios1[indice] = np.mean(ArrayOpi[indice][1::2]) # Acá tomo el promedio de las opiniones en el tópico 1
+                                        
+                                    plt.plot(Promedios0,Promedios1, color="red",linewidth = 5 )
+                                    
+                                    
+        #                            for x1,x2 in zip(ArrayOpi[ArrayOpi.shape[0]-1][0::2],ArrayOpi[ArrayOpi.shape[0]-1][1::2]):
+        #                                indice = Indice_Color(np.array([x1,x2]),Divisiones)
+        #                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+                                        
+        #                            plt.legend()
+        
+                                
+                        #-------------------------------------------------------------------------------------------------------------------
                         
-                            # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
-                            # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
-                            # el momento
+                        # Cierro los gráficos.
+            
+                        plt.figure("Topico")
+                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
+                        plt.close("Topico")
+                            
+            
+            
+                        plt.figure("Trayectoria Opiniones")
+                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/TdO_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
+                        plt.close("Trayectoria Opiniones")
                     
+                        # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
+                        # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
+                        # el momento
+                                
                     
 Tiempo()
                     

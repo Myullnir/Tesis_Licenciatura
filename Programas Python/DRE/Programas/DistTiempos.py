@@ -418,157 +418,59 @@ for REDES in ["Erdos-Renyi","RandomRegulars","Barabasi"]:
 
         for GM,igm in zip(Conjunto_Gm,np.arange(len(Conjunto_Gm))):
             
-            # Primero me armo los grid para el gráfico de las fases. Para eso
-            # primero tengo que armarme un array y con el np.meshgrid armarme 
-            # los grids del pcolormesh.
-            Conjunto_Alfa = list(SuperDiccionario[REDES][AGENTES][GM].keys())
-            Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][Conjunto_Alfa[0]].keys())
-            
-            Conjunto_Cdelta.sort()
-            Conjunto_Alfa.sort()
-            
-#            Conjunto_Alfa.reverse() # Lo invierto para que me quede el uno arriba y no abajo
-#            
-#            x = np.array(Conjunto_Cdelta)
-#            y = np.array(Conjunto_Alfa)
-#            
-#            Conjunto_Alfa.reverse() # Lo vuelvo a invertir para que de nuevo esté como siempre.
-#            
-#            XX,YY = np.meshgrid(x,y)
-#        
-#            ZZV = np.zeros(XX.shape) # Esta es la matriz de valores para la varianza
-            
-            print("Inicialicé las matrices de los mapas de colores para GM={}".format(GM))
-        
             #-------------------------------------------------------------------------------------
             
-            for ALFA in [1]:
-                for CDELTA in [-0.4,-0.2,0,0.2,0.4]:
+            ALFA = 1
+            for CDELTA in [-0.4,-0.2,0,0.2,0.4]:
+                
+                # Me armo el array de Tiempos de Simulación.
+                
+                TideSi = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
+                
+                for nombre,numero in zip (SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA],np.arange(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))):
                     
-                    # Me armo el array de Tiempos de Simulación.
+                    #--------------------------------------------------------------------------------------------
+                
+                    # Levanto los datos del archivo original y separo los datos en tres listas.
+                    # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                
+                    # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
                     
-                    TideSi = np.zeros(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))
-                    
-                    for nombre,numero in zip (SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA],np.arange(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))):
+                    if Subdividido == True:
+                        #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
+                        Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
                         
-                        #--------------------------------------------------------------------------------------------
+                    else:
+                        # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
+                        Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
                     
-                        # Levanto los datos del archivo original y separo los datos en tres listas.
-                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
+                    # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
+                    # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
                     
-                        # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
-                        
-                        if Subdividido == True:
-                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
-                            
-                        else:
-                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
-                        
-                        # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
-                        # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                        
 #                            Opi0 = np.array([float(x) for x in Datos[1][1::]])
-                        
-                        Var = np.array([float(x) for x in Datos[1][1::]])
-                        
-                        Opi = np.array([float(x) for x in Datos[3][1::]])
-                        
-                        #-----------------------------------------------------------------------------------------------
-                        
-                        # Voy guardando el tiempo de simulación de cada uno de las simulaciones del putno de ensamble.
-                        # Acordate que en total son 61.
-                        
-                        TideSi[numero] = Var.shape[0]
-                        
-                        #-----------------------------------------------------------------------------------------------
-                        
-                    # Acá armo el gráfico de las distribuciones de tiempos de Simulacion
                     
-                    plt.rcParams.update({'font.size': 24})
-                    fig = plt.figure("DistTiempo",figsize=(20,15))
-                    plt.hist(TideSi,bins=15)
-                    plt.grid()
-                    plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Dist_Tiempos_Cdelta={:.2f}.png".format(REDES,GM,CDELTA),bbox_inches = "tight")
-                    plt.close("DistTiempo")
+                    Var = np.array([float(x) for x in Datos[1][1::]])
                     
-                    
-            
-            
-            """
-            # Voy a iterar esto para todos los archivos de datos que tengo
-
-            for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
-                
-                # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
-                # que voy a necesitar para después
-                
-                
-                plt.rcParams.update({'font.size': 24})
-            
-                fig = plt.figure("Variaciones Promedio",figsize=(64,36))
-                
-                gs = fig.add_gridspec(6,5,hspace=0,wspace=0)
-                axs = gs.subplots(sharex=True, sharey=True)
-                
-                Columnas = [0,1,2,3,4]*6
-                Filas = [i for i in range(0,6) for j in range(0,5)]
-                
-                
-                for ALFA,filas,columnas in zip(Conjunto_Alfa[0:30],Filas,Columnas):
-                
-                    Colores2 = cm.rainbow(np.linspace(0,1,len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA])))
-                    
-                    #-------------------------------------------------------------------------------------
-                    for nombre,numero in zip (SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA],np.arange(len(SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]))):
-        
-                        #--------------------------------------------------------------------------------------------
-                    
-                        # Levanto los datos del archivo original y separo los datos en tres listas.
-                        # Una para la matriz de Adyacencia, una para la matriz de superposición y una para los vectores de opiniones
-                    
-                        # Tengo que hacer una diferenciación entre levantar datos de las carpetas subdividida en 4 y de la carpeta con todo mezclado.
-                        
-                        if Subdividido == True:
-                            #PARA LEVANTAR DATOS DE LA CARPETA SUBDIVIDIDA EN 4
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[igm],nombre))
-                            
-                        else:
-                            # PARA LEVANTAR DATOS DE LA CARPETA TODA MEZCLADA
-                            Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
-                        
-                        # Lista con elementos de los vectores de opinión. Al final sí había una forma compacta de hacer esto.
-                        # Si la matriz de Adyacencia evoluciona en el tiempo, va a haber que ver de hacer cambios acá.
-                        
-#                            Opi0 = np.array([float(x) for x in Datos[1][1::]])
-                        
-                        Var = np.array([float(x) for x in Datos[1][1::]])
-                        
-                        Opi = np.array([float(x) for x in Datos[3][1::]])
-                        
-                        #-----------------------------------------------------------------------------------------------------
-                        
-                        # Acá ploteo los datos de la variación Promedio. El largo de estas curvas es lo que da
-                        # la pauta de cuánto tardo el sistema en resolverse.
-        
-                        X = np.arange(0,len(Var))*0.01 # El dt usado en todos los archivos es 0.1
-                        
-                        # Ahora grafico las curvas de Variación de Opiniones
-                        axs[filas,columnas].semilogy(X,Var,"--",c = Colores2[numero],linewidth = 4)
-                        
-                        #--------------------------------------------------------------------------------------------------------
-                        
-                    axs[filas,columnas].annotate(r"$\alpha=${}".format(ALFA), xy=(0.8,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                    axs[filas,columnas].grid()
+                    Opi = np.array([float(x) for x in Datos[3][1::]])
                     
                     #-----------------------------------------------------------------------------------------------
-                plt.savefig("../../../Imagenes/Redes Estáticas/Anomalia/{}/Variacion_Conjunta_Cdelta={:.2f}_N={}.png".format(REDES,CDELTA,AGENTES),bbox_inches = "tight")
-    #                plt.show()
-                plt.close("Variaciones Promedio")
+                    
+                    # Voy guardando el tiempo de simulación de cada uno de las simulaciones del putno de ensamble.
+                    # Acordate que en total son 61.
+                    
+                    TideSi[numero] = Var.shape[0]
+                    
+                    #-----------------------------------------------------------------------------------------------
+                    
+                # Acá armo el gráfico de las distribuciones de tiempos de Simulacion
                 
-                print("Ya terminé los gráficos de Variaciones Conjuntas de {}".format(REDES))
+                plt.rcParams.update({'font.size': 24})
+                fig = plt.figure("DistTiempo",figsize=(20,15))
+                plt.hist(TideSi,bins=15)
+                plt.grid()
+                plt.savefig("../../../Imagenes/Redes Estáticas/{}/GM={}/Dist_Tiempos_Cdelta={:.2f}.png".format(REDES,GM,CDELTA),bbox_inches = "tight")
+                plt.close("DistTiempo")
                 Tiempo()
-                """
+
                         
 Tiempo()
