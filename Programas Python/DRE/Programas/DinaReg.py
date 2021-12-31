@@ -317,8 +317,8 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
     # de Evolución Sistemas con los de Datos Opiniones.
     #--------------------------------------------------------------------------------------------
     
-    AlfaV = 0.5
-    CdeltaV = 0.5
+    AlfaV = 0
+    CdeltaV = 0
     
 
     for AGENTES in [1000]:
@@ -350,7 +350,7 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                                 
                                 #----------------------------------------------------------------
                                 
-                                
+            """                    
             # Abro el gráfico de las TdO
             plt.rcParams.update({'font.size': 24})
             plt.figure("Topico",figsize=(20,15))
@@ -371,11 +371,22 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
             
             print("Arme el segundo")
 
+            """
+            
+            # Abro el gráfico de Histogramas 2D
+            plt.rcParams.update({'font.size': 24})
+            plt.figure("Histograma 2D",figsize=(20,15))
+            plt.xlabel(r"$x^1$")
+            plt.ylabel(r"$x^2$")
+            plt.xlim(-OpiMaxima,OpiMaxima)
+            plt.ylim(-OpiMaxima,OpiMaxima)
+            
             
             for ALFA in Conjunto_Alfa:
                 Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][ALFA].keys())
                 Conjunto_Cdelta.sort()
                 for CDELTA in Conjunto_Cdelta:
+                    OpinionesFinales = np.array([])
                     
                     if ALFA == AlfaV and CDELTA == CdeltaV:
                         
@@ -384,20 +395,24 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                             if nombre.split("_")[1] == "Sistema":
                                 
                                 repeticion = int(nombre.split("_")[7].split("=")[1])
-                                if repeticion in [1,4]:
+                                if repeticion in [4]:
                                 
                                     Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
                                     
                                     Opi = Datos[1::] # Lista con los datos de las opiniones
-                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
-                                    
-                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
-                                        ArrayOpi[i] = fila[1::]
+#                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
+#                                    
+#                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
+#                                        ArrayOpi[i] = fila[1::]
+                                        
                                     # De esta manera tengo mi array que me guarda los datos de los
                                     # agentes a lo largo de la evolución del sistema.
                                     
+                                    # Levanto las opiniones finales para graficar los histogramas 2D
+                                    OpinionesFinales = np.concatenate((OpinionesFinales,np.array([float(x) for x in Opi[len(Opi)-1][1::]])), axis=None)
+                                    
                                     #----------------------------------------------------------------
-                                
+                                    """
                                     # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
                                     # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
                                     # que estuve viendo en los archivos de Actividades
@@ -425,8 +440,27 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
         #                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
                                         
         #                            plt.legend()
-        
-        
+                                    """
+                                    #-----------------------------------------------------------------------------------------------
+                                    
+                                    # Acá armo los gráficos de histogramas 2D.
+                                    
+                                    plt.figure("Histograma 2D")
+                                    
+                                    OpiExtremos = np.array([OpiMaxima,OpiMaxima,-OpiMaxima,OpiMaxima,OpiMaxima,-OpiMaxima,-OpiMaxima,-OpiMaxima])
+                                    Opiniones2D = np.concatenate((OpinionesFinales,OpiExtremos), axis=None)
+                                    plt.hist2d(Opiniones2D[0::2],Opiniones2D[1::2], bins=(59,59), density=True, cmap=plt.cm.Reds)
+                                    plt.colorbar()
+                                    
+#                                    plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/H2D_alfa={:.3f}_Cdelta={:.2f}_C2.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
+                                    plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/H2DCon0.png".format(REDES),bbox_inches = "tight")
+                                    plt.close("Histograma 2D")
+                                    
+                                    
+                                    #-------------------------------------------------------------------------------------------------
+                                    
+                                    
+                        """
                         for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
                             
                             if nombre.split("_")[1] == "Sistema":
@@ -506,7 +540,7 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                         # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
                         # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
                         # el momento
-                                
+            """                  
                     
 Tiempo()
                     

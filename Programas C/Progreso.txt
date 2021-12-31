@@ -6182,3 +6182,375 @@ teórico con grado medio promediado sobre todas las redes y la de alfa crítico
 calculado con el valor de actividad media promediado sobre todas las redes.
 
 Ahora sí, a escribir la tesis.
+
+---------------------------------------------------------------------------------
+
+14/12/2021
+
+Llevo todos estos días escribiendo. Ahora mismo me falta sólo la parte de Dinámica
+en las distintas regiones. Y al llegar a esta parte me di cuenta que los archivos
+que tengo armados no tienen los datos de la evolución de los agentes a lo largo de
+toda la simulación, entonces no puedo construir las TdO. O si las construyo tendrían
+apenas 5 líneas, una pobreza. Así que por eso voy a armar unos datos extra que 
+me permitan calcular eso.
+
+Para eso modifiqué el main que tengo de Actividad Conexa agregándole las cosas
+para armar los archivos que guardan los datos de la evolución de las opiniones
+de todos los agentes, los archivos llamados Evolución_Sistema, que se guardan
+a su vez en la carpeta DinaReg, dentro de la carpeta DilAct dentro de Programas
+Python. Cuestión, todo lo que hace referencia al armado de los archivos
+de Datos_Testigos está COMENTADO en el main original, y me quedé sólo con el
+armado de Datos_Opiniones más lo de Evolución_Sistema. Lo digo para que después
+no te confundas de lo que hay en el archivo.
+
+Entonces voy a armar tres tandas de archivos de 15 simulaciones. Una tanda
+para el Alfa=0, Cdelta=0. Otra para el Alfa=0,4, Cdelta=0 y la última
+para el Alfa=0,4 y Cdelta=0,5.
+
+Mientras eso resuelve, termino de preparar el archivo de Spyder para armar los
+gráficos. Bien, el código parece funcar bárbaro. Ahora a elegir las iteraciones
+adecuadas.
+
+En el caso de los gráficos para Redes de Actividad los gráficos de Polarización
+y los de Estado Ideológico recorren todas las regiones en una sola iteración,
+a diferencia de lo que ocurre con Redes Estáticas, así que no necesito ir uniendo
+gráficos, así como está ya me sirve.
+
+Para Consenso tomé la iteración 10.
+Para Polarización tomé 8 en TdO y 9 en Tópicos
+Para Ideológico tomé la iteración 8 en TdO y 10 en Tópicos
+
+----------------------------------------------------------------------------------------
+
+15/12/2021
+
+.) Revisar porqué la curva teórica del Alfa es menor a la empírica. Entendiendo
+la empírica como la que está hecha con el grado medio medido sobre todo
+y la teórica hecha con el valor medio de la actividad
+.) Reescribir la parte del capítulo 3 con este nuevo entendimiento de que
+la convergencia en la red estática a un estado polarizado se entiende
+sobre el ensamble, no de manera individual. Quitar las referencias a estados
+polarizados y hablar de estados radicalizados correlacionados o descorrelacionados.
+
+Vamos a arrancar con la introducción. Me parece razonable tener los dos papers
+de Baumann, el de Redes de Actividad y el de Wither now? sobre modelos de agentes
+abiertos al revisar esto. Bien, para mayor facilidad ya junté los cuatro papers
+que me resultan importantes en una sola carpeta. Ahora sí, a leer las intros de estos
+papers y con eso ir planeando la mía.
+
+-----------------------------------------------------------------------------------------
+
+19/12/2021
+
+Pablo me dijo de revisar la intro de dos papers que hizo, uno con Fede y otro
+con Lupi, como para ver sobre distintos modelos ya sean unidimensionales y
+multidimensionales y agregar eso a la intro mía de la tesis.
+
+Encontré el que hizo con Lupi, me olvidé de preguntarle por el otro.
+Estuve revisando la Introducción, me parece que está bien, se le podría
+agregar algunas de las menciones de estudios previos sobre redes multidimensionales
+o unidimensionales.
+Llegué a la parte final de la intro del capítulo 2. Estoy haciendo la revisión
+de la tesis. La idea sería tenerla hecha para el finde. No puedo estimar en 
+la semana debido a que entre lo del colegio, mi viejo y la mar en coche
+no sé cuanto tiempo tendré en la semana para esto.
+
+--------------------------------------------------------------------------------------------
+
+21/12/2021
+
+Ayer fue un día bastante ocupado. Hoy seguimos revisando (con algunas
+distracciones). Esperemos terminar el capítulo de Redes Complejas.
+Ya revisé la parte de Erdos-Renyi y al de Random Regulars. Ahora
+estoy en la de Redes Libres de Escala. Me parece que es un buen momento
+para buscar las citas libres en esa sección.
+
+------------------------------------------------------------------------------------------
+
+22/12/2021
+
+Seba me recomienda arrancar con dos o tres párrafos dando contexto,
+básicamente explicando por qué en una tesis de física hablamos de sistemas
+sociales. Es importante no escribir cosas que no sabés que son. También
+es muy importante entender el contexto.
+
+Estaría bueno que haya un gráfico análogo en la parte de Dinámica de la
+red donde se vea el caso de simulaciones individuales, como para marcar 
+mejor las diferencias con los resultados de redes de Actividad.
+
+Ver si se puede armar una red de Actividad conexa y graficarla.
+Si se puede incluso usar algún método para detectar las comunas.
+
+Con Pablo tuvimos una charla por teléfono, me dijo que le mande el mail
+a los jurados pidiéndoles de manera formal que sean jurados.
+
+Seguí revisando la tesis, estoy en la parte de la topología de la red,
+cerca del gráfico final de esa sección.
+
+----------------------------------------------------------------------------------------
+
+25/12/2021
+
+Ok, tomó esfuerzo, pero rearmé la sección de Distintos tipos de Soluciones para diferenciar
+el tema de las soluciones radicalizadas e incorporé ahí los gráficos que diferencian
+el cómo se observan los estados radicalizados de los estados de ensamble y de los
+estados de Polarización.
+
+Llegué a la parte de Implementación Numérica. Frené en esto porque acá arranca el tema
+de corregir las expresiones sobre que el sistema alcanza polarización para empezar
+a hablar de Radicalización, pero se generan problemas en el tema de que para definir
+la región de transición siempre miramos los ensambles. Al final igual lo que voy
+a hacer es aclarar la distinción de que miro los datos de los ensambles y no las simulaciones
+individuales, y que a partir de eso consideramos Polarización del sistema y no radicalización.
+
+--------------------------------------------------------------------------------------------
+
+26/12/2021
+
+Revisé buena parte del Capítulo 3, quedando en la parte de revisar la entropía. Queda
+mañana terminar eso y lo de Dinámica en las distintas regiones y el capítulo 3
+estaría revisado. En la semana habrá que hacer lo de agregar los primeros párrafos
+a la introducción que me dijo Sebas y ya resolver las conclusiones, agradecimientos,
+la bibliografía y el tema de la separación rara en el Latex.
+
+------------------------------------------------------------------------------------------
+
+27/12/2021
+
+Ya terminé el capítulo 3, ahora queda revisar lo de la Intro que me dijeron
+Pablo y Seba y después revisar el Capítulo 4. Arranquemos con lo de la Intro.
+
+Mañana anotar a los jurados, mandar mensaje a Osdop, 
+
+
+--------------------------------------------------------------------------------------------
+
+28/12/2021
+
+.) En el inicio de la tesis, corregir a Sebas como Colaborador, no Co-Director.
+Además Pinto, no Pintos. En los Agradecimientos aclarar que ofició como Co-Director,
+pero que por cuestiones formales lo anotamos como Colaborador.
+.) Quedó la frase de Lucio al principio sobre nominar. Corregir eso.
+.) Cuando tenés muchas citas juntas, ponelas todas en un sólo cite y separalas con coma
+y espacio.
+.) Hay una parte que diga presentado por Fabian Baumann, así no se cita, se dice presentado
+"en" y cita.
+.) Haber tomado la intro tan fiel a Baumann no fue una buena decisión, fijate que 
+darle la importancia que Baumann le da a la red no tiene sentido en nuestro trabajo.
+Repensar la parte de presentación del modelo de forma que tenga sentido con nuestro trabajo.
+Hacer énfasis en que queremos ver la importancia entre la dinámica de la red y la dinámica
+de las opiniones.
+.) Ser más preciso con el lenguaje al comparar cosas.
+.) Buscar literatura de red dinámica y ser un poco más conciso y claro sobre ejemplos de
+redes dinámicas. Usar ejemplos como el del votante de Maxi San Miguel o el de Sasahara.
+.) 
+.) En la introducción del capítulo 3 quizás convenga cortar un poco la intro porque
+hablo de cosas no presentadas todavía.
+.) los estados finales de los ensambles de las simulaciones: NO
+Ensambles de los estados finales: SI
+.) Estoy despreciando demasiado el tema del etiquetado a mano, no es tan malo
+como lo hago parecer. Pablo me propone que incluso es el método más robusto.
+.) Estoy dando demasiada explicación para las cosas, intentá ser mucho más
+breve.
+.) En regiones dinámicas ser un poco más acotado 
+
+-------------------------------------------------------------------------------------------
+
+29/12/2021
+
+Hablando del capítulo 4:
+.) A la hora de explicar el porque el resultado del modelo planteado como en
+Baumann no da, deberíamos mostrar gráficos de la red en su evolución para ver
+que siempre me quedan sujetos sueltos
+.) La parte de redes de de actividad a lo Baumann acortarlo y compactarlo fuerte.
+.) Correr lo de Dinámica de las regiones al principio de la parte de redes
+de actividad conexas para presentar nuevamente los estados finales
+.) En los gráficos de Dinámicas de Regiones mostrar los promedios de las
+ramas, no el promedio total.
+
+Bueno, revisando las correcciones que hizo Pablo, no parece taaaanto lo que hay que
+corregir, varias de esas cosas son más o menos rápidas. Lo cual me alegra mucho.
+
+Lo principal entonces para el capítulo 4 está en la construcción de ciertos gráficos.
+Uno podría ser el construir varios snapshots de la red de actividad a lo Baumann,
+armando gráficos de redes y viendo que siempre hay una gran cantidad de agentes
+desconectados. Se me ocurre además que se pueden graficar los agentes con colores
+dependiendo de si sus opiniones están cerca del cero o no. Igual lo importante es
+que se vean la gran cantidad de agentes desconectados.
+
+Después está el tema de los gráficos de la opinión en función del tiempo o de
+la Variación promedio en función del tiempo. El tema de esos gráficos es que
+se ven demasiado compactados, habría que ver de hacer zoom en una parte. 
+Ahora que lo pienso, podría mostrar el gráfico entero, hacer luego el gráfico
+en una región y hacer ese efecto lupa hermoso y listo. Eso me compra, hagamos
+eso.
+
+Y después está el tema de la opinión de los agentes en función del tiempo, también
+podría mostrar uno de esos para que se vea lo que pasa con las opiniones, aunque
+está el tema de la simetría que nos levantó muchas dudas al respecto, pero bueno,
+eso es un detalle.
+
+Bueno, de estos tres gráficos, dos técnicamente "Ya los tengo", hay uno sólo por
+armar realmente. Yo empezaría con los que ya tengo, para tener algo que mostrarle
+a Pablo. Después, está lo que me propuso Seba sobre los gráficos de Redes Conexas,
+que ya que estamos, ya fue, hagámoslo.
+
+Así que en total son 4 gráficos, los que haremos en el siguiente orden:
+1) Variación promedio de Redes de Actividad, con una lupa en una parte.
+2) Opinión de los agentes en función del tiempo para redes de actividad,
+de manera de observar cómo la opinión de los agentes varía en las nuevas
+reconstrucciones de la red.
+3) Redes de Actividad mostrando cómo hay varios agentes que quedan desconectados
+en varios momentos sucesivos. Vale la pena intentar colorearlos según módulo de
+su opinión.
+4) Redes de Actividad Conexa mostrando las comunidades que se forman. Habrá
+que ver de armar algún método de detección de comunidades que funcione de manera
+razonable.
+5) Me acordé de este tarde, hay que agarrar los gráficos de Dinámica en las Regiones
+de Redes de Actividad Conexa y graficarle los promedios de las ramas, de forma
+de que se observe que cada rama tiende a la región correspondiente en promedio.
+Lo cual no me parece tan informativo en sí mismo, aunque lo que importa ahí
+no es tanto el valor final, sino la trayectoria de la rama. Creo, charlarlo
+mañana sino.
+
+Bueno, por lo visto el archivo de TdO_Actividad.py me va a ayudar a armar los gráficos
+1 y 2. Ya el 3 y 4 veré si los armo con el google workspace o con qué.
+Ahora, tengo que revisar bastantes cosas del archivo para lograr hacerlo
+funcar correctamente. Así que primero saquemos lo que no es necesario,
+y coloquemos las nuevas versiones de las funciones de AlfaC y demás.
+
+Armar el gráfico 2 era lo que estaba más a mano, así que arranqué por ahí.
+Después haré el 1. Tengo que elegir cuál iteración usar y qué mostrar en
+particular, cosa de que el gráfico no sea muy sobrecargado. Se me ocurre
+que la región graficada sea hasta 50 en tiempo, y después una lupa que
+tenga un rango de 10
+
+-----------------------------------------------------------------------------
+
+30/12/2021
+
+Para armar el gráfico de Opinión en función dle tiempo, voy a graficar
+hasta un tiempo de 50, sabiendo que cada iteración avanza de a 0,01.
+Voy a graficar a tres agentes mejor, para que no haya tantas curvas
+superpuestas. Estoy seleccionando los gráficos mejores. El de alfa
+0,3 es el que voy a usar. Tiene una curva de un agente con fuertes variaciones,
+mientras los otros dos pelean por salir del cero.
+
+El gráfico 2 en principio ya está hecho, mañana mostrárselo a Pablo a ver
+qué opina al respecto. Ahora pasemos al gráfico 1, el de la Variación
+Promedio. Quizás no haga falta hacer un zoom con ese, podríamos directamente
+mostrar un ploteo entre 0 y 20, poner los ticks correspondientes y listo.
+
+El gráfico 1 también ya está, puedo charlar esto con Pablo mañana entonces.
+Cuestión que el tema de la Variación Promedio me parece que está bien
+el gráfico, marca la línea del criterio de Convergencia, el cual eventualmente
+se puede remover, marca el gráfico de la Variación Promedio en la cual se observa
+claramente que la variación cambia su tendencia cada vez que la red se reconstruye.
+
+Bueno, si bien tengo que hablar con Pablo para ver qué opina al respecto
+de esos gráficos, igualmente podemos ir preparando lo que vamos a tener que
+hacer mañana para construir los otros gráficos. Por un lado está el 
+tema de mostrar las redes de Actividad que se van formando. Para eso
+podemos tomar el código de Tiempo Extra y modificarlo de forma de que
+luego de evolucionar el sistema, justo antes de desarmar la red, 
+me guarde la matriz de Adyacencia y los valores de Opiniones. De esa
+manera puedo ver qué hizo el sistema sobre ese conjunto de agentes.
+Guardarme las opiniones al inicio de la construcción de la red no 
+me parece buena idea porque en ese caso tendría lo que quedó
+de la red anterior, y si me aparecen sujetos con opiniones cercanas
+a cero conectados, no serían representativos de si la red los
+polariza o no.
+
+En src tengo un archivo de Redes de Actividad Conexas que guarda dos
+archivos. Por lo que veo, fue usado para calcular la Dinámica de
+las Regiones de Consenso. Creo que entonces puedo tomar ese mismo
+archivo, modificarlo y usarlo para ir armando el gráfico 4.
+Se me ocurre arrancar por ahí porque por lo que vi no hay una carpeta
+de Tiempo Extra, tengo que buscar esa carpeta. Antes de meterme con eso,
+definamos esto. La idea es guardarme la matriz de Actividad Conexa, no
+necesito esperar a que el sistema converja. Y además voy a querer ver
+cómo quedan las redes en el caso de Consenso, para mostrar que la red
+no se termina de construir ahí, mostrar la red en Polarización Descorrelacionada
+para ver que se forman cuatro comunidades y en Estado Ideológico quiero ver
+que se forman dos comunidades. Entonces el plan es arrancar graficando
+el caso de Polarización Descorrelacionada. Y guardamos la red una vez
+que el sistema converge así nos ahorramos problemas. Teniendo eso,
+lo mandamos al Workspace de Google y desde ahí nos encargamos de visualizar
+la red y ver si podemos aplicar algún método de detección de Comunidades.
+Si logramos hacer funcionar eso, recién entonces nos armamos las redes
+en Consenso y en Estado Ideológico. Si todo sale bien, tendremos entonces
+tres gráficos que colocar y eso será lo correspondiente al gráfico 4.
+
+Ahora, sobre el gráfico 3, vamos a tener que. No completé esta idea, pero
+me imagino que iba de la mano de ver cuál archivo usar para generar estos
+datos.
+
+-------------------------------------------------------------------------------
+
+31/12/2021
+
+Última reunión del año con Pablo, vamos a charlar sobre algunos gráficos y cosas.
+Anotaciones importantes:
+
+.) En algún momento hacer mención sobre que no se hizo un barrido en la controversialidad,
+o en K o cosas así en el modelo de Actividad. Para eso citar el paper de Baumann y decir
+que se mostró que no era relevante.
+.) A la hora de armar las conclusiones plantear que vimos los estados radicalizados,
+que no vimos los estados polarizados en Actividad y que lo corregimos con
+Actividad Conexa.
+.) En la parte de dinámica en las regiones, al final va 
+.) La introducción queda para resolver después.
+
+.) Fijate si podés juntar en un gráfico 10 tipos con alta actividad y 10 tipos con
+baja actividad y graficarlos juntos y hacer un claro contraste con eso.
+.) En el de Variación Promedio hacé dos gráficos en uno y andá comparando la Variación
+que se observa en el caso de Redes de Actividad con Redes Estáticas
+
+Organicemos el trabajo. La cosa es que Pablo me propuso otra forma de hacer los gráficos
+que me involucra armar nuevas simulaciones y de ahí levantar datos. Por no hablar
+de mezclar datos con simulaciones de redes estáticas, lo cual va a ser un problema
+en sí mismo. Así que vamos viendo cómo lo resolvemos. La idea sería resolver
+qué código tengo en src y cuál debería usar. Por lo que estoy viendo, en Actual tengo
+un código que, si bien no es exactamente el de Tiempo Extra, al parecer es muy similar.
+Desde ahí puedo armar las simulaciones necesarias para construir el gráfico 1, el
+2 y el 3. Para eso necesito tener anotadas las actividades de los agentes, las opiniones
+en función del tiempo y la matriz de adyacencia cada vez que se rearma. Ya revisé mejor
+la documentación, es la carpeta Analizando Actividades la que tiene un código
+más fiel de Tiempo Extra. La idea sería armar dos archivos. Uno donde guardo las actividades
+iniciales de los agentes y luego las matrices de adyacencia, mientras que el segundo
+guarde la evolución de las opininiones en todos los pasos. Con eso tengo todo preparado
+para armar los gráficos necesarios. Decidiré cuántas iteraciones necesito cosa de
+tener varias opciones para armar los gráficos .
+
+Ahora, arranquemos esto de manera un poco más ordenada. Organicemos la documentación,
+guardemos los archivos, saquemos lo que está en src, revisemos la documentación
+de las carpetas de datos y recién después arrancamos a simular.
+
+Las carpetas en Programas ya están organizadas y la Documentación actualizada. Ahora
+voy a mirar algunos archivos en Programas C que están dando vueltas raro.
+Me gustaría meter los archivos de Bash dentro de una carpeta aparte, pero tengo
+miedo de hacer cagadas, creo que lo mejor sería hacer eso en un momento donde
+esté corriendo cosas para poder ir probándolo. A cambio, me haré un archivo de
+Documentación que cuente qué hace cada cosa. Trabajo hecho. Graciosamente
+habí un archivo llamado Readme.md que tenía inicialmente ese mismo espíritu.
+Lo borré y me quedé con mi nueva Documentación. Acabo de darme cuenta para qué
+es que estaba el Readme.md. Voy a descargarlo de nuevo del Github.
+
+Para no pasarme todo el día armando documentación, voy a simplemente
+documentar las carpetas con datos, y después continuaré otro día documentando
+los archivos de Python, tanto los que están en la carpeta al inicio de Python
+como los que están en la carpeta Programas dentro de DRE.
+Aún terminando eso, sigo teniendo que documentar las Imágenes. La eterna burocracia
+no finaliza nunca.
+
+Bueno, ya actualicé la Documentación en las Carpetas de Programas Python.
+Quedará para un futuro el actualizar la Documentación respecto a los programas
+de python usados para analizar los datos y las carpetas de imágenes. Pero
+eso será después de terminada la tesis. Quizás incluso sea lo primero que
+haga cuando arranque a laburar con Pablo y demás.
+
+Ahora sí, ya tengo buena parte organizada, como para mañana arrancar a armar
+tres de los cinco gráficos que necesito hacer. Es mi plan que además haya un
+nuevo archivo python y una nueva carpeta donde guardar esos datos específicos.
+Aunque quizás no arme el nuevo archivo de Python y reuse lo que ya tengo. Veré.
+Esto de armar gráficos manualmente es un tema en verdad.

@@ -62,8 +62,7 @@ def ldata(archive):
 def AlfaC(x,GM):
     T = 2 # Número de tópicos
     K = 3 # Influencia social
-    
-    if(x > 0):
+    if(x>0):
         alfa = (T-1)/((GM*K)*(T-1+x))
     else:
         alfa = (T-1)/((GM*K)*(T-1-x))
@@ -120,71 +119,82 @@ def Indice_Color(vector,Divisiones):
 # Finalmente, si algunos de estos productos me dan positivos y otros negativos,
 # entonces estoy en Polarización Descorrelacionada.
 
-def EstadoFinal(Array):
+def EstadoFinal(Array,Histo,Bins):
     
-    Topicos = 2    
-    # Primero veo el caso de que hayan tendido a cero. En este caso lo importante
-    # es ver que la mayoría haya ido al cero y que alguno que se haya escapado no
-    # me joda el consenso. Pedir que el 90% esté debajo del umbral es lo mismo que
-    # decir que como máximo 100 sujetos se hayan escapado, que es un número
-    # me parece razonable.
+    Topicos = 2
+
+    # Primero identifico los tres posibles picos
     
-    ArrayAbs = np.absolute(Array)
-    Comprobacion = np.sqrt(ArrayAbs[0::2]*ArrayAbs[0::2] + ArrayAbs[1::2]*ArrayAbs[1::2])
-    Cant0 = np.count_nonzero(Comprobacion < 2*math.sqrt(2.5))/len(Comprobacion)
-    if Cant0 > 0.95:
+    Nbins = len(Bins) # Esto es la cantidad de bins totales en los que dividí mi distribución
+    
+    Pcero = Histo[int((Nbins-1)/2)] # Esto es cuánto mide el pico en cero
+    
+    DistNegativa = Histo[0:int((Nbins-1)/2)] # Este es la distribución de las opiniones negativas
+    Pmenos = max(DistNegativa) # Esto es la altura del pico de Distribución negativa
+    
+    DistPositiva = Histo[int((Nbins-1)/2)+1::] # Este es la distribución de las opiniones positivas
+    Pmas = max(DistPositiva) # Esto es la altura del pico de Distribución positiva
+    
+    
+    ###########################################################################
+    
+    # Ahora que tengo los picos, puedo empezar a definir el tema de los estados
+    #finales. Arranco por el Consenso
+    
+    if Pcero == max(Pcero,Pmas,Pmenos):   #Pcero*0.85 > Pmax:  (Esto es la versión con umbral)
         return "Consenso"
     
-    #----------------------------------------------------------
-    # Ahora veamos los otros dos casos. Primero voy a armar
-    # un array que tenga las opiniones del tópico 1, y otro
-    # con las opiniones del tópico 2.
+    ###########################################################################
     
-    ArrayT1 = Array[0::2]
-    ArrayT2 = Array[1::2]
-    Maximo = max(ArrayAbs)
+    # Ahora veamos el caso de región de transición. Este estado
+    # Lo caracterizo porque el sistema tiene un pico central y picos por fuera
+    # que no son definitorios del estado
     
-    OpinionesFiltradas = np.zeros(len(Array))
+#    Pmediano = min(Pmas,Pmenos)
     
-    for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
-        if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
-            OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+#    if Pmaximo*0.7 < Pcero < Pmaximo*1.3 and Pmaximo*0.7 < Pmas < Pmaximo*1.3 and Pmaximo*0.7 < Pmenos < Pmaximo*1.3 :
+#        return "RegionTrans"
     
-    ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+    ###########################################################################
     
-    Cant1 = np.count_nonzero(ArrayCuad == 1)
-    Cant2 = np.count_nonzero(ArrayCuad == 2)
-    Cant3 = np.count_nonzero(ArrayCuad == 3)
-    Cant4 = np.count_nonzero(ArrayCuad == 4)
+#    indicemenos = np.where(DistNegativa == Pmenos)[0][0]
+#    indicemas = np.where(DistPositiva == Pmas)[0][0]
     
-    if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
-        return "Ideologico"
-    elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
-        return "Ideologico"
-    else:
-        return "Polarizacion"
-
-
-# Armo una función acá que tome el conjunto de opiniones obtenidas en todas las iteraciones
-# y luego promedie las opiniones para darme el estado al cual converge el sistema
-
-def PromediosOpiniones(Array):
+    if Pcero == min(Pcero,Pmas,Pmenos):  #and Pcero < Pmediano*0.85: (Esto es de la versión umbral)
+        
+        # Filtro los agentes que se hayan desviado apenas, cosa
+        # de que el criterio final se decida con los agentes que se polarizaron
+        # correctamente y no los que terminaron en cualquier lugar cerca del
+        # cero.
+        ArrayT1 = Array[0::2]
+        ArrayT2 = Array[1::2]
+        Maximo = max(np.absolute(Array))
+        
+        OpinionesFiltradas = np.zeros(len(Array))
+        
+        for agente,x1,x2 in zip(np.arange(len(ArrayT1)),ArrayT1,ArrayT2):
+            if abs(x1) > Maximo*0.3 and abs(x2) > Maximo*0.3:
+                OpinionesFiltradas[0+agente*Topicos:2+agente*Topicos] = [x1,x2]
+        
+        # Ahora veamos los otros dos casos. Primero voy a armar
+        # un array que tenga las opiniones del tópico 1, y otro
+        # con las opiniones del tópico 2.
+        
+        ArrayCuad = ClasificacionCuadrantes(OpinionesFiltradas)
+        
+        Cant1 = np.count_nonzero(ArrayCuad == 1)
+        Cant2 = np.count_nonzero(ArrayCuad == 2)
+        Cant3 = np.count_nonzero(ArrayCuad == 3)
+        Cant4 = np.count_nonzero(ArrayCuad == 4)
+        
+        if Cant2 > 0 and Cant4 > 0 and Cant1 == 0 and Cant3 == 0:
+            return "Ideologico"
+        elif Cant2 == 0 and Cant4 == 0 and Cant1 > 0 and Cant3 > 0:
+            return "Ideologico"
+        else:
+            return "Polarizacion"
     
-    # Tomo el array, y luego voy armando mi resultado a partir de promediar
-    # las opiniones finales de todas las iteraciones. Para eso primero necesito
-    # definir T y N
-    
-    T = 2
-    N = 1000
-    
-    
-    Resultado = np.zeros(N*T)
-    
-    for opinion in range(N*T):
-        Resultado[opinion] = np.mean(Array[opinion::N*T])
-    
-    return Resultado
-    
+    return "RegionTrans"
 
 
 # Voy a definir una función que tome un array con opiniones del sistema y me 
@@ -207,17 +217,13 @@ def ClasificacionCuadrantes(Array):
     SwitchDic[(-1,1)] = 2
     SwitchDic[(-1,-1)] = 3
     SwitchDic[(1,-1)] = 4
-    SwitchDic[(1,0)] = 0
-    SwitchDic[(0,1)] = 0
-    SwitchDic[(0,-1)] = 0
-    SwitchDic[(-1,0)] = 0
-    SwitchDic[(0,0)] = 0
+
     
     # Repaso los elementos en Signos para identificar los cuadrantes de mis objetos.
     
     for x1,x2,indice in zip(Array[0::2],Array[1::2],np.arange(len(Array[0::2]))):
         Absolutos = np.abs(np.array([x1,x2]))
-        if max(Absolutos)<0.01:
+        if max(Absolutos)<0.5 or x1==0 or x2==0:
             Resultado[indice] = 0
         else:
             Signos = np.sign(np.array([x1,x2]))
@@ -256,93 +262,61 @@ t0 = time.time()
 
 # Primero levanto datos de la carpeta de la red REDES
 
+SuperDiccionario = dict()
+
 Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra","RCC"]
-#SelCarpeta = 1
-for SelCarpeta in [4]: # range(1,len(Carpetas)):
+
+for SelCarpeta in [3]:
+    
+    # CÓDIGO PARA LEVANTAR ARCHIVOS DE UNA CARPETA CON TODOS LOS ARCHIVOS MEZCLADOS
     
     CarpCheck=[[root,files] for root,dirs,files in os.walk("./DilAct/{}".format(Carpetas[SelCarpeta]))]
     
     # El elemento en la posición x[0] es el nombre de la carpeta
     
     for x in CarpCheck:
-        # dada = x[0].split("\\")
         Archivos_Datos = [nombre for nombre in x[1]]
         Archivos_Datos.insert(0,x[0])
+        
     
-    # Con esto tengo los nombres de todos los archivos en la carpeta de Datos de Barabasi
-    # Archivos_Datos tiene en la primer coordenada el principio de la dirección
-    # de la carpeta, y el resto de elementos son los archivos en la carpeta.
-    
-    #---------------------------------------------------------------------------------------------
+
+    #-------------------------------------------------------------------------------------------------------
     
     # Es importante partir del hecho de que mis archivos llevan por nombre: "Datos_Opiniones_alfa=$_Cdelta=$_N=$_Iter=$"
+    # También tengo otros archivos llamados "Datos_Actividades_alfa=$_Cdelta=$_N=$_Iter=$"
     
-    Conjunto_Alfa = []
-    Conjunto_Cdelta = []
-    Conjunto_N = []
+    Conjunto_Direcciones = [Archivos_Datos[0]]
+    
+    SuperDiccionario[Carpetas[SelCarpeta]] = dict()
     
     for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
+        tipo = nombre.split("_")[1]
         alfa = float(nombre.split("_")[2].split("=")[1])
         Cdelta = float(nombre.split("_")[3].split("=")[1])
         N = int(nombre.split("_")[4].split("=")[1])
-        if alfa not in Conjunto_Alfa:
-            Conjunto_Alfa.append(alfa)
-        if Cdelta not in Conjunto_Cdelta:
-            Conjunto_Cdelta.append(Cdelta)
-        if N not in Conjunto_N:
-            Conjunto_N.append(N)
+        if tipo not in SuperDiccionario[Carpetas[SelCarpeta]].keys():
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta][alfa] = [nombre]
+        if N not in SuperDiccionario[Carpetas[SelCarpeta]][tipo].keys():
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta][alfa] = [nombre]
+        elif Cdelta not in SuperDiccionario[Carpetas[SelCarpeta]][tipo][N].keys():
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta] = dict()
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta][alfa] = [nombre]
+        elif alfa not in SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta].keys():
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta][alfa] = [nombre]
+        else:
+            SuperDiccionario[Carpetas[SelCarpeta]][tipo][N][Cdelta][alfa].append(nombre)
+
     
-    Conjunto_Alfa.sort()
-    Conjunto_Cdelta.sort()
-    Conjunto_N.sort()
-    
-    # Bien, esto ya me arma el conjunto de Alfas, Cdelta, N y Gm correctamente y ordenados
-    # Ahora podemos pasar a lo importante de esta celda
-    
-    #--------------------------------------------------------------------------------------------
-    
-    # Voy a armar un diccionario que contenga las listas de los nombres de los archivos asociados
-    # a un cierto N, Alfa, Cdelta y Gm. Me armo primero el superdiccionario, que es el diccionario,
-    # que contiene diccionarios, que llevan a diccionarios que lleva a diccionarios
-    # que lleva a diccionarios que llevan a las listas de los nombres
-    # de los archivos, donde los ingresos a los diccionarios son el número de Agentes, el Alfa,
-    # el Cdelta, el tipo de red y el Gm respectivos. 
-    # Entonces la lista se accede sabiendo el Alfa, Cdelta y N correspondiente de antemano.
-    
-    SuperDiccionario = dict()
-    
-    for AGENTES in Conjunto_N:
-        SuperDiccionario[AGENTES] = dict()
-        for ALFA in Conjunto_Alfa:
-            for CDELTA in Conjunto_Cdelta:
-                for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-                    alfa = float(nombre.split("_")[2].split("=")[1])
-                    Cdelta = float(nombre.split("_")[3].split("=")[1])
-                    N = int(nombre.split("_")[4].split("=")[1])
-                    if N==AGENTES and alfa==ALFA and Cdelta==CDELTA:
-                        if alfa not in SuperDiccionario[AGENTES].keys():
-                            SuperDiccionario[AGENTES][ALFA] = dict()
-                        if Cdelta not in SuperDiccionario[AGENTES][ALFA].keys():
-                            SuperDiccionario[AGENTES][ALFA][CDELTA] = []
-                        else:
-                            break
-                    
-                
-    
-    for nombre in Archivos_Datos[1:len(Archivos_Datos)]:
-        alfa = float(nombre.split("_")[2].split("=")[1])
-        Cdelta = float(nombre.split("_")[3].split("=")[1])
-        N = int(nombre.split("_")[4].split("=")[1])
-        SuperDiccionario[N][alfa][Cdelta].append(nombre)
-        
-    # Ya mejoré el armado del SuperDiccionario de manera de que cada N tenga los Alfa y cada
-    # Alfa tenga los Cdelta y cada Cdelta tenga los GM correspondientes. Antes me pasaba que el Conjunto_Alfa era el conjunto
-    # de TODOS los Alfas que hubiera entre todos los archivos, entonces si algún N tenía
-    # Alfas que el otro no, eso podía generar problemas. Ahora, como cada diccionario
-    # armado para cada N tiene por keys sólo los Alfas de ese N, puedo usar eso para
-    # definir el Conjunto_Alfa de cada N y evitar los problemas que había visto que
-    # iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
-    
+    # Le hice una modificación a esta parte del código, ahora esto trabaja
+    # armando el SuperDiccionario también, no sólo los Conjuntos de Alfa, Cdelta
+    # y demás. Lo bueno de esto es que ahora el armado del SuperDiccionario
+    # es mucho más rápido.
+
     #--------------------------------------------------------------------------------------------
         
     # Tengo que saber cuántas veces itero los programas para poder saber el tamaño de mis datos de los
@@ -365,30 +339,17 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
     
     
     for AGENTES in [1000]:
+        
+        tipo = "Opiniones"
     
-        Conjunto_Alfa = list(SuperDiccionario[AGENTES].keys())
-    
-        Conjunto_Cdelta = list(SuperDiccionario[AGENTES][Conjunto_Alfa[0]].keys())[0]
+        Conjunto_Cdelta = list(SuperDiccionario[Carpetas[SelCarpeta]][tipo][AGENTES].keys())
+        Conjunto_Cdelta.sort()
         
-        # Primero me armo los grid para el gráfico de las fases. Para eso
-        # primero tengo que armarme un array y con el np.meshgrid armarme 
-        # los grids del pcolormesh.
         
-    #    Conjunto_Alfa.reverse() # Lo invierto para que me quede el uno arriba y no abajo
-    #    
-    #    x = np.array(Conjunto_Cdelta)
-    #    y = np.array(Conjunto_Alfa)
-    #    
-    #    Conjunto_Alfa.reverse() # Lo vuelvo a invertir para que de nuevo esté como siempre.
-    #    
-    #    XX,YY = np.meshgrid(x,y)
-    #    
-    #    ZZ = np.zeros(XX.shape)
-        
-        # Con esto ya tengo armados los grids de XX,YY y de paso me armo el grid
-        # del ZZ para ir rellenándolo a medida que corro todo el programa, o usando
-        # los datos que ya guardé de antes. Para eso es el módulo siguiente
-        
+        Conjunto_Alfa = list(SuperDiccionario[Carpetas[SelCarpeta]][tipo][AGENTES][0].keys())
+        Conjunto_Alfa.sort()
+
+        """
         # Me armo los arrays que voy a necesitar para graficar la varianza. Xvar es los valores
         # de alfa para los cuales calculo la varianza. Yvar1 es la varianza del tópico 1,
         # Yvar2 es la varianza del tópico 2, Varvar1 es el valor de Desviación media de la varianza
@@ -399,33 +360,33 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
         Yvar2 = np.zeros(len(Conjunto_Alfa))
         Varvar1 = np.zeros(len(Conjunto_Alfa))
         Varvar2 = np.zeros(len(Conjunto_Alfa))
+        """
+        
         
         #--------------------------------------------------------------------------------------------
         
-        for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
+#        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+        for CDELTA in [0]:
             
-            CDELTA = 0
-            icdelta = 0
+            for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
+#            for ALFA in [0.3]:
             
-    #        for CDELTA,icdelta in zip(Conjunto_Cdelta,np.arange(len(Conjunto_Cdelta))):
+                #-----------------------------------------------------------------------------------
+                
+                # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
+                # que voy a necesitar para después
+                
+                OpinionesFinales = np.array([])
+                OpinionesIniciales = np.array([])
+                Resultados = list()
+                Testigos = dict()
+                for i in range(5):
+                    Testigos[i] = np.array([])
+                
+                #-------------------------------------------------------------------------------------
+                
+                for nombre in SuperDiccionario[Carpetas[SelCarpeta]][tipo][AGENTES][CDELTA][ALFA]:
             
-            #-----------------------------------------------------------------------------------
-            
-            # Abro mis gráficos, creo listas que voy a llenar con todas las simulaciones y armo algunas cosas varias
-            # que voy a necesitar para después
-            
-            OpinionesFinales = np.array([])
-            OpinionesIniciales = np.array([])
-            Resultados = list()
-            Testigos = dict()
-            for i in range(5):
-                Testigos[i] = np.array([])
-            
-            #-------------------------------------------------------------------------------------
-            
-            for nombre in SuperDiccionario[AGENTES][ALFA][CDELTA]:
-                if nombre.split("_")[1] == "Opiniones":
-        
                     #--------------------------------------------------------------------------------------------
                 
                     # Levanto los datos del archivo original y separo los datos en tres listas.
@@ -445,7 +406,7 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
                     
                     # Voy a mirar en cada una de las iteraciones el estado final y guardarme eso en una lista.
                     
-                    Resultados.append(EstadoFinal(Opi))
+#                    Resultados.append(EstadoFinal(Opi))
                     
                     #------------------------------------------------------------------------------------------------
                     
@@ -471,66 +432,72 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
                     
                     #-------------------------------------------------------------------------------------------------
 
-            Graficar = np.random.choice(int(len(Testigos[0])/Iteraciones),2,False)
-            
-
-            # Hago un gráfico de los tópicos de los agentes testigos en función del tiempo. Hago un gráfico
-            # para todas las iteraciones de un agente y de un tópico
-            
-            for repeticion in Graficar:
-                plt.rcParams.update({'font.size': 18})
-                plt.figure("Topico",figsize=(20,15))
-                X = np.arange(len(Testigos[0][0:Iteraciones:2]))*0.01
-                for sujeto in range(len(AgentesTestigos)):
-                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+0:(repeticion+1)*Iteraciones+0:2], label="T=0,agente={}".format(AgentesTestigos[sujeto]), linewidth = 4)
-                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2], label="T=1,agente={}".format(AgentesTestigos[sujeto]), linewidth = 4)
-                plt.xlabel("Tiempo")
-                plt.ylabel("Tópico")
-                plt.ylim(-30,30)
-                plt.grid()
-                plt.legend()
-                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                plt.savefig("../Imagenes/RedAct/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
-                plt.close("Topico")
-                    
-    #                plt.rcParams.update({'font.size': 18})
-    #                plt.figure("Topico2",figsize=(20,15))
-    #                X = np.arange(len(Testigos[0][1:Iteraciones+1:2]))*0.01
-    #                for sujeto in range(len(AgentesTestigos)):
-    #                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2],linewidth = 4)
-    #                plt.xlabel("Tiempo")
-    #                plt.ylabel("Tópico 2")
-    #                plt.grid()
-    #                plt.annotate("Agente {}".format(AgentesTestigos[sujeto]), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-    #                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-    #                plt.savefig("../Imagenes/RedAct/Topico2_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
-    #                plt.close("Topico2")
+    #            Graficar = np.random.choice(int(len(Testigos[0])/Iteraciones),2,False)
                 
-            """
-            #----------------------------------------------------------------------------------------------
+                """
+                # Hago un gráfico de los tópicos de los agentes testigos en función del tiempo. Hago un gráfico
+                # para todas las iteraciones de un agente y de un tópico
+                
+                for repeticion in [1,2]:
+                    plt.rcParams.update({'font.size': 24})
+                    plt.figure("Topico",figsize=(20,15))
+                    X = np.arange(len(Testigos[0][0:Iteraciones:4]))*0.01
+                    for sujeto in [1,0,2]:
+                        inicio = repeticion*Iteraciones+0
+                        final = int(inicio + Iteraciones/2)
+#                        if sujeto == 1:
+#                            plt.plot(X[::100],Testigos[sujeto][inicio:final:200],linestyle = "", marker = "o", color = "red", markersize = 12, alpha = 0.7)
+                        plt.plot(X,Testigos[sujeto][inicio:final:2],linewidth = 4)
+    #                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2], label="T=1,agente={}".format(AgentesTestigos[sujeto]), linewidth = 4)
+                    plt.xlabel("Tiempo")
+                    plt.ylabel(r"$x^1$")
+#                    plt.ylim(-30,30)
+                    plt.xticks(np.arange(0,51,5))
+                    plt.grid()
+    #                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+                    plt.savefig("../Imagenes/RedAct/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
+                    plt.close("Topico")
+                        
+        #                plt.rcParams.update({'font.size': 18})
+        #                plt.figure("Topico2",figsize=(20,15))
+        #                X = np.arange(len(Testigos[0][1:Iteraciones+1:2]))*0.01
+        #                for sujeto in range(len(AgentesTestigos)):
+        #                    plt.plot(X,Testigos[sujeto][repeticion*Iteraciones+1:(repeticion+1)*Iteraciones+1:2],linewidth = 4)
+        #                plt.xlabel("Tiempo")
+        #                plt.ylabel("Tópico 2")
+        #                plt.grid()
+        #                plt.annotate("Agente {}".format(AgentesTestigos[sujeto]), xy=(0.75,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+        #                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.75,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+        #                plt.savefig("../Imagenes/RedAct/Topico2_alfa={:.2f}_Cdelta={:.2f}_N={}_iter={}.png".format(ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
+        #                plt.close("Topico2")
+                
             
-            # Acá lo que voy a hacer es rellenar el grid de ZZ con los valores de los resultados de
-            # opiniones finales
+                #---------------------------------------------------------------------------------------------------
+                """
+                # Voy a acá armar el gráfico de la Variación Promedio del sistema en cada una de las simulaciones.
+                # La idea es mostrar que esta oscila en un valor muy por encima del crietrio de corte, y
+                # después hacer un zoom mostrando que en los intervalos de tiempo discreto, cuando la red se
+                # rearma, la Variación Promedio se dispara y vuelve a lentamente empezar a caer.
+                
+                plt.rcParams.update({'font.size': 24})
+                plt.figure("VarProm",figsize=(20,15))
+                X = np.arange(len(Testigos[0][0:Iteraciones:2]))*0.01
+                plt.plot(X[0:2000],Var[0:2000], linewidth = 4)
+                plt.hlines(y = 0.005, xmin = 0, xmax = 20, color = "red",linewidth = 3)
+                plt.xlabel("Tiempo")
+                plt.ylabel("Variación Promedio")
+                plt.xticks(np.arange(0,21))
+                plt.grid()
+                plt.savefig("../Imagenes/RedAct/{}/VarProm_alfa={:.3f}_Cdelta={:.2f}_N={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES),bbox_inches = "tight")
+                plt.close("VarProm")
+                
             
-            # Voy a agregar un paso extra en esto porque el sistema está teniendo problemas en clasificar algunos casos límite
-    #        EC = [("Consenso",0),("Polarizacion",1),("Ideologico",2)] # EC es Estados y colores. Tiene tuplas con los colores asociados
             
-            # Voy a tomar la lista de todos los estados finales del sistema y contar cuál estado es el que más aparece.
-            # Ese estado es el que voy a pasarle al gráfico de los estados finales.
-            
-    #        Maximos = [0,0,0]
-            
-            # Para identificar cuál es el que aparece más veces, simplemente cuento cuantas veces aparece cada uno.
-    #        for estado in EC:
-    #            Maximos[estado[1]] = Resultados.count(estado[0])
-            
-            # Básicamente paso la posición del estado que haya aparecido más veces, total la posición puede ir entre
-            # 0,1 y 2, y esos números son justamente los que le pasaba a la matriz.
-    #        ZZ[len(Conjunto_Alfa)-1-ialfa, icdelta] = Maximos.index(max(Maximos)) 
             
             
             #---------------------------------------------------------------------------------------------------
             
+            """
             # Voy a guardarme para cada Alfa la fracción de estados finales que llegan
             # al consenso. Al mismo tiempo voy a ir armando el vector de Alfas
             
@@ -556,42 +523,42 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
             # el hecho de que los límites de los gráficos tienen que ser entre -30 y 30
             
             # Armo los valores X e Y que me dibujan el círculo
-            Tita = np.linspace(0,2*math.pi,1000)
-            Xcirc = 2*math.sqrt(2.5)*np.cos(Tita)
-            Ycirc = 2*math.sqrt(2.5)*np.sin(Tita)
-            
-            
-            for repeticion in Graficar:
-                plt.rcParams.update({'font.size': 18})
-                plt.figure("Grafico Opiniones",figsize=(20,15))
-                
-                # Grafico los puntos iniciales de las opiniones
-                for x1,x2 in zip (OpinionesIniciales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2],OpinionesIniciales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2]):
-                    plt.plot(x1,x2, "o" ,c = "black", markersize=5, alpha = 0.5)
-                
-                # Grafico los puntos finales de las opiniones
-                for x1,x2 in zip (OpinionesFinales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2],OpinionesFinales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2]):
-                    indice = Indice_Color(np.array([x1,x2]),Divisiones)
-                    plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
-                
-                # Grafico el círculo en distancia 2 sigma del cero
-                plt.plot(Xcirc,Ycirc,"--",linewidth=5,alpha=0.6)
-                
-                #            plt.tick_params(left=False,
-                #                bottom=False,
-                #                labelleft=False,
-                #                labelbottom=False)
-                plt.xlabel("Tópico 1")
-                plt.ylabel("Tópico 2")
-                plt.xlim(-30,30)
-                plt.ylim(-30,30)
-    #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
-    ##                    plt.xlim((xmin,xmax))
-    ##                    plt.ylim((ymin,ymax))
-                plt.annotate("{}".format(EstadoFinal(OpinionesFinales[repeticion*len(Opi):(repeticion+1)*len(Opi)])), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={},iter={}".format(ALFA,CDELTA,AGENTES,repeticion), xy=(0.7,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-                plt.savefig("../Imagenes/RedAct/{}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
-                plt.close("Grafico Opiniones")
+#            Tita = np.linspace(0,2*math.pi,1000)
+#            Xcirc = 2*math.sqrt(2.5)*np.cos(Tita)
+#            Ycirc = 2*math.sqrt(2.5)*np.sin(Tita)
+#            
+#            
+#            for repeticion in Graficar:
+#                plt.rcParams.update({'font.size': 18})
+#                plt.figure("Grafico Opiniones",figsize=(20,15))
+#                
+#                # Grafico los puntos iniciales de las opiniones
+#                for x1,x2 in zip (OpinionesIniciales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2],OpinionesIniciales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2]):
+#                    plt.plot(x1,x2, "o" ,c = "black", markersize=5, alpha = 0.5)
+#                
+#                # Grafico los puntos finales de las opiniones
+#                for x1,x2 in zip (OpinionesFinales[repeticion*len(Opi)+0:(repeticion+1)*len(Opi)+0:2],OpinionesFinales[repeticion*len(Opi)+1:(repeticion+1)*len(Opi)+1:2]):
+#                    indice = Indice_Color(np.array([x1,x2]),Divisiones)
+#                    plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+#                
+#                # Grafico el círculo en distancia 2 sigma del cero
+#                plt.plot(Xcirc,Ycirc,"--",linewidth=5,alpha=0.6)
+#                
+#                #            plt.tick_params(left=False,
+#                #                bottom=False,
+#                #                labelleft=False,
+#                #                labelbottom=False)
+#                plt.xlabel("Tópico 1")
+#                plt.ylabel("Tópico 2")
+#                plt.xlim(-30,30)
+#                plt.ylim(-30,30)
+#    #                    #            plt.title(r"Trayectoria de las opiniones en el espacio de tópicos para $\alpha$={},cos($\delta$)={} y N={}".format(ALFA,CDELTA,AGENTES))
+#    ##                    plt.xlim((xmin,xmax))
+#    ##                    plt.ylim((ymin,ymax))
+#                plt.annotate("{}".format(EstadoFinal(OpinionesFinales[repeticion*len(Opi):(repeticion+1)*len(Opi)])), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.annotate(r"$\alpha$={},cos($\delta$)={},N={},iter={}".format(ALFA,CDELTA,AGENTES,repeticion), xy=(0.7,0.85),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
+#                plt.savefig("../Imagenes/RedAct/{}/Grafico_opiniones_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpetas[SelCarpeta],ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
+#                plt.close("Grafico Opiniones")
 
             #------------------------------------------------------------------------------------------------
                 
@@ -613,7 +580,6 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
     #                plt.close("TdO")
             
             #----------------------------------------------------------------------------------------------------------
-            """
             # Para graficar los valores de la Varianza en función de Alfa necesito primero aprovechar el for del Alfa
             # y armar mis datos al respecto.
             
@@ -634,65 +600,7 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
             # Con esto me armé los datos que voy a graficar de la varianza. Ahora sólo tengo que hacer el gráfico.
             
             #----------------------------------------------------------------------------------------------------------
-    
-        # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
-        
-        # Armo mi colormap. Para eso armo una lista con los colores que voy a usar,
-        # los cuales son una tuplas de tres elementos que combinan colores en proporción
-        # donde el primer número es el color rojo, el segundo el verde y el tercero el azul.
-        # Con eso luego uso la función de LinearSegmentedeColormap para que me traduzca
-        # mi lista de colores a un colormap, y como sólo voy a graficar tres valores
-        # en N pongo un 3 para separar el binneado de mi mapa de colores en sólo 3.
-        # Luego le mando ese colormap al pcolormesh y listo.
-        
-        
-    #    colors = [(0, 0.7, 0), (0, 0.3, 1), (1, 0.3, 0)]  #  R -> G -> B 
-    #    cmap_name = 'Mi_lista'
-    #    ColMap = LinearSegmentedColormap.from_list(cmap_name, colors, N=3)
-    #    
-    #    # Defino los parámetros usuales de mi gráfico
-    #    
-    #    plt.rcParams.update({'font.size': 24})
-    #    plt.figure("Espacio parametros",figsize=(20,12))
-    #    plt.xlabel(r"cos($\delta$)")
-    #    plt.ylabel(r"$\alpha$")
-    #    plt.title("Estados finales en EP")
-    #    
-    #    # Grafico la línea del Alfa Crítico teórico
-    #    
-    #    Xa = np.arange(-0.05,0.05,0.01)
-    #    Ya = np.array([AlfaC(x,0.817) for x in Xa]) # El grado Medio lo calculé aparte, después puedo ver de incorporar esto en el programa.
-    #    plt.plot(Xa,Ya,"--",color = "black",linewidth = 4, label = r"$\alpha_c$ teórico")
-    #    plt.annotate("Red Actividad N={}".format(AGENTES), xy=(0.35,0.95),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-    #    
-    #    # Armo el gráfico del Alfa Crítico experimental
-    #    
-    #    Xb = Conjunto_Cdelta
-    #    Yb = []
-    #    
-    #    for columna in range(ZZ.shape[1]):
-    #        for fila in range(ZZ.shape[0]-1):
-    #            if ZZ[fila,columna]!=0 and ZZ[fila+1,columna]==0:
-    #                Yb.append((YY[fila,columna]+YY[fila+1,columna])/2)
-    #                break
-    #                
-    #    plt.plot(Xb,Yb,"--",color = "yellow",linewidth = 4, label = r"$\alpha_c$ experimental")
-    #    
-    #    # Hago el ploteo del mapa de colores con el colormesh y usando el mapa de colroes creado por mi.
-    #    
-    #    plt.legend()
-    #    plt.pcolormesh(XX,YY,ZZ,shading="nearest", cmap = ColMap)
-    #    plt.savefig("../Imagenes/RedAct/{}/Estados finales EP.png".format(Carpetas[SelCarpeta]), bbox_inches = "tight")
-    #    plt.close("Espacio parametros")
-        
-        #---------------------------------------------------------------------------------------------------
-        
-        # Me falta guardar los valores de ZZ en un archivo, por si necesito hacerle un retoque al archivo y no 
-        # quiero volver a correr todo de una
-        
-    #    np.savetxt("Grafico Fases RedAct N={}.csv".format(AGENTES), ZZ, delimiter = ",")
-    
-    
+            
         #---------------------------------------------------------------------------------------------------
         
         # Acá armo los gráficos de Varianza en función de Alfa.
@@ -719,7 +627,7 @@ for SelCarpeta in [4]: # range(1,len(Carpetas)):
 
 Carpetas = ["Actividad Reversion","Regact","HomofiliaCero","TiempoExtra","RCC"]
 #SelCarpeta = 1
-for SelCarpeta in [4]:  #range(1,len(Carpetas)):
+for SelCarpeta in [3]:  #range(1,len(Carpetas)):
     
     CarpCheck=[[root,files] for root,dirs,files in os.walk("./DilAct/{}".format(Carpetas[SelCarpeta]))]
     
@@ -805,7 +713,6 @@ for SelCarpeta in [4]:  #range(1,len(Carpetas)):
     # iban a aparecer al querer graficar el mapa de colores de los estados finales del N=1000
     
     #--------------------------------------------------------------------------------------------
-
     plt.rcParams.update({'font.size': 24})
     plt.figure("Consenso vs alfa",figsize=(20,12))
 
@@ -853,16 +760,14 @@ for SelCarpeta in [4]:  #range(1,len(Carpetas)):
             # no estaría pudiendo hacerse corréctamente. Así que ahora mejor veo de graficar la cantidad de estados
             # finales de consenso en función del Alfa.
             
-            plt.plot(Xcons,Ycons,"o",markersize = 16-3*umbral, label=r"umbral = {}$\sigma$".format((umbral/2)))
+            plt.plot(Xcons,Ycons,"o",markersize = 16-3*umbral) # , label=r"umbral = {}$\sigma$".format((umbral/2)))
     
-    plt.vlines(AlfaC(0,0.817),0,1,colors="red", label="Alfa Critico")
+    plt.vlines(AlfaC(0,0.817),0,1,colors="red",linewidth = 3, label="Alfa Critico")
     plt.xlabel(r"$\alpha$")
     plt.ylabel("Fraccion de agentes")
-    plt.title("Fraccion de agentes en consenso en funcion de Alfa, Datos {}".format(Carpetas[SelCarpeta]))
-    plt.legend()
+#    plt.title("Fraccion de agentes en consenso en funcion de Alfa, Datos {}".format(Carpetas[SelCarpeta]))
     plt.grid()
-    plt.annotate(r"{}$\sigma$".format(umbral/2), xy=(0.45,0.9),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-    plt.savefig("../Imagenes/RedAct/{}/Consenso vs Alfa.png".format(Carpetas[SelCarpeta]), bbox_inches = "tight")
+    plt.savefig("../Imagenes/RedAct/{}/CvA.png".format(Carpetas[SelCarpeta]), bbox_inches = "tight")
     plt.close("Consenso vs alfa")
     
     
@@ -947,7 +852,7 @@ for SelCarpeta in [4]:  #range(1,len(Carpetas)):
             plt.close("Distribucion Opiniones")
                 
             #--------------------------------------------------------------------------------------------------------
-
+            """
 
 
 

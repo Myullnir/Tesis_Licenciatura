@@ -117,6 +117,8 @@ En esta carpeta la idea es armar datos de redes de Actividad que se van
 acumulando a medida que evoluciona el proceso. Esto debería decantar
 en un sistema que converge a algo, a diferencia de la idea de usar
 una red que se arma y desarma constantemente.
+Al final no converge a nada, porque el crecimiento ininterrumpido hace que
+el sistema nunca se estabilice.
 
 .) ActividadConexa:
 --------------------
@@ -129,3 +131,9 @@ lo que como sabemos que esas redes convergen, estas deberían converger también
 los datos de los agentes testigos y en los archivos de Datos Opinioens agregué al final
 una fila extra con datos de los grados de los agentes, de manera de tener eso como info
 extra del sistema.
+
+.) DinaReg:
+------------
+Acá coloqué algunas pocas simulaciones de redes de actividad, las cuales usé para construir
+mis gráficos de Dinámica en distintas regiones. Los archivos guardan datos de las opiniones
+de todos los agentes a lo largo de la evolución del sistema de principio a fin.

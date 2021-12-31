@@ -1,0 +1,78 @@
+Primero voy a documentar las carpetas que acá se encuentran. En un futuro
+documentaré los archivos de Python también.
+
+.) ipynb_checkpoints:
+------------------------
+Acá básicamente se guardan automáticamente instancias del notebook de Python.
+Yo nunca entro acá, se arma sólo porque coloqué un notebook en esta carpeta.
+
+.) Cambios dt:
+---------------
+Ahora está vacía, pero esta carpeta guardaba datos de redes estáticas
+en las que probé el ir variando el paso temporal dt para ver que tal
+daba el programa en esos casos. Creo que usamos un dt de 0,1 y de 
+0,001, aparte del que terminó quedando de 0,01.
+
+.) Datos Corte:
+----------------
+Acá armé datos de redes estáticas en las que probé el criterio de corte
+por primera vez. La idea era ver que el criterio efectivamente cortara
+el sistema. Esta también está vacía.
+
+.) DilAct:
+----------
+El nombre significa Dilema Actividad. Esta carpeta la armé en su momento para
+contener a todas las carpetas de cada cosa que iba probando con redes de actividad.
+Surgió en ese momento en que quisimos empezar a trabajar con la red de actividad
+y no lográbamos observar las cosas que ve Baumann. Empezamos a hacer pruebas,
+cada prueba era una nueva etapa y por tanto una carpeta nueva. Decidí juntarlas
+para separar redes de actividad de redes estáticas. Esto contiene a una serie de
+carpetas: AcRedes, Actividad Reversión, ActividadAcumulada, ActividadConexa,
+DinaReg, HomofiliaCero, RCC, Redes Actividad, Redes Actividad Oporto, Regact,
+TiempoExtra.
+
+.) DRE:
+-------
+El nombre de esta carpeta es Datos Redes Estáticas. Guarda todas las carpetas
+utilizadas en el trabajo de redes estáticas en su conjunto, es decir cuando
+arrancó el trabajo sobre Barabassi, Erdos-Renyi y Random Regulars a la par.
+Contiene las carpetas: Anomalia, Barabasi, DinaReg, Erdos-Renyi, ERZoom,
+NCC, Programas, RandomRegulars, RevisionNCC.
+
+.) ER2:
+--------
+Esta carpeta está vacía, creo que la usé para ir trabajando con Erdos-Renyi
+una vez que tuve el criterio de Corte y ya más o menos aceitada la red.
+
+.) ER2 Rev:
+-----------
+Esta carpeta está vacía, creo que surgió como una forma de revisar más
+en detalle la red de Erdos-Renyi que tenía algunos problemas.
+
+.) Grafico Baumann:
+--------------------
+Acá creo que fue la primer carpeta en la que guaardé archivos de datos
+con Trayectorias de Opiniones para ir armando gráficos como los de Baumann.
+En su momento la cosa funcionó bastante bien. También está vacía.
+
+.) Interacción Pares:
+---------------------
+En esta carpeta iban los archivos de datos armados con una evolución de
+la dinámica de la red en la que se evolucionaba un par de agentes a la
+vez. Esto era básicamente independiente de una red. Por supuesto que 
+esta carpeta está vacía.
+
+.) MARE:
+---------
+Esta carpeta guarda a su vez tres carpetas, una para cada red estática.
+Esas carpetas contienen las redes de adyacencias de redes estáticas
+construidas con el networkx. De acá es donde los archivos que grafican
+redes estáticas sacan sus redes. Los ID's que aparecían en los datos hacían
+referencia a estas redes. En total hay 20 redes para cada red estática
+y para cada grado medio.
+
+.) Modelo Erdos-Renyi:
+-----------------------
+Esta carpeta no me acuerdo qué tenía o porqué. Obvio que está vacía.
+Supongo que servía para guardar los primeros datos que construí
+con una red de Erdos-Renyi, luego de la interacción de Pares.

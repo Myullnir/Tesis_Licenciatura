@@ -1,0 +1,71 @@
+Acá voy a anotar de qué son los datos de cada una de las carpetas.
+
+.) Anomalia:
+------------
+Acá puse datos de las tres redes estáticas con grado medio 4. La idea era revisar
+por qué motivo la Dispersión de los tiempos de simulación daba tan mal en los casos
+de grado medio bajo de las redes. Honestamente, no pudimos descubrir motivo, simplemente
+pasaba. Lo importante es que descartamos el que sea un artefacto.
+
+.) Barabasi:
+------------
+Acá guardé en un principio los datos que iba armando de la red de Barabasi.
+Esto contiene datos de todos los grados medios. Dejé de usarlo cuando empecé a pasar
+a otras etapas que involucraban a las tres redes. Básicamente, fue mi ingenua
+idea de que podía simplemente en un primer intento conseguir lo que quería de
+estas redes, obviamente requirieron varios intentos.
+
+.) DinaReg:
+------------
+Acá hay unas pocas simulaciones hechas en todas las redes estáticas.
+La cosa era armar unos pocos datos para poder manualmente seleccionar
+los gráficos a armar y cómo orientarlos. Incluso fue al pedo armar estos
+datos para las tres redes, terminé usando los gráficos de Erdos-Renyi.
+Todos los datos están hechos con grado medio 8.
+
+.) Erdos-Renyi:
+---------------
+Acá guardé en un principio los datos que iba armando de la red de Erdos-Renyi.
+Esto contiene datos de todos los grados medios. Dejé de usarlo cuando empecé a pasar
+a otras etapas que involucraban a las tres redes. Básicamente, fue mi ingenua
+idea de que podía simplemente en un primer intento conseguir lo que quería de
+estas redes, obviamente requirieron varios intentos.
+
+.) ERZoom:
+-----------
+Acá hice un barrido muy fino en una red de Erdos-Renyi en una región de alfa
+entre 0,1 y 0,2. No recuerdo porqué quería armar semejante barrido. 
+¿Era para probar el armado de los gráficos de Distribución de Opiniones y su
+posible uso como método de catalogar estados finales? Muy posiblemente.
+
+.) NCC:
+-------
+Esta carpeta contiene datos de las tres redes con los cuatro grados medios
+cada una. La cosa es que este es el barrido fino en la región cerca de
+la zona de transición de las tres redes, una región variable para cada
+grado medio y cada red. Al final, quedaron bien sólo los gráficos de
+grado medio 12 y 16, así que esos fueron los que mostramos.
+
+.) Programas:
+--------------
+Esta carpeta contiene los archivos de Python que usé para analizar las redes
+estáticas, estos archivos son los que grafican las TdO, gráficos de
+variación, Distribución de Opiniones, mapas de colores, Dinámica en regiones
+y seguro algo más. También contiene dos carpetas con los Excel en los cuales
+me encargué de estiquetar manualmente los estados finales de los sistemas 
+de las redes estáticas en versión general y en NCC.
+
+.) RandomRegulars:
+------------------
+Acá guardé en un principio los datos que iba armando de la red de Random Regulars.
+Esto contiene datos de todos los grados medios. Dejé de usarlo cuando empecé a pasar
+a otras etapas que involucraban a las tres redes. Básicamente, fue mi ingenua
+idea de que podía simplemente en un primer intento conseguir lo que quería de
+estas redes, obviamente requirieron varios intentos.
+
+.) RevisiónNCC:
+---------------
+La verdad no estoy seguro de qué archivos van acá. No recuerdo qué fue
+la revisión de NCC, pero te puedo asegurar que esto tiene datos de
+las tres redes en grados medios 8 y 12. Quizás en Progreso esté
+anotado qué fue lo que quise hacer acá.

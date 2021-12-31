@@ -307,4 +307,28 @@ extra = 15.
  Además lo último que probamos con este programa es que la red se recreara cada
 5 tiempos discretos en vez de cada uno, pero eso tampoco logró resolver el problema.
 
+------------------------------------------------------------------------------------------
 
+31/12/2021
+
+Voy a empezar organizando las carpetas para poder preparar los archivos
+necesarios para las simulaciones de los gráficos finales. Lo primero es cambiarle
+el nomrbe a la carpeta "Actual". El programa de esa carpeta lo que hace
+es rearmar la red de Actividad en cada iteración y correr el programa por 5000
+iteraciones. Podríamos llamarlo "Rearmado Constante Actividad".
+
+Ahora, lo siguiente es guardar el código que se encuentra en este momento dentro
+de src. Este código me arma las redes de Actividades a partir de ir acumulándolas
+y cortando el proceso en cuanto se confirma que la red construida es conexa.
+Llamémoslo "Actividades Conexas". El código arma dos archivos, uno de Datos_Opiniones
+donde guarda el Estado Inicial de la Matriz de Opiniones, La Variación promedio,
+el Estado Final de la Matriz de Opiniones, el Grado de los agentes, la Actividad
+de los agentes y la semilla de la simulación.
+El segundo archivo, Datos_Testigos guarda la Actividad de los agentes (Dos veces porque
+me confundí) y las opiniones de los testigos en la evolución del sistema.
+Para armar ciertos gráficos me hizo falta el armar unos archivos extra que son
+Evolución_Sistema, en los cuales guardo las opiniones de todos los agentes
+en la evolución del sistema.
+Este código funciona como la mayoría, 1000 agentes, 2 tópicos, variando alfa y cos(delta).
+Agrega una nueva capa a la red en cada paso discreto, funciona con homofilia
+y creo que nada más especialmente llamativo.
