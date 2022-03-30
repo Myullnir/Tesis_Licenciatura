@@ -15,11 +15,11 @@ if [ -z $decision ]
 then
 	for N in 1000
 	do
-		for iteracion in {0..14}
+		for iteracion in {0..4}
 		do
 			# Alfa=$2
 			# while [ $Alfa -le $3 ]
-			for Alfa in 80
+			for Alfa in 5
 			do
 				for Cdelta in 5
 				do

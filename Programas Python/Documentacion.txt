@@ -76,3 +76,102 @@ y para cada grado medio.
 Esta carpeta no me acuerdo qué tenía o porqué. Obvio que está vacía.
 Supongo que servía para guardar los primeros datos que construí
 con una red de Erdos-Renyi, luego de la interacción de Pares.
+
+.) ActAcumulada.py:
+------------------
+Este archivo arma un gráfico de distribución de actividades para una red
+acumulada de actividad. Creo que esto lo usé para el archivo ese en el
+que únicamente construí una red acumulada.
+
+.) ActividadConexa.py:
+----------------------
+Este archivo arma todos los gráficos necesarios para las redes de
+actividad conexas. Arma los colormaps, los gráficos de distribución.
+Este junta todo lo necesario.
+
+.) Análisis Datos.ipynb:
+------------------------
+Archivo armado por las notebooks
+
+.) Análisis Datos.py:
+---------------------
+Este es el archivo .py que es la transcripción del archivo de notebook
+de Python.
+
+.) Caracterización Transición.py:
+----------------------------------
+Este archivo es el primero de los que armé en los que únicamente armaba
+gráficos para medir la región de transición. Mirá si es viejo que esto
+levanta datos de la carpeta ER2.
+
+.) DinaRegRA.py:
+----------------
+Este es el archivo que arma los gráficos de Dinámica en las regiones
+para redes de actividad. Asumo que para las redes conexas. Los
+gráficos son trayectorias de opiniones y variación de la opinión
+en función del tiempo.
+
+.) EstadosFinalesRA.py:
+-----------------------
+Este archivo arma los gráficos de mapas de colores de estados finales
+para Redes de actividad. Esto es para redes conexas.
+
+.) Grados y Actividades.py:
+---------------------------
+Este archivo arma los gráficos de distribución de grado y de actividad
+de las redes de actividad. Los armé para saber si la distribución
+de actividad y de grado era la esperada.
+
+.) Grafico Fases.csv:
+---------------------
+Este es un csv con los números indicativos si en ese punto el sistema se
+encuentra en estado de Consenso, Polarización o estado ideológico.
+También están marcados los estados de transición. No tengo idea de
+a qué gráfico hace referencia esto.
+
+.) Graficos_Finales.py:
+-----------------------
+Este es el archivo que armé en las últimas semanas para armar los
+gráficos específicos que iban haciendo falta. Por eso es un archivo
+tan largo, porque fui agregando muchas secciones diferentes de forma
+modular y repitiendo código.
+
+.) GraficosAcRedes.py:
+----------------------
+Este archivo creo que arma gráficos para las redes de actividad
+básica, la de Baumann.
+
+.) GraficosActConexa.py:
+------------------------
+Este archivo arma los gráficos para las redes de actividad conexa,
+los mapas de colores y los cuadros de las distribuciones de opiniones
+
+.) Histograma_Ciclos:
+---------------------
+Este es un archivo creo que de la cantidad de ciclos que tardaba en
+realizar una cierta operación el programa para poder medir si valía la
+pena pasar a usar un archivo de interpolación de la tanh.
+
+.) Profunc.ipynb:
+-----------------
+Es el archivo de python Notebook.
+
+.) Python from Luke to Yoda.ipynb:
+----------------------------------
+Es el archivo de python Notebook.
+
+.) Readme.md:
+-------------
+Esto es simplemente un archivo que viene del Github.
+
+.) TablaTdO.py:
+---------------
+Este es un archivo para armar las tablas de trayectorias de opiniones.
+Eso lo hice en las redes de ER2, así que esto es re viejo.
+
+.) TdO_Actividad.py:
+--------------------
+Este archivo lo usé para ir armando gráficos de los distintos datos
+armados para las distintas redes de actividad. Es decir, lo usé para
+armar los mapas de colores de Actividad Reversión, Regact, HomofiliaCero,
+TiempoExtra y RCC.

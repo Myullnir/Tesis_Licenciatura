@@ -1,0 +1,68 @@
+Acá voy a anotar de qué son los datos de cada una de las carpetas.
+
+.) Anomalia:
+------------
+Acá puse gráficos de las tres redes estáticas con grado medio 4. La idea era revisar
+por qué motivo la Dispersión de los tiempos de simulación daba tan mal en los casos
+de grado medio bajo de las redes. Honestamente, no pudimos descubrir motivo, simplemente
+pasaba. Lo importante es que descartamos el que sea un artefacto. Los gráficos son
+gráficos de variación promedio en función del tiempo de simulación. Son gráficos
+de tablas.
+
+.) Barabasi:
+------------
+Está documentada en su interior bien en detalle.
+
+.) DinaReg:
+------------
+Hice gráficos del comportamiento del sistema para las tres redes en las distintas
+regiones. En especial me concentré en lso gráficos de la red de Erdos-Renyi, los otros
+fueron unos gráficos iniciales que no trabajé demasiado.
+
+.) Erdos-Renyi:
+---------------
+Está muy bien documentado en su interior.
+
+.) ERZoom:
+-----------
+Tiene dos gráficos chotos, ni importa
+
+.) NCC:
+-------
+Esta carpeta contiene datos de las tres redes con los cuatro grados medios
+cada una. La cosa es que este es el barrido fino en la región cerca de
+la zona de transición de las tres redes, una región variable para cada
+grado medio y cada red. Al final, quedaron bien sólo los gráficos de
+grado medio 12 y 16, así que esos fueron los que mostramos.
+Los gráficos son las distribuciones 2D, los mapas de colores y distribuciones
+de opiniones.
+
+.) NuevaD:
+----------
+No recuerdo qué es esto. Tiene gráficos de distribuciones 2D, distribuciones
+de opiniones y mapas de colores. Creo que en Progreso está anotado qué es esto.
+No me parece que sea muy importante, me parece que fue para revisar algo
+que al final no quedó
+
+.) Oporto:
+----------
+Esta carpeta contiene los gráficos que fui armando en la pc remota de Oporto.
+Ahí hice los gráficos finales de los mapas de colroes, las distirbuciones de
+opiniones e incluso los gráficos de la variación del tamaño de la región de
+transición en función del K del sistema. Estos gráficos son importantes,
+bastante los laburamos.
+
+
+.) RandomRegulars:
+------------------
+Está muy bien documentado en su interior.
+
+.) RevisiónNCC:
+---------------
+La verdad no estoy seguro de qué archivos van acá. No recuerdo qué fue
+la revisión de NCC, pero te puedo asegurar que esto tiene datos de
+las tres redes en grados medios 8 y 12. Quizás en Progreso esté
+anotado qué fue lo que quise hacer acá.
+Los gráficos de acá son algunas distribuciones de opiniones, algunos mapas
+de colores, varianzas y algo más. No le daría mucha bola, no creo que
+haya servido de mucho esto.

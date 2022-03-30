@@ -317,8 +317,10 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
     # de Evolución Sistemas con los de Datos Opiniones.
     #--------------------------------------------------------------------------------------------
     
-    AlfaV = 0
+    AlfaV = 0.5
     CdeltaV = 0
+    
+    Graficar =[0,2,9,8]
     
 
     for AGENTES in [1000]:
@@ -327,6 +329,7 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
             Conjunto_Alfa.sort()
             
             OpiMaxima = 0
+            
             for ALFA in Conjunto_Alfa:
                 Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][ALFA].keys())
                 Conjunto_Cdelta.sort()
@@ -350,7 +353,7 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                                 
                                 #----------------------------------------------------------------
                                 
-            """                    
+            
             # Abro el gráfico de las TdO
             plt.rcParams.update({'font.size': 24})
             plt.figure("Topico",figsize=(20,15))
@@ -359,7 +362,7 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
             plt.ylim(-OpiMaxima,OpiMaxima)
             plt.grid()
             
-            print("Arme el primero")
+            
             
             # Abro el gráfico de los Tópicos vs Tiempo
             plt.rcParams.update({'font.size': 24})
@@ -369,9 +372,8 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
             plt.xlim(-OpiMaxima,OpiMaxima)
             plt.ylim(-OpiMaxima,OpiMaxima)
             
-            print("Arme el segundo")
-
             """
+
             
             # Abro el gráfico de Histogramas 2D
             plt.rcParams.update({'font.size': 24})
@@ -380,13 +382,13 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
             plt.ylabel(r"$x^2$")
             plt.xlim(-OpiMaxima,OpiMaxima)
             plt.ylim(-OpiMaxima,OpiMaxima)
-            
+            """
             
             for ALFA in Conjunto_Alfa:
                 Conjunto_Cdelta = list(SuperDiccionario[REDES][AGENTES][GM][ALFA].keys())
                 Conjunto_Cdelta.sort()
                 for CDELTA in Conjunto_Cdelta:
-                    OpinionesFinales = np.array([])
+#                    OpinionesFinales = np.array([])
                     
                     if ALFA == AlfaV and CDELTA == CdeltaV:
                         
@@ -395,24 +397,24 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                             if nombre.split("_")[1] == "Sistema":
                                 
                                 repeticion = int(nombre.split("_")[7].split("=")[1])
-                                if repeticion in [4]:
+                                if repeticion in Graficar:
                                 
                                     Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
                                     
                                     Opi = Datos[1::] # Lista con los datos de las opiniones
-#                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
-#                                    
-#                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
-#                                        ArrayOpi[i] = fila[1::]
+                                    ArrayOpi = np.zeros((len(Datos)-1,len(Datos[1])-1))
+                                    
+                                    for fila,i in zip(Datos[1::],np.arange(len(Datos[1::]))):
+                                        ArrayOpi[i] = fila[1::]
                                         
                                     # De esta manera tengo mi array que me guarda los datos de los
                                     # agentes a lo largo de la evolución del sistema.
                                     
                                     # Levanto las opiniones finales para graficar los histogramas 2D
-                                    OpinionesFinales = np.concatenate((OpinionesFinales,np.array([float(x) for x in Opi[len(Opi)-1][1::]])), axis=None)
+#                                    OpinionesFinales = np.concatenate((OpinionesFinales,np.array([float(x) for x in Opi[len(Opi)-1][1::]])), axis=None)
                                     
                                     #----------------------------------------------------------------
-                                    """
+                                    
                                     # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
                                     # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
                                     # que estuve viendo en los archivos de Actividades
@@ -421,9 +423,9 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                                                                         
                                     plt.figure("Topico")
                                     
-                                    X = np.arange((len(Datos)-1))*0.01
-                                    for sujeto in range(5):
-                                        plt.plot(X,ArrayOpi[:,sujeto*50], color="gray", linewidth = 3)
+                                    X = np.arange(ArrayOpi.shape[0])*0.01
+                                    for sujeto in range(200):
+                                        plt.plot(X,ArrayOpi[:,sujeto*4], color="gray", linewidth = 1, alpha = 0.5)
 
                                     #-----------------------------------------------------------------------------
                                     
@@ -432,17 +434,17 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                                     
                                     plt.figure("Trayectoria Opiniones")
                                     
-                                    for sujeto in range(200):
-                                        plt.plot(ArrayOpi[:,0+2*sujeto],ArrayOpi[:,1+2*sujeto], color="gray",linewidth = 2, alpha=0.2)
+                                    for sujeto in range(AGENTES):
+                                        plt.plot(ArrayOpi[:,0+2*sujeto],ArrayOpi[:,1+2*sujeto], color="gray",linewidth = 0.5, alpha=0.3)
                                         
         #                            for x1,x2 in zip(ArrayOpi[ArrayOpi.shape[0]-1][0::2],ArrayOpi[ArrayOpi.shape[0]-1][1::2]):
         #                                indice = Indice_Color(np.array([x1,x2]),Divisiones)
         #                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
                                         
         #                            plt.legend()
-                                    """
-                                    #-----------------------------------------------------------------------------------------------
                                     
+                                    #-----------------------------------------------------------------------------------------------
+                                    """
                                     # Acá armo los gráficos de histogramas 2D.
                                     
                                     plt.figure("Histograma 2D")
@@ -455,18 +457,18 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
 #                                    plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/H2D_alfa={:.3f}_Cdelta={:.2f}_C2.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
                                     plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/H2DCon0.png".format(REDES),bbox_inches = "tight")
                                     plt.close("Histograma 2D")
-                                    
+                                    """
                                     
                                     #-------------------------------------------------------------------------------------------------
                                     
                                     
-                        """
+                        
                         for nombre in SuperDiccionario[REDES][AGENTES][GM][ALFA][CDELTA]:
                             
                             if nombre.split("_")[1] == "Sistema":
                                 
                                 repeticion = int(nombre.split("_")[7].split("=")[1])
-                                if repeticion in [1,4]:
+                                if repeticion in Graficar:
                                 
                                     Datos = ldata("{}/{}".format(Conjunto_Direcciones[0],nombre))
                                     
@@ -478,69 +480,116 @@ for REDES in ["Erdos-Renyi"]: # ,"RandomRegulars","Barabasi"]:
                                     # De esta manera tengo mi array que me guarda los datos de los
                                     # agentes a lo largo de la evolución del sistema.
                                     
-                                    #----------------------------------------------------------------
-                                
-                                    # Ahora yo voy a querer armar dos gráficos. Uno el que dijo Pablo de la
-                                    # TdO si no me equivoco. El otro el gráfico de la convergencia de Opiniones
-                                    # que estuve viendo en los archivos de Actividades
-                                    
-                                    # Tengo que armar los promedios para graficarlos también
-                                    
-                                    Promedios = np.zeros(ArrayOpi.shape[0])
-                                    
-                                    for indice in range(ArrayOpi.shape[0]):
-                                        Promedios[indice] = np.mean(ArrayOpi[indice][0::2]) # La cosa es promediar sólo la opinión del tópico 0
+                                    #-----------------------------------------------------------------------------
+                
+                                    # Para graficar los Promedios, voy a hacer gráficos de promedios por
+                                    # rama. Ahora, los casos son distintos para Polarización en general y
+                                    # Consenso. Así que voy a hacer una separación según el alfa
                                     
                                     plt.figure("Topico")
                                     
-                                    X = np.arange((len(Datos)-1))*0.01
-                                    plt.plot(X,Promedios, color="red", linewidth = 5)
-        #                            plt.legend()
-        #                            plt.annotate(r"$\alpha$={},cos($\delta$)={},N={}".format(ALFA,CDELTA,AGENTES), xy=(0.5,0.75),xycoords='axes fraction',fontsize=20,bbox=dict(facecolor='White', alpha=0.7))
-
-                                    #-----------------------------------------------------------------------------
+                                    
+                                    if ALFA == 0:
+                                        # En este caso puedo tomar un único Promedio y listo
+                                        
+                                        Promedios = np.zeros(ArrayOpi.shape[0])
+                                        for indice in range(ArrayOpi.shape[0]):
+                                            Promedios[indice] = np.mean(ArrayOpi[indice][0::2]) # La cosa es promediar sólo la opinión del tópico 0
+                                            
+                                        X = np.arange(ArrayOpi.shape[0])*0.01
+                                        plt.plot(X,Promedios, color="green", linewidth = 5)
+                                        
+                                    else:
+                                        # Ahora tengo que armar el caso de Polarizacion
+                                        
+                                        # Establezco unos datos iniciales
+                                        colores = ["green","blue","red","magenta","orange"]
+                                        X = np.arange(ArrayOpi.shape[0])*0.01
+                                        
+                                        # Clasifico los agentes en cuadrantes según sus opiniones finales y después me armo una
+                                        # lista de los cuadrantes observados. Esto es importante porque en descorrelacionada veo
+                                        # 4 cuadrantes, mientras que en ideológico veo sólo 2. Quiero evitar los errores de intentar
+                                        # graficar un array de promedios vacío
+                                        clasificacion = ClasificacionCuadrantes(ArrayOpi[ArrayOpi.shape[0]-1])
+                                        cuadrantes = [int(n) for n in set(clasificacion)]
+                                        
+                                        # Voy a armar promedios para cada rama ignorando los que van al consenso
+                                        for n in cuadrantes:
+                                            if n != 0:
+                                                Promedios = np.zeros(ArrayOpi.shape[0])
+                                                for indice in range(ArrayOpi.shape[0]):
+                                                    Promedios[indice] = np.mean(ArrayOpi[indice][0::2][clasificacion == n]) # La cosa es promediar sólo la opinión del tópico 0 de los sujetos de cada rama
+                                                plt.plot(X,Promedios, color=colores[n], linewidth = 6)
                                     
                                     # Acá debería hacer el otro gráfico, el que me propuso Pablo. Para esto tengo que hacer los viejos y clásicos
                                     # TdO si no me equivoco. Eso no debería tardar mucho.
                                     
+                                    #--------------------------------------------------------------------------------------------------------
+                    
+                                    # Acá armo los promedios para cada rama. Para eso, como ahora estoy en el espacio de tópicos,
+                                    # necesito tomar promedios de ambos tópicos, no de uno solo
+                                    
                                     plt.figure("Trayectoria Opiniones")
-
-
-                                    Promedios0 = np.zeros(ArrayOpi.shape[0])
-                                    Promedios1 = np.zeros(ArrayOpi.shape[0])
                                     
-                                    for indice in range(ArrayOpi.shape[0]):
-                                        Promedios0[indice] = np.mean(ArrayOpi[indice][0::2]) # Acá tomo el promedio de las opiniones en el tópico 0
-                                        Promedios1[indice] = np.mean(ArrayOpi[indice][1::2]) # Acá tomo el promedio de las opiniones en el tópico 1
+                                    if ALFA == 0:
+                                        # En este caso simplemente tomo promedio de todo y fue
                                         
-                                    plt.plot(Promedios0,Promedios1, color="red",linewidth = 5 )
-                                    
-                                    
-        #                            for x1,x2 in zip(ArrayOpi[ArrayOpi.shape[0]-1][0::2],ArrayOpi[ArrayOpi.shape[0]-1][1::2]):
-        #                                indice = Indice_Color(np.array([x1,x2]),Divisiones)
-        #                                plt.plot(x1,x2, "o" ,c = color[indice], markersize=10)
+                                        Promedios0 = np.zeros(ArrayOpi.shape[0])
+                                        Promedios1 = np.zeros(ArrayOpi.shape[0])
                                         
-        #                            plt.legend()
-        
-                                
-                        #-------------------------------------------------------------------------------------------------------------------
+                                        for indice in range(ArrayOpi.shape[0]):
+                                            Promedios0[indice] = np.mean(ArrayOpi[indice][0::2]) # Acá tomo el promedio de las opiniones en el tópico 0
+                                            Promedios1[indice] = np.mean(ArrayOpi[indice][1::2]) # Acá tomo el promedio de las opiniones en el tópico 1
+                                            
+                                        X = np.arange(ArrayOpi.shape[0])*0.01
+                                        plt.plot(Promedios0,Promedios1, color="green",linewidth = 5)
+                                        
+                                    else:
+                                        # Ahora tengo que armar el caso de Polarizacion, tomando promedios de cada una de las ramas.
+                                        
+                                        # Establezco unos datos iniciales
+                                        colores = ["green","blue","red","magenta","orange"]
+                                        X = np.arange(ArrayOpi.shape[0])*0.01
+                                        
+                                        # Establezo el tamaño del gráfico y lo centro
+#                                        plt.ylim(-100,100)
+#                                        plt.xlim(-100,100)
+                                        
+                                        # Clasifico los agentes en cuadrantes según sus opiniones finales y después me armo una
+                                        # lista de los cuadrantes observados. Esto es importante porque en descorrelacionada veo
+                                        # 4 cuadrantes, mientras que en ideológico veo sólo 2. Quiero evitar los errores de intentar
+                                        # graficar un array de promedios vacío
+                                        clasificacion = ClasificacionCuadrantes(ArrayOpi[ArrayOpi.shape[0]-1])
+                                        cuadrantes = [int(n) for n in set(clasificacion)]
+                                        
+                                        # Voy a armar promedios para cada rama ignorando los que van al consenso
+                                        for n in cuadrantes:
+                                            if n != 0:
+                                                Promedios0 = np.zeros(ArrayOpi.shape[0])
+                                                Promedios1 = np.zeros(ArrayOpi.shape[0])
+                                                
+                                                for indice in range(ArrayOpi.shape[0]):
+                                                    Promedios0[indice] = np.mean(ArrayOpi[indice][0::2][clasificacion == n]) # La cosa es promediar sólo la opinión del tópico 0 de los sujetos de cada rama
+                                                    Promedios1[indice] = np.mean(ArrayOpi[indice][1::2][clasificacion == n]) # La cosa es promediar sólo la opinión del tópico 1 de los sujetos de cada rama
+                                                plt.plot(Promedios0,Promedios1, color=colores[n],linewidth = 6)
+                                                
+                        #-------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         
                         # Cierro los gráficos.
             
                         plt.figure("Topico")
-                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
+                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,Graficar[0]),bbox_inches = "tight")
                         plt.close("Topico")
                             
             
             
                         plt.figure("Trayectoria Opiniones")
-                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/TdO_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,repeticion),bbox_inches = "tight")
+                        plt.savefig("../../../Imagenes/Redes Estáticas/DinaReg/{}/TdO_alfa={:.3f}_Cdelta={:.2f}.png".format(REDES,ALFA,CDELTA,Graficar[0]),bbox_inches = "tight")
                         plt.close("Trayectoria Opiniones")
                     
                         # Esto es el gráfico de las líneas grises. Con el nuevo formato de los datos que
                         # guardo, no tengo bien armado el cómo hacer esto por ahora, así que lo dejo desacoplado por
                         # el momento
-            """                  
                     
 Tiempo()
                     

@@ -6343,7 +6343,6 @@ de las opiniones.
 .) Ser más preciso con el lenguaje al comparar cosas.
 .) Buscar literatura de red dinámica y ser un poco más conciso y claro sobre ejemplos de
 redes dinámicas. Usar ejemplos como el del votante de Maxi San Miguel o el de Sasahara.
-.) 
 .) En la introducción del capítulo 3 quizás convenga cortar un poco la intro porque
 hablo de cosas no presentadas todavía.
 .) los estados finales de los ensambles de las simulaciones: NO
@@ -6498,7 +6497,6 @@ que se mostró que no era relevante.
 .) A la hora de armar las conclusiones plantear que vimos los estados radicalizados,
 que no vimos los estados polarizados en Actividad y que lo corregimos con
 Actividad Conexa.
-.) En la parte de dinámica en las regiones, al final va 
 .) La introducción queda para resolver después.
 
 .) Fijate si podés juntar en un gráfico 10 tipos con alta actividad y 10 tipos con
@@ -6554,3 +6552,920 @@ tres de los cinco gráficos que necesito hacer. Es mi plan que además haya un
 nuevo archivo python y una nueva carpeta donde guardar esos datos específicos.
 Aunque quizás no arme el nuevo archivo de Python y reuse lo que ya tengo. Veré.
 Esto de armar gráficos manualmente es un tema en verdad.
+
+---------------------------------------------------------------------------------
+
+01/01/2022
+
+Copié los archivos de Analizando Actividades y sobre eso me voy a
+armar el código que quiero. Necesito armar dos archivos.
+El primero es el de Evolución_Sistema, el cual va a guardar la opinión
+de todos los agentes en cada iteración. El segundo es el de Datos_Opiniones,
+que va a guardar los valores de Actividad de los agentes y la matriz de
+Adyacencia de cada red construída. Momento, también tengo que guardar la 
+Variación Promedio para hacer ese gráfico. Técnicamente lo puedo hacer
+con datos viejos, pero intentemos tener todo junto. El problema es que
+no puedo andar colocando datos constantemente y mezclándolos. Supongo que
+lo más razonable sería guardar tres archivos. Hagmos entonces:
+Evolucion_Sistema, Datos_Adyacencia, Datos_Variacion. El primero tiene
+las opiniones de todos los agentes y las actividades, el segundo las redes 
+de Adyacencia construidas, el tercero las Variaciones Promedio.
+Como tengo las actividades, voy a poder decidir qué sujetos tienen alta actividad
+y graficar de esa manera a 10 sujetos de alta actividad en contraste con 10 de baja
+actividad.
+Como tengo las variaciones Promedio voy a poder graficar la Variación del sistema
+y compararla con la Variación de sistemas de Redes estáticas.
+Como tengo las matrices de Adyacencia y las opiniones, voy a poder armar gráficos de
+snapshots de la red y además pintar los agentes con colores según su opinión.
+
+Bien, la idea es que puedo hacer todos mis gráficos. ¿Queda la duda, el criterio de
+convergencia de las redes Estáticas es efectivamente 0,005? En este caso eso creo
+que no va a ser un problema y lo puedo simplemente buscar después, total las redes
+de actividad NO tienen un criterio de convergencia, de eso se trata.
+
+Voy a armar gráficos en el caso de cos(delta)=0 para alfa chico y para alfa grande.
+La idea es ver que en caso de alfa chico cae a cero el sistema y para alfa grande
+nunca converge a nada.
+
+Todos estos datos los voy a guardar en una carpeta llamada TEFinal, Tiempo Extra
+Final. De paso, quizás haya cosas que modificar en general y demás para ver que
+todo funque perfecto.
+
+Ya preparé el código, debería funcionar correctamente. Después de comer lo pruebo.
+Lo mandé a correr, parece no tener problemas.
+Hagamos los gráficos. El primero entonces es el de las opiniones en función del
+tiempo. Para eso tengo que tomar el archivo de las opiniones, que también tiene 
+las actividades. Busco los agentes con las 10 actividades más altas y los que 
+tengan las 10 actividades más bajas. Grafico sus opiniones respecto el 
+tópico 1 en función del tiempo.
+
+Bien el gráfico 1 pareciera ir bien. Aunque me resulta no tan claro, no coincido
+con que sea mejor para mostrar lo que uno quiere mostrar. Es más, la verdad,
+se ve terrible. Mirando la evolcuión de la opinión de un agente en un tópico en
+función del tiempo, los agentes con baja actividad se polarizan igual o más que 
+los que tienen alta actividad. Rarísimo, porque los de baja actividad tienen prácticamente
+un 1% de chance de activarse, mientras que los que tienen alta actividad tienen un
+80% aprox, no hay forma de que estén polarizados igual cantidad. A menos que la homofilia
+juegue un rol clave haciendo que estos sujetos consigan enlaces de amigos que los
+mantengan en el sube y baja. La verdad, una re decepción el gráfico, cuesta un montón
+entender algo y realmente no ayuda a explicar nada. Veamos si los otros gráficos
+le brindan un poco más de luz al asunto.
+
+El segundo gráfico es el de la variación Promedio donde la comparo con la Variación
+Promedio de redes estáticas. Entonces tengo que sumarle al relevamiento de los nombres
+de archivos, el relevamiento de nombres de archivos de redes estáticas. Hagamos
+esta parte completamente separada de la anterior.
+
+Logré hacer los gráficos, se observan bastante bien, no sé si debería armar algún extra
+para adornar el gráfico. ¿Quizás hacer que el trazo de la red estática no sea línea punteada?
+¿O quizás hacerlo más grueso? La verdad, no sé, pero es un detalle menor. Lo importante
+es que este gráfico está hecho y da muy bien.
+
+-------------------------------------------------------------------------------------------------
+
+02/01/2022
+
+Vamos a armar el código del tercer gráfico. Para eso estamos primero peleando con cargar
+los archivos en Google Colab. Si eso no funca, no sé cómo haré para graficar las redes.
+
+Al carajo con Colab, logré actualizar mi spyder, ahora puedo resolver esto por mi cuenta.
+Creí que los gráficos estaban bien, pero me doy cuenta que me estaba equivocando. Al
+armar el gráfico únicamente a través de los enlaces, estoy ignorando todos los nodos
+desconectados. Por algo todos tenían enlaces. Sólo grafiqué 330 de los 1000. Esto da
+distinto.
+
+Ya corregí eso, los gráficos ahora se ven bien. Tengo un anillo de agentes en el exterior
+todos desconectados y un grupo minoritario en el centro conectado. Además logré que se 
+grafiquen con color según su opinión, lo que lleva a que se observer que la mayoría
+de los que están en el centro están polarizados y la mayoría de los que están en el
+anillo tienen opiniones cercanas a cero.
+
+El siguiente es el gráfico 4, el que me había dicho Sebas para poner. Lo primero a
+hacer es graficar la red conexa, luego veo si puedo pintar los nodos según su
+región. El tema es que mis archivos al respecto no contienen la red de Adyacencia
+conexa obtenida. Es por eso que voy a tener que armarme unas nuevas simulaciones
+primero y usar eso.
+
+Para armar este gráfico sólo necesito la matriz de Adyacencia y las Opiniones Finales,
+el resto no hace falta. Con la matriz de Adyacencia armo la red y con las
+Opiniones Finales asigno los colores de mis agentes según el cuadrante en el que
+están. Aunque la idea era usar un método para detectar comunidades, verdad?
+Veamos primero mi idea, y después vemos de hacer lo que me propuso Sebas.
+El gráfico ya está armado. Ahora probemos lo de colorearlos según su opinión y
+ver si se forman comunidades. Luego vemos lo de colorearlos según algún método de
+comunidad tipo Louvain.
+
+Lo de Louvain no parece tan complejo, si no recuerdo mal Louvain básicamente te
+devuelve un diccionario con los conjuntos. Luego lo que tengo que hacer yo es
+pintar las distintas comunidades y listo. Además, tiene sentido que no las
+pinte como lo otro, siguiendo los colores que estuve "usando antes",
+porque eso era una categorización en función de su opinión final. Louvain
+va a estar mirando modularidad, así que nada que ver.
+
+Armé los gráficos con detección de comunidad por Louvain. En el caso del consenso
+no tiene mucho sentido lo observado, pero en el caso de Polarización, se ve bastante
+claro que se construyen comunidades muy similares a las observadas si simplemente
+los catalogo según cuadrante, lo cual es genial. Estoy dándome cuenta que para esto
+estaría bueno tener un gráfico del caso de Estado Ideológico también.
+Hagamos la simulación. No es igual de necesario para los gráficos de Tiempo Final,
+en esos lo que busco mostrar es que en casos de polarización la red sigue siendo muy
+esparsa y pocos agentes logran que sus opiniones tengan valores que se alejan del
+cero.
+
+Armo la simulación, luego mando a correr los gráficos y por hoy termino con esto.
+Ya mañana preparo los gráficos finales sobre Dinámica en distintas regiones y empiezo 
+a corregir la tesis de arriba para abajo. Luego, cuando llegue al cuarto capítulo
+empezaré a revisar qué gráficos sumo y cuales no.
+
+Después no te olvides, mucho muy importante los últimos comentarios que te hicieron
+sobre el nombre de Sebas, sobre agregarlo en los agradecimientos haciendo mención
+de que oficio como Co-Director y algunas otras cosas que están acá anotadas.
+
+-------------------------------------------------------------------------------------
+
+03/01/2022
+
+Armemos los últimos gráficos. Estos son los de Dinámica en las regiones pero
+tomando promedios de cada una de las ramas y graficando eso en vez del promedio
+total del sistema.
+
+Me voy a armar unas simulaciones nuevas para esto, así me saco de encima algunos
+archivos que no necesito, además de armar simulaciones para alfa = 0, alfa = 0,5
+y cos(delta) = 0 y cos(delta) = 0,5. La cosa es que antes había hecho simulaciones
+para alfa = 0,4 y para evitar que me pregunten por qué en las otras simulaciones
+usé 0,5 y en estas 0,4, lo hago todo igual.
+
+Después posiblemente quiera recordar qué colores usé para cada cuadrante cuando
+coloree los nodos según su cuadrante. Lo que hice fue:
+.) Verde para los que caen al cero.
+.) Azul para primer cuadrante.
+.) Rojo para el segundo.
+.) Magenta para el tercero.
+.) Naranja para el cuarto.
+
+El gráfico de los tópicos en función del tiempo está, quedaría ver que pasa
+con el gráfico de las Trayectorias en el espacio de tópicos. Y creo que
+voy a corregir los gráficos de Dinámica en Regiones de redes estáticas.
+
+Ya los gráficos de TdO están. En principio esto era todo. Hagamos una cosa,
+corregir los de Redes estáticas no es tanto problema, puede quedar para después.
+Arranquemos con el armado de la tesis ahora, y cualquier cosa eso después se
+corrige, no es tan terrible.
+
+Saqué la frase de Lucio. Después veré si hay una frase que tenga ganas de colocar
+o no. Bueno, ya logré que esté la bibliografía y no me tire más error. Roguemos
+que lo próximo que voy a tocar no desmadre todo.
+
+Estuve viendo que cuando la cosa se desmadra, siempre se puede arrancar
+nuevamente modificando algo en el main y desde ahí volver a cambiarlo.
+Es algo así como cuando tenés que borrar los .o de la carpeta de bin para
+que el código en C pueda compilar correctamente. Ok, definitivamente
+no sé que tocar. Es como que el LaTex se preocupa por llenar las hojas y no
+por intentar que las cosas vayan una detrás de la otra. Saqué el fancyheader.
+No sé para qué era, no veo la diferencia. Ya vi, es un tema de que los números de
+página se ubiquen a derecha o izquierda en vez de abajo. Y creo que le pone
+el header con el título de la sección. Está bien, se queda. Igual
+creo que el consenso final es que voy a armar un nuevo LaTex donde voy a ir
+poniendo las cosas por mi mismo de a una y con eso ir viendo si puedo hacer
+que todo quede mejor.
+
+---------------------------------------------------------------------------------
+
+04/01/2022
+
+Voy a arrancar un nuevo Latex en el que ir colocando la Tesis de a poco
+cosa de ver que los errores que estuvo teniendo se solucionen. Esperemos
+que esto funque.
+
+Primero voy a organizar un poco el tema de la tesis. Para eso voy a separar los
+archivos que tengo en carpetas. Haré una carpeta de Labo, otra de E4, una de
+Docencia y una de Trabajos viejos. Organicé todo, ahora se ve todo más prolijo
+y puedo ver lo que estoy usando. Por ahora, mantengamos el Backup de la Tesis.
+Usemos la Plantilla de Referencia y de ahí rearmamos la Tesis de nuevo desde cero.
+Espero que esto quede bien.
+
+Ya configuré el archivo de settings. Ahora copiemos la bibliografía y el main.
+La cosa no compilaba porque no encontraba el \end{document}. Hoy aprendí que
+si vas a compilar con muchos archivos juntos, es necesario definir en el
+menú del LaTex cuál es el archivo principal.
+
+La Carátula está lista.
+
+Mientras corrijo la introducción, estoy viendo que Pablo me corrigió unas
+bibliografías en las que además del nombre del nombre del autor puso
+"y col.". No me mencionó antes que así es como las corrigió, pero asumo
+que así las tengo que corregir. Haremos eso con todas las que tengan más
+de un autor. Revisando, no fue Pablo el que hizo la corrección, el coso
+de las bibliografías hace eso solo con las bibliografías que tienen muchos
+autores. Bueno, entonces eso ya va tranca por si mismo.
+
+Ya rearmé la intro, espero que ahora haya quedado mejor. Algunas partes podrían
+haberse favorecido de utilizar algunas referencias más, pero no quería abusar
+de eso, porque después voy a tener que leerlas todas y no sé si llegaré a hacerlo.
+
+Creo que encontré la solución a los problemas de los espacios en blanco. Es mandar
+el comando \raggedbottom al principio de la hoja y listo. Después, hacete bien el
+boludo con el resto y estamos. Básicamente eso le permite al código el aceptar
+dejar espacio en blanco sabiendo que no puede meter una figura ahí. Al fin
+una respuesta la que lo parió. Si efectivamente ese comando era todo lo que
+necesitaba, vuelvo a copiar lo de la Intro en la Tesis, y continuo trabajando
+desde el archivo original. Total la carátula y lo demás ya estaba corregido
+
+Ya pasé lo de la intro al archivo original, ahora queda continuar las correcciones
+desde ahí. La intro ya está hecha, así que hay que seguir desde el capítulo de Redes.
+
+----------------------------------------------------------------------------------
+
+05/01/2022
+
+Hice la corrección que me dijo Pablo sobre en qué están inspirados o en qué
+se basan los modelos de actividad. Espero que esté bien, aunque no estoy
+muy convencido. El capítulo 2 ya está revisado. Ahora quedan el 3 y el
+4.
+
+En el capítulo 3 llegué hasta la parte de Distintas Soluciones. El objetivo
+es mañana terminar de corregir el 3 y arrancar con el 4. Ojalá todo
+vaya acorde al plan.
+
+-----------------------------------------------------------------------------------
+
+06/01/2022
+
+Llegué hasta los mapas de colores de estados finales. Si me apuro, creo que hoy
+llego hasta la parte de Dinámica en las distintas regiones. Logré terminar la
+parte de los Estados Finales en el Espacio de Parámetros. Mañana arranco
+con la parte de Promedios de las Opiniones en el Espacio de Parámetros.
+
+-----------------------------------------------------------------------------------
+
+07/01/2022
+
+Ya estoy en la parte de Dinámica en las Distintas Regiones, ya casi termino con
+el capítulo 3 de la tesis.
+
+Rearmé el código de DinaReg de redes estáticas para actualizar el formato de los
+colores de los promedios y demás para que sea igual a como lo hago en redes de
+actividad. Por eso me anoto las iteraciones que voy a necesitar graficar
+para los casos de consenso, polarización descorrelacionada y estado ideológico.
+
+consenso: 0
+polarización: 0, 2, 5, 8 y 9
+ideológico: 1 y 4
+
+Listo, ya lo rearmé, se ven bárbaros los gráficos.
+
+----------------------------------------------------------------------------------
+
+08/01/2022
+
+Ninguno de los gráficos de Tópicos en función del tiempo me parecen buenos, realmente
+cuesta mucho sacar alguna conclusión al diferenciar según la actividad. Voy a poner
+el gráfico de iteración 7 en el caso de polarización y esperar a charlar con Pablo
+y Sebas al respecto.
+
+Mañana arranco con la parte de la dinámica de regiones. Iniciamos marcando que con redes
+de actividad se logran los estados de polarización descorrelacionada y estado
+ideológico, mostramos las simulaciones individuales de TdO y Tópicos, mostramos
+la forma de la red en cada uno de los casos, hablamos de la detección de comunidades
+en el sistema y después ya podemos pasar a los datos de los mapas de colores.
+Con eso ya resuelvo todo. Espero. Y el lunes termino de armar las conclusiones
+y los agradecimientos.
+
+Ya está, ya terminé el capítulo 4. Ya mañana puedo arrancar con las conclusiones
+y los agradecimientos y descargar bibliografías a morir.
+
+-----------------------------------------------------------------------------------
+
+10/01/2022
+
+Ya armé la sección de conclusiones y perspectivas. Claramente habrá cosas que modificar,
+pero en dos hojas de texto no puede haber tanto error.
+
+Para los agradecimientos, hagamos notas de a quienes siento que tengo que agradecer:
+.) La UBA
+.) Amigos de la facultad
+.) El grupo de Laboratorio de Sophy
+.) Los caballeros de la Pera
+.) El grupo Menos Peor
+.) Familiares
+.) Pablo y Sebas
+
+Ahora estoy escribiendo las bibliografías. Me voy a hacer una carpeta y un archivo aparte
+para eso. Lo hice, anoté todas las bibliografías en la tesis. Dios santo, eso sí que fue
+un laburo tedioso y molesto. Y mañana tengo que encargarme de descargarlos todos.
+Que poca ganas que dan
+
+------------------------------------------------------------------------------------------
+
+11/01/2022
+
+Ya descargué hasta la cita 40, con una o dos faltantes nomás. Fijate de anotar en la
+bibliografía del Newman el capítulo que estás citando. Y creo que las hojas también.
+
+Bien, ya descargué todos, y creo que corregí todas las citas, aunque debería revisar algunas.
+Por supuesto, queda todavía corregir la del Newman sobre qué capítulo estoy citando.
+
+-----------------------------------------------------------------------------------------
+
+19/01/2022
+
+Una buena parte de las correcciones están ya en el pdf de Sebas y de Pablo.
+
+
+Correcciones de Sebas:
+.) En la parte final de las conclusiones, que no diga que se "plantean
+muchos nuevos caminos", sino que se "plantean nuevos caminos".
+.) Los epígrafes los podría reducir poniendo ídem anterior.
+
+
+Correcciones de Pablo:
+.) En la intro, se puede tomar como referencia un modelo abstracto
+y adaptarlo a sistemas sociales en el cual se interpretan a los agentes
+como átomos y a las opiniones como spines.
+.) En conclusiones, agregar la idea de reformular el modelo como un modelo
+donde las opiniones van de 0 a 1, indicando nada de interés y mucho interés.
+.) Buscar en algún libro de álgebra la relación entre las coordenadas y el
+vector en un espacio no ortogonal. Quizás no es necesario agregar
+algo, pero sí tenerlo claro.
+.) En la parte de aproximación de campo medio aclarar que lo que se estudia
+es la estabilidad del 0 como punto fijo
+.) Armar gráficos de Distribución de Opiniones para cuatro o seis alfas
+de redes de actividad de tiempo extra y conexas
+
+Cosas por hacer en orden de prioridades:
+1) Distribución de Opiniones
+2) Corregir la intro con lo de Seba
+3) Armar el abstract
+
+Ok, para hacer unos estudios tengo datos en las carpetas de TiempoExtra y
+ActividadConexa dentro de DilAct. Puedo simplemente levantar datos de ahí,
+total las carpetas tienen bastantes simulaciones. Con eso, me armo
+los gráficos de Distribuciones y ya de ahí arranco con una primer idea de
+lo que estoy observando y les puedo mandar eso a Sebas y a Pablo.
+
+Momento, para redes de actividad conexas sí tengo armados los gráficos de
+distribución de opiniones. Quizás, sólo quizás, haya que retocarlos,
+pero fuera de eso están bien.
+
+Bien, encontré dos imágenes con estos gráficos. Lo próximo que tengo que hacer
+es conseguir algunos datos más cosa de que el gráfico quede bien armado y
+emprolijarlo un poco. Hecho eso, ya pudo ponerme a corregir las cosas
+segun lo que dijo Seba, y de ahí hacemos la corrección completa de la tesis,
+eliminando mayúsculas y mierda que nada que ver. Esperemos completarla en
+estos días.
+
+Creo que estos gráficos se pueden hacer tranquilamente de 4x4, cosa de observar
+un barrido razonable, pero a la vez que el gráfico se vea. También, se
+pueden poner todos en sharey. Los datos de actividad conexa ya los tengo
+armados, es sólo cuestión de rearmar el gráfico. Los datos de tiempo
+extra diría yo que hacen un barrido bastante razonable también. Creo que
+lo único importante es efectivamente emprolijar el gráfico.
+
+Tendré que decidir si el gráfico de distribución de opiniones de actividad
+conexa queda mejor con o sin sharey.
+
+-----------------------------------------------------------------------------------
+
+20/01/2022
+
+Hablando con Pablo y Sebas, entonces la idea es agregar el gráfico de distribución
+de las opiniones como un gráfico de 4x4, y en el caso del gráfico para redes de
+actividad conexa hacerlo sin sharey para que se observen mejor los picos de distri-
+bución de las zonas de polarización. Aclarar que son ejes en y distintos. Eso
+dijo Pablo, pero creo que va a quedar claro por sí mismo.
+
+También tengo que sumar los gráficos de la evolución de las opiniones en función
+del tiempo en los cuales se observa muy bien que la mayor densidad de opiniones se
+encuentra en la región central, no tanto en los extremos. Con eso reemplazo los
+gráficos de curvas de agentes de mucha actividad y agentes de poca actividad.
+
+Por último, estoy revisando toda la tesis para corregir todos los errores de mayúsculas
+y las cosas que me marcaron Pablo y Sebas en el orden en que aparecen. Ya corregí
+la Intro. Estoy en la parte de redes, llegué a redes random regulars
+
+-------------------------------------------------------------------------------------
+
+21/01/2022
+
+Sigo corrigiendo la tesis, estoy en el capítulo 3. Sobre la corrección de Pablo
+del tema de los vectores en espacios no ortogonales, creo que acordamos no
+hacer una explicación extra, pero sí investigarlo mejor.
+Creo que entiendo lo que pasa y la confusión me parece que surge porque se
+usan dos representaciones diferentes sin diferenciarlas. La primera vez que
+se menciona el vector Xi se lo hace en coordenadas de la base no ortogonal,
+mientras que cuando se muestra al vector como la suma de coordenadas por los
+vectores de la base se está haciendo una representación en la base canónica.
+Luego, el resto del trabajo se hace trabajando sobre la base no ortogonal y
+por tanto se pueden simplemente interpretar las componentes del vector como
+las coordenadas en el espacio. El hecho de que la base sea no ortogonal
+es capturado por la matriz Phi en la definición del producto de vectores,
+además de que en el cálculo de la distancia también surge un término extra
+debido a la no ortogonalidad de los vectores. Por tanto, la no ortogonalidad
+de los vectores está considerada en los cálculos y las opiniones de los agentes
+respecto de los tópicos son a su vez las coordenadas en el espacio T.
+
+------------------------------------------------------------------------------------------
+
+22/01/2022
+
+Bueno, avanzando con la corrección, ya hice hasta el capítulo 4, por lo que sólo
+me faltan las conclusiones y escribir el abstract.
+Ya está todo revisado, ahora queda armar el abstract.
+
+------------------------------------------------------------------------------------------
+
+26/01/2022
+
+El abstract lo armé el 23/01. Preguntarle a Pablo y Sebas sobre el proceso
+de anotarme en SIGEVA correctamente.
+
+--------------------------------------------------------------------------------------------
+
+28/01/2022
+
+Charlar sobre el tema de las coordenadas en la evolución, al principio del
+capítulo 3.
+
+Algunas anotaciones sobre las correcciones:
+.) En EsqueletoTesisLicFavio.docx está el resumen que me pasó Pablo
+para agregar a la tesis, no te olvides.
+.) Revisar mejor los títulos para que la cosa fluya mejor.
+.) La función sigmoidea no es lo que pensaba.
+.) En la sección distintos tipos de soluciones lo llamaríamos: "Estados
+colectivos del sistema". Ahí mencionaríamos los resultados obtenidos con
+un tipo particular de red. Después unas secciones más adelante recordar
+que obtenemos resultados como los ilustrados antes.
+.) En redes dinámicas vuelve a ocurrir lo de que hay simulaciones mostradas,
+pero después viene la implementación numérica.
+.) Armar un ejemplo con vectores en las dos bases.
+
+----------------------------------------------------------------------------------------------
+
+29/01/2022
+
+Estoy corrigiendo las cosas con lo que me dijeron Pablo y Sebas.
+Ya agregué el resumen que me pasó Pablo y también corregí toda la
+Intro. 
+.) Mencionarles a Pablo y Sebas que cambié la referencia al libro del
+Newman. Creo que citar todo el libro por unas páginas no es una manera
+correcta de citar, pero estaría bueno preguntar.
+
+.) Tengo muchas dudas de cómo quedó la parte de redes libres de escala.
+El lunes mandale un mensaje a Sebas para que revise esa parte en específico.
+
+----------------------------------------------------------------------------------------------
+
+30/01/2022
+
+.) Preguntar si la coma en la ecuación 3.1 está bien o si Pablo se refería a otra
+cosa.
+
+.) También preguntar si está bien la descripción de los estados polarizados en 
+la sección de estados colectivos del sistema.
+
+.) En la sección 3.4.1 llamarlo Variación en K me parece raro porque justamente
+uno sólo de los tres gráficos es de variación en K.
+
+Ya terminé el capítulo 3, ahora me queda corregir el 4.
+Me quedé en el capítulo 4 en el tema de que aparece una simulación antes de
+la implementación numérica.
+
+-------------------------------------------------------------------------------------------------
+
+31/01/2022
+
+Ya hice todas las correcciones de nuevo, aunque en el tema de los nombres no tengo
+mucha confianza de que esté bien.
+
+En el capítulo 3 al mostrar los resultados podríamos meter todos en una misma sección
+y cuando llego a la parte de los mapas de colores hacer eso como subsecciones sin número.
+
+-------------------------------------------------------------------------------------------------
+
+04/02/2022
+
+.) Lo del factor de Renormalización para el modelo de actividad revisarlo una
+vez más, pero en principio simplemente tacharlo.
+.) En la corrección de matriz temporal, borrar la dependencia de t.
+.) En la parte de estados colectivos del sistema fijate de aclarar bien que
+los estados de polarización y estados ideológico observados son análogos,
+no son estados reales.
+.) Podríamos llamar a la sección 3.4 Exploración numérica del modelo
+.) Mover la parte de la descripción del algoritmo utilizado para simular
+al principio de la sección 3.4
+.) "Simulamos el modelo utilizando los mismos parámetros que los descriptos
+en 3.4."
+
+---------------------------------------------------------------------------------------------------
+
+05/02/2022
+
+Arranqué a corregir la tesis. Ya revisé el abstract. Era una boludez, son dos alfas nomás.
+La Introducción ya está. El capítulo de Redes también está, falta revisar lo del factor de
+renormalización de redes de actividad. Eso lo miraré cuandoe esté releyendo papers.
+
+Preguntarle a Pablo si la corrección en la parte de Estados colectivos del sistema ahora
+está mejor. Le agregué algo porque modifiqué una frase que me parecía que se repetía.
+
+Llegué hasta la parte de exploración numérica.
+
+------------------------------------------------------------------------------------------------------
+
+07/02/2022
+
+Preguntarle a Pablo si considera mejor poner estados radicalizados o estados polarizados en
+el título de 3.4.1. Preguntar cómo quedaron los cambios en esa sección en general.
+
+Ya terminé la revisión de las correcciones de la tesis.
+
+Agrandar figuras 3.4. Agregar un gráfico que sea en función de K para red libre de escala.
+Mover la parte del criterio de corte para más arriba.
+Decir que voy a estudiar la transición con los parámetros K y grado medio.
+Después estudio los estados colectivos del sistema en función de alfa
+y cos(delta) para distintos grados medios de la red. Vamos a tomarnos un momento
+para revisar la parte sobre cuál es exactamente la región observada y escribirla
+de forma mucho más compacta. Más bien vamos a tomarnos un momento para revisar
+toda la tesis y escribirla de forma más compacta.
+
+------------------------------------------------------------------------------------------------------
+
+08/02/2022
+
+El plan es tener todo corregido para este finde. Y después veremos. Mañana mandaré el
+mail al Instituto del Cálculo y a Guille para ver lo de al fin mandar el mail con la
+nota tipo sobre lo de la materia optativa de Toma de Decisiones.
+
+Por otro lado, creo que puedo tomar los archivos en Algarve y usar eso para hacer las
+simulaciones de los datos que necesitaría para el gráfico la curva del alfa crítico
+en función de K para redes libres de escala. Así que haré eso. Luego haré las
+correcciones que me anoté con Pablo ayer. Eso me tomará entre miércoles y
+jueves. El viernes arrancaré a revisar la tesis, el sábado iré de la abuela y armaré
+un bardo en Twitch y el domingo termino lo de la tesis. Ese es el plan. Y si no termino
+el domingo, el lunes estará terminado.
+
+----------------------------------------------------------------------------------------------------
+
+09/02/2022
+
+Para armar los datos de K en Algarve, tengo que modificar el main para que reciba el K como
+input. Luego, tengo que modificar el lugar al cual envía los datos, para que se guarden
+en la carpeta de Kvariable y tengo que crear la carpeta de Kvariable. No hay miedo de que
+los gráficos que ya hice se pierdan, porque los datos para armar esos gráficos YA están
+todos anotados en el archivo de jupyter notebook de Profunc. Es ahí donde tengo que modificar
+el tamaño de la letra de los gráficos. Entonces con eso me armo mis datos para el Kvariable y
+estoy hecho. Ahora, la gran pregunta es: ¿En qué región de alfa hago las cuentas?
+
+Si uso redes de grado medio 8, el alfa crítico se va a encontrar en 0.125. Como estas son
+redes libres de escala, yo espero que la región de transición se encuentre por debajo
+de la curva del alfa crítico, así que lo mejor será recorrer entre 0 y 0,13 de a
+0,005 de manera de cubrir bien la región. Eso me dejará unos 27 alfas, los cuales
+puedo distribuir en 9 hilos.
+
+El archivo en main parece ser el correcto ya que es el que uso para construir redes estáticas.
+La región en la que voy a revisar los datos parece razonable. No creo que esto pueda salir
+mal. Sólo tengo que ver de no reescribir cosas importantes supongo. De paso,
+los archivos que arma el main tienen el siguiente formato de datos:
+.) Estado inicial de Opiniones
+.) Variación promedio
+.) Estado Final de Opiniones
+.) Semilla
+
+Así que es la fila 5 la que necesito para los datos. Y con eso estaría.
+También necesitaré al final una carpeta para las imágenes.
+
+Orden de trabajo:
+.) Modificar el main.c 	HECHO
+.) Modificar el Instanciar.sh o el Instanciar2.sh  HECHO
+.) Modificar la Metainstanciacion.sh  HECHO
+.) Crear las carpetas de Kvariable  HECHO
+.) Mandar a correr los datos  HECHO
+.) Armar las carpetas para las imágenes  HECHO
+.) Revisar el archivo de python que crea los gráficos de distribución
+de opiniones para el Kvariable  HECHO
+.) Armar los gráficos
+.) Descargar los gráficos a mi pc
+.) Revisar el archivo de jupyter Notebook para rearmar los gráficos
+con letra más grande
+.) Armar el último gráfico
+.) Subir los nuevos gráficos a Overleaf
+.) Organizar los gráficos en un formato de 2x2
+.) Fijarse que el tamaño sea adecuado
+.) Hacer todas las otras correcciones que charlamos con Pablo
+
+Reduzcamos las simulaciones innecesarias. Hagamos simulaciones en las regiones importantes.
+De esa manera puedo recorrer la región más en detalle. Espero no estar cagándola
+K=1: [0.09;0.12]
+K=2: [0.03;0.06]
+K=5: [0;0,03]
+K=10: [0;0,02]
+
+Ya está todo corriendo y también subí el archivo que arma los gráficos de Kvariable.
+Ahora queda esperar que las simulaciones terminen y Dios mediante estén en la región
+correcta
+
+Mientras se terminan las simulaciones de los datos para el gráfico de Kvariable con
+redes libres de escala, estoy arrancando con las correcciones. Ya revisé el abstract.
+En principio ese está bien. Creo que algunas cosas las diría distinto yo, pero en sí
+está bien.
+
+En la Intro, creo que yo sacaría la parte de mecanismos de acumulación de información.
+Luego de leerlo, honestamente no sé qué carajos es. Ya está sacado eso. Corregí
+algunos errores ortográficos o faltas de comas e hice algunas correcciones a algunas
+palabras. La Intro ya está.
+
+----------------------------------------------------------------------------------------
+
+11/02/2022
+
+Ayer terminé de revisar toda la tesis, sólo falta agregar el cuadro del
+comportamiento del sistema en función de K para redes libres de escala.
+
+Obviamente hacer el gráfico no iba a ser tan fácil, debí imaginarlo. Primero,
+parece que está todo desordenado como la concha de su madre. Ahí lo ordené.
+Lo segundo, parece que para K=1 la cosa necesita revisar valores de alfa más
+chicos. No sé si K=2 también, pero K=5 parece estar bien. K=2 también
+está bien, sólo tendría que armar algunos datos extra para K=10
+para que el programa arme los gráficos de ese K bien, y para K=1 porque
+nunca llego a ver la parte del consenso.
+
+Estoy viendo que en el archivo de Jupyter Notebook, en el array de 
+los mínimos puse los máximos y en el de los máximos puse los mínimos.
+¿Cómo no me di cuenta?
+
+-----------------------------------------------------------------------------------------
+
+15/02/2022
+
+Ya ayer les mandé la tesis a los jurados, así que ya está terminada, ya
+está escrita y lista. Ahora queda armar la presentación de la defensa de
+tesis. Entre el calor y cosas, creo que hoy estoy con poca voluntad de
+hacer la presentación. Primero, arranquemos organizando qué voy a poner
+en la tesis. Es decir, armemos dos o tres diapositivas con las cosas
+que tienen que estar y en el orden en que van a ir.
+
+--------------------------------------------------------------------------------------
+
+25/02/2022
+
+Schweizer Sociofísica, Modelos abstractos. Saltos utilizando 
+varias dimensiones y conexión con experimentos.
+La sociofísica y su vínculo con física estadística y dinámica no lineal.
+
+¿Yo qué quiero contar?
+.) Quiero contar que usamos un modelo de opiniones multidimensionales en redes estáticas
+y en redes dinámicas.
+.) En redes estáticas generaba estados de consenso y estados radicalizados.
+.) Además estudiándolo como ensamble de soluciones reproducía distribuciones de
+polarización descorrelacionada y estado ideológico.
+.) En redes dinámicas generaba estados de consenso, polarización y estados ideológicos.
+.) Al usar los mismos parámetros que en el paper no conseguimos resultados.
+.) Modificamos la red y conseguimos resultados y se producían cámaras de eco
+dentro de la red.
+
+Eso es todo.
+
+¿Qué cosas necesito contar para darle sentido a esto?
+.) Mencionar las redes estáticas que usamos.
+.) Describir la red de actividad.
+.) Qué son los estados de polarización e ideológicos.
+.) Supongo que dar un primer contexto sobre sociofísica
+
+Sobre Motivación:
+Discurso de Sociofísica:
+Sociofísica, campo que combina física estadística y dinámica no lineal,
+en sus inicios utilizaba modelos abstractos y teóricos, como el de Galam,
+pero con el surgimiento del Big data, que se refiere a la disponibilidad
+de datos debido al aumento del uso de dispositivos electrónicos,
+(y con el surgimiento de las ciencias sociales de la computación) impulsan
+a la sociofísica a una descripción de los fenómenos sociales con modelos
+basados en datos, con el desarrollo de modelos que incorporen estos datos
+y se conecten con los experimentos. Y en alguna parte mencionar lo de
+pasar del desarrollo de modelos de un sólo tópico a modelos multidimensionales.
+Como el de Axelrod o algún otro.
+
+Al hablar sobre estados ideológicos, plantear esto de que conociendo la opinión
+de una persona usualmente se puede intuir lo que piensa en otro tema. Luego agrego
+lo de Nature Beliefs y por último imágenes de las encuestas.
+
+¿Qué cosas quiero hablar al hablar del modelo?
+.) Las suposiciones en las que se basa
+.) Su ecuación dinámica. Usar las 2 ecuaciones separadas en dos
+Así te ahorrás hablar de la matriz de superposición.
+.) Los estados que genera
+.) La aproximación de campo medio y su resultado
+
+Creo que nada más. Hagámoslo
+
+------------------------------------------------------------------------------------------
+
+26/02/2022
+
+Ya terminé la parte de Presentación del modelo y me gusta cómo quedó.
+Ahora pasemos a la parte de Aplicación del modelo a Redes estáticas.
+
+¿Qué cosas quiero contar en esta parte?
+.) Lo que vimos en los gráficos de estados finales en el espacio
+de parámetros y el de entropía en el espacio de parámetros.
+No mostraré esto para todos los grados medios, sino para un sólo grado
+medio, el grado medio 12 o 16 seguro.
+.) El zoom en la región de transición.
+.) Dinámica en las distintas regiones
+
+¿Qué cosas necesito mencionar para que tenga sentido?
+.) Las redes utilizadas
+.) El criterio para identificar los estados (Ponerlo en apéndice por si preguntan)
+
+Creo que nada más. Hagámoslo
+
+(Creo que parte de lo que está en presentación del modelo
+debería ir en Aplicación del modelo sobre redes estáticas.
+Y quizás habría que cambiar ese título)
+
+-----------------------------------------------------------------------------------------
+
+27/02/2022
+
+Ya armé la parte de aplicación del modelo sobre redes estáticas.
+Me parece que está bien, pero que hay partes de presentación
+del modelo que deberían entrar en esta sección. Por el resto, creo que
+correctamente cubre los temas a tratar y lo que digo está bien,
+necesita una repasada nomás.
+
+Hagamos la sección de aplicación del modelo sobre redes dinámicas
+¿Qué quiero contar?
+.) Usamos el modelo de Baumann y dió mal
+.) Dió mal porque las redes son muy esparsas y el sistema no converge.
+.) Modificamos las redes para que sean conexas y ahora el sistema converge
+.) Se observan estados de polarización y estado ideológico
+.) Esto mostrarlo con las dinámicas y con los gráficos de las redes.
+.) Finalmente, si sobra tiempo, mencionar que se observa un comportamiento
+parecido al estudiar el comportamiento en el espacio de parámetros.
+Y que agregamos una segunda curva de alfa crítico.
+
+¿Qué necesito para contar esto?
+.) Describir redes de actividad. (HECHO)
+.) Homofilia
+
+---------------------------------------------------------------------------------------
+
+28/02/2022
+
+Ya está la parte de Aplicación del modelo sobre redes dinámicas. Me queda sólo
+la parte de motivación y la de Conclusiones. Copio lo que tengo más arriba sobre
+esto.
+
+Sobre Motivación:
+Discurso de Sociofísica:
+Sociofísica, campo que combina física estadística y dinámica no lineal,
+en sus inicios utilizaba modelos abstractos y teóricos, como el de Galam,
+pero con el surgimiento del Big data, que se refiere a la disponibilidad
+de datos debido al aumento del uso de dispositivos electrónicos,
+(y con el surgimiento de las ciencias sociales de la computación) impulsan
+a la sociofísica a una descripción de los fenómenos sociales con modelos
+basados en datos, con el desarrollo de modelos que incorporen estos datos
+y se conecten con los experimentos. Y en alguna parte mencionar lo de
+pasar del desarrollo de modelos de un sólo tópico a modelos multidimensionales.
+Como el de Axelrod o algún otro.
+
+Al hablar sobre estados ideológicos, plantear esto de que conociendo la opinión
+de una persona usualmente se puede intuir lo que piensa en otro tema. Luego agrego
+lo de Nature Beliefs y por último imágenes de las encuestas.
+
+Terminé con la parte de Motivación, como pude. Mañana o el miércoles Pablo
+y Sebas me darán un feedback razonable al respecto. Espero que no sea demasiado
+severo.
+
+¿Qué quiero contar en Conclusiones?
+.) El modelo en redes estáticas genera estados de consenso y radicalización
+.) Mirando las distribuciones de los ensambles de redes estáticas, observamos
+estados de polarización descorrelacionada y estado ideológico.
+.) La exploración del sistema en el espacio de parámetros cumple con lo esperado.
+.) No pudimos reproducir los resultados presentados por Baumann et. al.
+usando sus mismos parámetros
+.) En las redes de actividad se producen estados de polarización y estados ideológicos.
+Estos estados surgen como resultado del mecanismo de homofilia
+
+----------------------------------------------------------------------------------
+
+01/03/2022
+
+.) Entre transparencia 11 y 12 meter alguna cosa sobre el paper de Joaquín.
+.) En diapositiva 21, aclarar que la matriz de adyacencia es la conexión entre
+las redes y el modelo. HECHO
+.) Modificar la parte que dice polarización por estados de radicalización
+correlacionada y radicalización descorrelacionada
+.) Hacer una diapositiva indicando cuáles son los parámetros utilizados
+y mostrando un poco por qué los parámetros relevantes son alfa y delta HECHO
+.) También agregar un gráfico de la dependencia del sistema con
+el K y lo comparamos con el alfa crítico. HECHO
+.) Al terminar redes estáticas, enfatizar que esto es trabajo original.
+.) Al hablar de redes de actividad, colocar una diapositiva más hablando
+de en qué están inspiradas estas redes.
+.) En la diapositiva donde está la red de actividad instantánea con muchos
+nodos en la periferia, explicar por qué algunos nodos en la periferia son
+azules
+.) Al final de redes dinámicas comparar los mapas de colores de redes dinámicas
+con redes estáticas. 
+
+.) En perspectivas, mencionar que una idea que tenemos es que las opiniones
+públicas no están desacopladas de la opinión mediática, y que para eso
+es un interés del grupo el desarrollar un modelo acoplando datos de la agenda mediática,
+mencionar paper de Sebas, y que en este contexto surge la idea de armar un
+modelo acoplando la influencia de la agenda mediática.
+
+.) Al principio, al mencionar sociofísica, mostrar el índice de Castellano y 
+de ahí recuadrar la parte de dinámica de opinión.
+.) Al empezar a hablar de estados macroscópicos en la introducción, cambié
+un poco el texto, lo mismo al empezar a hablar de estados ideológicos.
+.) Al terminar motivación, vincular mejor el modelo de axelrod con el de Baumann
+que es el que usamos.
+.) Tomar un respiro al ir frenando las secciones
+.) Al presentar las ecuaciones dinámicas aclarar bien que es para 2 tópicos.
+.) En los estados colectivos no hablar de redes estáticas sino que el
+modelo genera estos estados. También agregar simbolitos de alfa muy chico
+o alfa muy grande.
+.) En la aproximación de campo medio, agregar algún paso intermedio
+.) Al presentar las redes estáticas, no presentar los tres cartelitos
+sino hacerlo de a uno con la imagen de red correspondiente.
+.) En los mapas de colores, colocar el mapa de la distribución de opiniones,
+mostrar con flechitas cuáles estados son cuales, empezar mostrando un sólo mapa
+de colores y después el resto de los mapas diciendo: Se ve lo mismo
+.) En los gráficos de dinámica, colocar flechas que indiquen la dirección del
+tiempo.
+.) Moví la parte de la dinámica antes de los estados finales. En esa parte también
+poner los simbolitos sobre si los alfas son chicos o grandes.
+.) Las redes libre de escala no tienen un grado medio bien definido.
+Por eso falla la aproximación de campo medio, que involucra explícitamente
+el grado medio.
+.) Al explicar la parte de la entropía, hacer énfasis en que esto no es algo
+mostrado en el paper de Baumann.
+.) Al finalizar la sección de redes, colocar una conclusión parcial
+enfatizando el trabajo hecho.
+.) Iniciando la sección de redes dinámicas, mencionar que el trabajo
+es una reproducción de lo hecho en Baumann
+.) La diapositiva 51 quizás, sólo quizás, queda mejor, más arriba.
+.) Agregar al apéndice algunos gráficos sobre lo estudiado 
+siguiendo el modelo de Baumann
+.) Al decir que pasamos a redes acumuladas y conexas, explicar cómo las armamos.
+.) Agregar después de la diapositiva 50 una mostrando cuándo integro la dinámica
+de opiniones, y que básicamente eso no converge porque voy reseteando la red.
+
+
+(Agrandar los bordes de los gráficos. Si queda tiempo).
+
+--------------------------------------------------------------------------------
+
+02/03/2022
+
+Ayer me dieron bastante para hacer. Anotemos lo importante.
+La idea es tener una versión de la tesis para el mediodía
+
+.) Entre transparencia 11 y 12 meter alguna cosa sobre el paper de Joaquín.
+Esto lo dejaré para lo último, honestamente es un tema el tener leído
+el paper este.
+.) Modificar la parte que dice polarización por estados de radicalización
+correlacionada y radicalización descorrelacionada HECHO
+.) Al hablar de redes de actividad, colocar una diapositiva más hablando
+de en qué están inspiradas estas redes. HECHO
+.) En la diapositiva donde está la red de actividad instantánea con muchos
+nodos en la periferia, explicar por qué algunos nodos en la periferia son
+azules HECHO
+.) Al final de redes dinámicas comparar los mapas de colores de redes dinámicas
+con redes estáticas. HECHO
+.) Al principio, al mencionar sociofísica, mostrar el índice de Castellano y 
+de ahí recuadrar la parte de dinámica de opinión. HECHO
+.) Al empezar a hablar de estados macroscópicos en la introducción, cambié
+un poco el texto, lo mismo al empezar a hablar de estados ideológicos. HECHO
+.) Al terminar motivación, vincular mejor el modelo de axelrod con el de Baumann
+que es el que usamos. HECHO
+.) Al presentar las ecuaciones dinámicas aclarar bien que es para 2 tópicos. HECHO
+.) En los estados colectivos no hablar de redes estáticas sino que el
+modelo genera estos estados. También agregar simbolitos de alfa muy chico
+o alfa muy grande. HECHO
+.) En la aproximación de campo medio, agregar algún paso intermedio HECHO
+.) Al presentar las redes estáticas, no presentar los tres cartelitos
+sino hacerlo de a uno con la imagen de red correspondiente. HECHO
+.) En los mapas de colores, colocar el mapa de la distribución de opiniones,
+mostrar con flechitas cuáles estados son cuales, empezar mostrando un sólo mapa
+de colores y después el resto de los mapas diciendo: Se ve lo mismo HECHO
+.) En los gráficos de dinámica, colocar flechas que indiquen la dirección del
+tiempo. NO HECHO
+.) Moví la parte de la dinámica antes de los estados finales. En esa parte también
+poner los simbolitos sobre si los alfas son chicos o grandes. HECHO
+.) Iniciando la sección de redes dinámicas, mencionar que el trabajo
+es una reproducción de lo hecho en Baumann HECHO
+.) La diapositiva 51 quizás, sólo quizás, queda mejor, más arriba. HECHO
+.) Agregar al apéndice algunos gráficos sobre lo estudiado 
+siguiendo el modelo de Baumann
+.) Al decir que pasamos a redes acumuladas y conexas, explicar cómo las armamos. HECHO
+.) Agregar después de la diapositiva 50 una mostrando cuándo integro la dinámica
+de opiniones, y que básicamente eso no converge porque voy reseteando la red. HECHO
+
+También tengo que mandarle un mail a Silvinia y a Florencia sobre quienes me
+van a acompañar a la tesis.
+
+.) Al terminar redes estáticas, enfatizar que esto es trabajo original.
+Haré esto a lo largo de las diapositivas, me parece que agregar una diapositiva
+sólo para esto es sobrepasarse en la explicación. Quizás puedo aprovechar
+la diapositiva de introducción a la sección de redes dinámicas para
+enfatizar que lo hecho es trabajo original. HECHO

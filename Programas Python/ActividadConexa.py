@@ -427,8 +427,8 @@ for Carpeta in ["ActividadConexa"]:
             
             print("Calculé OpiMaxima")
             Tiempo()
-            """
             
+            """
             for ALFA,ialfa in zip(Conjunto_Alfa,np.arange(len(Conjunto_Alfa))):
                 
                 # Armo mis arrays de Opiniones iniciales y finales
@@ -478,7 +478,7 @@ for Carpeta in ["ActividadConexa"]:
                     Grados = np.array([int(x) for x in Datos[7][1::]])
                     
                     # Levanto los datos de Actividad de los agentes
-                    Actividad = np.array([int(x) for x in Datos[9][1::]])
+                    Actividad = np.array([float(x) for x in Datos[9][1::]])
                     
                     #-----------------------------------------------------------------------------------------------
                     
@@ -524,7 +524,7 @@ for Carpeta in ["ActividadConexa"]:
 
                     #----------------------------------------------------------------------------------------------
                     
-                """
+                
                 # De los archivos de Testigos levanto las opiniones de un grupo de agentes
                 # a lo largo de todo el proceso. Los archivos de Testigos tienen en su fila 1
                 # los valores de actividad de los agentes
@@ -546,7 +546,7 @@ for Carpeta in ["ActividadConexa"]:
                     
                 #----------------------------------------------------------------------------------------------------------------------------------
                     
-                
+                """
                 repeticion = nombre.split("_")[5].split("=")[1]
                 
                 if int(repeticion) in Graficar and ALFA in [0,0.5] and CDELTA in [-0.5,0,0.5]:
@@ -564,7 +564,7 @@ for Carpeta in ["ActividadConexa"]:
                     plt.savefig("../Imagenes/RedAct/{}/Topicos_alfa={:.3f}_Cdelta={:.2f}_N={}_iter={}.png".format(Carpeta,ALFA,CDELTA,AGENTES,repeticion),bbox_inches = "tight")
                     plt.close("Topico")
                     
-                """
+                
                  
                 print("Tengo las opiniones finales alfa={}, Cdelta={}".format(ALFA,CDELTA))
                 Tiempo()
@@ -689,7 +689,7 @@ for Carpeta in ["ActividadConexa"]:
         
         
         #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-         
+        """
         
         # Como una primer medida burda, voy a definir el Gradomedio de la red como
         # el grado medio promediado de todas las redes conexas que se llegaron a crear.
@@ -706,9 +706,13 @@ for Carpeta in ["ActividadConexa"]:
         # reconstrucciones, están promediadas a lo largo de todas las simulaciones.
         
         gradomedio = 2*10*np.mean(ActividadesTotales)*(np.mean(TiemposTotales)/100)
+        
+        print(GM)
+        print(gradomedio)
+        print(np.mean(TiemposTotales))
 
         # Acá termino mi gráfico de Fases, una vez que recorrí todos los Alfa y Cdelta.
-        
+        """
         # Armo mi colormap. Para eso armo una lista con los colores que voy a usar,
         # los cuales son una tuplas de tres elementos que combinan colores en proporción
         # donde el primer número es el color rojo, el segundo el verde y el tercero el azul.
@@ -1001,7 +1005,6 @@ for Carpeta in ["ActividadConexa"]:
             Columnas = [0,1,2,3,4]*6
             Filas = [i for i in range(0,6) for j in range(0,5)]
             
-            """
             # Reinicio la OpiMaxima a 0
             OpiMaxima = 0
             
@@ -1028,7 +1031,7 @@ for Carpeta in ["ActividadConexa"]:
                     # Acá voy armando el cálculo de la OpiMáxima
                     
                     OpiMaxima = max(max(Opi),OpiMaxima)
-            """
+                    
             
             for ALFA,fila,columna in zip(Conjunto_Alfa[0:30],Filas,Columnas):
                 
@@ -1079,7 +1082,7 @@ for Carpeta in ["ActividadConexa"]:
             
             plt.savefig("../Imagenes/RedAct/{}/Conjunto_Hist2D_Cdelta={:.2f}.png".format(Carpeta,CDELTA),bbox_inches = "tight")
             plt.close("ConjuntoHist2D")
-                
+        
         #-----------------------------------------------------------------------------------------------------------
 
         # Acá me armo los gráficos de Conjunto de Distribución de Opinones
@@ -1092,18 +1095,18 @@ for Carpeta in ["ActividadConexa"]:
             
             fig = plt.figure("Distribucion Opiniones",figsize=(64,36))
             
-            gs = fig.add_gridspec(6,5, hspace = 0)
+            gs = fig.add_gridspec(4,4, hspace = 0)
             axs = gs.subplots(sharex=True)
             
             # Alfas_Dist = [Conjunto_Alfa[int(indice*math.floor(len(Conjunto_Alfa)/16))] for indice in range(0,16)]
             
-            Columnas = [0,1,2,3,4]*6
-            Filas = [i for i in range(0,6) for j in range(0,5)]
+            Columnas = [0,1,2,3]*4
+            Filas = [i for i in range(0,4) for j in range(0,4)]
 
             Conjunto_Alfa = list(SuperDiccionario[Carpeta][TIPO][AGENTES][CDELTA].keys())
             Conjunto_Alfa.sort()
             
-            """
+            
             # Reinicio la OpiMaxima a 0
             OpiMaxima = 0
             
@@ -1132,9 +1135,9 @@ for Carpeta in ["ActividadConexa"]:
                     OpiMaxima = max(max(Opi),OpiMaxima)
                     
                     #-----------------------------------------------------------------------------------------------
-            """
             
-            for ALFA,fila,columna in zip(Conjunto_Alfa[0:30],Filas,Columnas):
+            
+            for ALFA,fila,columna in zip(Conjunto_Alfa[0:16],Filas,Columnas):
                 
                 OpinionesFinales = np.array([])
 
@@ -1210,12 +1213,10 @@ for Carpeta in ["ActividadConexa"]:
             plt.savefig("../Imagenes/RedAct/{}/Distribucion_opiniones_Cdelta={:.2f}.png".format(Carpeta,CDELTA),bbox_inches = "tight")
 #                plt.show()
             plt.close("Distribucion Opiniones")
-            
-        print("Ya terminé las distribuciones de opinión")
         
         #--------------------------------------------------------------------------------------------------------
             
-        """
+        
         # Estos son los parámetros que definen el tamaño del gráfico, tamaño de la letra y nombres de
         # los ejes. Luego de eso guardo la figura y la cierro. Esto es para la figura de
         # TdO.

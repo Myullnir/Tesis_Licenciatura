@@ -8,7 +8,7 @@ o sobreescribir otros que ya tenía.
 
 De paso, llamé a la carpeta DilAct por "Dilema de Actividades".
 
-.)Redes Actividad Oporto:
+.) Redes Actividad Oporto:
 --------------------------
 Estos son los archivos que armé usando una distribución aleatoria entre -3 y 3
 y con un armado de 500 veces de la red de Actividad. Esto lo armé en la computadora de
@@ -137,3 +137,21 @@ extra del sistema.
 Acá coloqué algunas pocas simulaciones de redes de actividad, las cuales usé para construir
 mis gráficos de Dinámica en distintas regiones. Los archivos guardan datos de las opiniones
 de todos los agentes a lo largo de la evolución del sistema de principio a fin.
+
+.) TEFinal:
+--------------
+Voy a guardar acá los datos de redes de actividad construidas siguiendo el esquema de
+las de Tiempo Extra, es decir que dejo correr la red un tiempo fijo y luego corto.
+Estos datos los necesito para armar los gráficos finales de la tesis. Necesito armar
+tres archivos para guardar tres cosas importantes que son las matrices de adyacencia
+que voy construyendo, las opiniones de los agentes y la Variación Promedio.
+
+.) ConexaFinal:
+----------------
+Acá voy a colocar datos de redes de actividad que se vayan acumulando hasta volverse
+conexas. Lo separo de los otros datos que tengo de esto porque lo que voy a necesitar
+además es la matriz de Adyacencia, cosa que antes no me guardé. La idea es usar
+eso para graficar la red conexa obtenida. La cosa es que no quiero mezclar esto
+con lo otro para evitar inconvenientes. Pero en definitiva son archivos idénticos
+a los de ActividadConexa, sólo que simularé unos pocos casos específicos y 
+agregaré la matriz de adyacencia a los datos.

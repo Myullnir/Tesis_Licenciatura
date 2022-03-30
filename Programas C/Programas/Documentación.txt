@@ -284,7 +284,7 @@ ver rápido lo que ocurre.
 
 03/11/2021
 
-La carpeta Actividad Acumulada tiene el programa que arma la red de Actividad
+La carpeta "Actividad Acumulada" tiene el programa que arma la red de Actividad
 varias veces y guarda los datos de la matriz de Adyacencia cosa de poder armar la
 red de Actividad Acumulada. Por ahora el archivo arma redes de actividades siguiendo
 los parámetros de la red usada en el paper de Actividad, es decir N=5000, m=5,
@@ -295,7 +295,7 @@ de actividad) La red de Actividad se rearma 500 veces.
 
 14/11/2021
 
-La carpeta Red Acumulada tiene el programa con el cual tenías una red que en cada
+La carpeta "Red Acumulada" tiene el programa con el cual tenías una red que en cada
 tiempo discreto se recalculaba la red acumulándose con la anterior. El objetivo
 de esto era combatir la esparsidad de la red de Actividad y ver si con este
 cambio al mecanismo de Baumann el sistema lograba converger a algún resultado.
@@ -313,7 +313,7 @@ extra = 15.
 
 Voy a empezar organizando las carpetas para poder preparar los archivos
 necesarios para las simulaciones de los gráficos finales. Lo primero es cambiarle
-el nomrbe a la carpeta "Actual". El programa de esa carpeta lo que hace
+el nombre a la carpeta "Actual". El programa de esa carpeta lo que hace
 es rearmar la red de Actividad en cada iteración y correr el programa por 5000
 iteraciones. Podríamos llamarlo "Rearmado Constante Actividad".
 
@@ -332,3 +332,18 @@ en la evolución del sistema.
 Este código funciona como la mayoría, 1000 agentes, 2 tópicos, variando alfa y cos(delta).
 Agrega una nueva capa a la red en cada paso discreto, funciona con homofilia
 y creo que nada más especialmente llamativo.
+
+------------------------------------------------------------------------------------------
+
+02/01/2022
+
+Agregué la carpeta "TEFinal", la cual arma los archivos de simulación que usé para las redes
+de actividad de Tiempo Extra. Estos datos me sirvieron para la tanda final de gráficos que
+quería armar. Me guardo el archivo por si después tengo que corregir algo de esos gráficos
+y la verdad no tengo ganas de rearmar esto una segunda vez. Para qué hacer trabajo innecesario,
+¿verdad?. Bueno, cuestión que con esto me hice dos tandas de datos, una con alfa=0 y otra
+con alfa=0,5. Lo hice para cos(delta) = 0, rearmando las redes 30 veces. Me guardé la evolución
+de las opiniones a lo largo del tiempo, todas las reconstrucciones de la red de Adyacencia
+y la Variación Promedio del sistema. Como estas tres son cosas que van evolucionando en el
+tiempo es que tuve que armarme tres archivos diferentes en los cuales guardar cada uno de
+los datos.

@@ -426,7 +426,7 @@ for AGENTES in [1000]:
         
             # Defino los alfas que voy a usar en el gráfico de Distribución de Opiniones
             
-            plt.rcParams.update({'font.size': 18})
+            plt.rcParams.update({'font.size': 24})
             
             fig = plt.figure("Distribucion Opiniones",figsize=(64,36))
             
